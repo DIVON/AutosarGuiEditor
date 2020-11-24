@@ -63,9 +63,6 @@
     <Reference Include="WindowsBase" />
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
-    <Reference Include="WriteableBitmapEx.Wpf">
-      <HintPath>..\WritableBitmapEx\Build\Debug\WriteableBitmapEx.Wpf.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <ApplicationDefinition Include="App.xaml">
@@ -337,7 +334,12 @@
     <None Include="Images\icons\tree\icon.ico" />
     <Resource Include="AppIcon.ico" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="WriteableBitmapEx\WriteableBitmapEx.Wpf.csproj">
+      <Project>{b0aa6a94-6784-4221-81f0-244a68c374c0}</Project>
+      <Name>WriteableBitmapEx.Wpf</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
