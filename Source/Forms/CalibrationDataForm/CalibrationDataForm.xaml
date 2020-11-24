@@ -1,0 +1,68 @@
+﻿<Window
+    x:Class="AutosarGuiEditor.Source.Forms.CalibrationDataForm.CalibrationDataForm"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    Title="CalibrationDataForm"
+    Width="522"
+    Height="302"
+    MinWidth="680"
+    MinHeight="190">
+    <Grid>
+        <Button
+            Width="137"
+            Margin="10,10,0,0"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Top"
+            Content="Add calibration data" />
+        <DataGrid
+            Margin="10,35,10,10"
+            AutoGenerateColumns="False"
+            BeginningEdit="DataGrid_BeginningEdit"
+            CanUserAddRows="False">
+
+            <DataGrid.Columns>
+                <DataGridTemplateColumn Width="200" Header="Name">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBox
+                                VerticalContentAlignment="Center"
+                                BorderThickness="0"
+                                Text="{Binding Name}"
+                                TextChanged="CDataDescriptionNameTextBox_TextChanged" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+
+                <DataGridTemplateColumn Width="200" Header="Datatype">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Button Click="CDataDefenition_ChangeDatatype_Button_Click" Content="{Binding DataTypeName}" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+
+                <DataGridTemplateColumn Width="200" Header="Value">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBox
+                                VerticalContentAlignment="Center"
+                                BorderThickness="0"
+                                Text="{Binding Name}"
+                                TextChanged="CDataDescriptionNameTextBox_TextChanged" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+
+                <DataGridTemplateColumn Width="50" Header="X">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Button Click="CDataDescription_DeleteButton_Click" Content="x" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+
+            </DataGrid.Columns>
+        </DataGrid>
+
+    </Grid>
+</Window>

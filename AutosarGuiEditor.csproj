@@ -1,0 +1,349 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{C87CB053-50A4-454E-9436-6B0A96AF2FA3}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>AutosarGuiEditor</RootNamespace>
+    <AssemblyName>AutosarGuiEditor</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <WarningLevel>4</WarningLevel>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationManifest>Resources\app.manifest</ApplicationManifest>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>AppIcon.ico</ApplicationIcon>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Ookii.Dialogs.Wpf, Version=1.0.0.0, Culture=neutral, PublicKeyToken=0c15020868fd6249, processorArchitecture=MSIL">
+      <HintPath>packages\Ookii.Dialogs.1.0\lib\net35\Ookii.Dialogs.Wpf.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Xaml">
+      <RequiredTargetFramework>4.0</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="WindowsBase" />
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
+    <Reference Include="WriteableBitmapEx.Wpf">
+      <HintPath>..\WritableBitmapEx\Build\Debug\WriteableBitmapEx.Wpf.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <ApplicationDefinition Include="App.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </ApplicationDefinition>
+    <Compile Include="Settings.cs" />
+    <Compile Include="Source\App\Settings\IniFile.cs" />
+    <Compile Include="Source\App\Settings\SettingsProvider.cs" />
+    <Compile Include="Source\AutosarInterfaces\ClientServer\ClientServerInterface.cs" />
+    <Compile Include="Source\AutosarInterfaces\ClientServer\ClientServerInterfacesList.cs" />
+    <Compile Include="Source\AutosarInterfaces\ClientServer\ClientServerOperation.cs" />
+    <Compile Include="Source\AutosarInterfaces\ClientServer\ClientServerOperationDirectionComboBoxData.cs" />
+    <Compile Include="Source\AutosarInterfaces\ClientServer\ClientServerOperationField.cs" />
+    <Compile Include="Source\AutosarInterfaces\ClientServer\ClientServerOperationList.cs" />
+    <Compile Include="Source\AutosarInterfaces\SenderReceiver\SenderReceiverInterface.cs" />
+    <Compile Include="Source\AutosarInterfaces\SenderReceiver\SenderReceiverInterfaceField.cs" />
+    <Compile Include="Source\AutosarInterfaces\SenderReceiver\SenderReceiverInterfaceFieldsList.cs" />
+    <Compile Include="Source\AutosarInterfaces\SenderReceiver\SenderReceiverInterfacesList.cs" />
+    <Compile Include="Source\Autosar\AutosarApplication.cs" />
+    <Compile Include="Source\Autosar\CDataPool\CDataPool.cs" />
+    <Compile Include="Source\Autosar\OsTasks\OsTask.cs" />
+    <Compile Include="Source\Autosar\OsTasks\OsTasksList.cs" />
+    <Compile Include="Source\Autosar\SystemErrors\SystemErrorObject.cs" />
+    <Compile Include="Source\Autosar\SystemErrors\SystemErrorsList.cs" />
+    <Compile Include="Source\Component\CData\CDataDefaultValue.cs" />
+    <Compile Include="Source\Component\CData\CDataDefaultValuesList.cs" />
+    <Compile Include="Source\Component\CData\CDataDefenition.cs" />
+    <Compile Include="Source\Component\CData\CDataDefenitionList.cs" />
+    <Compile Include="Source\Component\CData\CDataInstance.cs" />
+    <Compile Include="Source\Component\CData\CDataInstancesList.cs" />
+    <Compile Include="Source\Component\ComponentDefenition.cs" />
+    <Compile Include="Source\Component\ComponentDefenitionList.cs" />
+    <Compile Include="Source\Component\Instance\ComponentInstance.cs" />
+    <Compile Include="Source\Component\Instance\ComponentInstancesList.cs" />
+    <Compile Include="Source\Component\PerInstanceMemory\PerInstanceMemoryDefenition.cs" />
+    <Compile Include="Source\Component\PerInstanceMemory\PerInstanceMemoryDefenitionList.cs" />
+    <Compile Include="Source\Component\PerInstanceMemory\PimDefaultValue.cs" />
+    <Compile Include="Source\Component\PerInstanceMemory\PimDefaultValuesList.cs" />
+    <Compile Include="Source\Component\PerInstanceMemory\PimInstance.cs" />
+    <Compile Include="Source\Component\PerInstanceMemory\PimInstancesList.cs" />
+    <Compile Include="Source\Component\PortDefenitions\PortDefenition.cs" />
+    <Compile Include="Source\Component\PortDefenitions\PortDefenitionsList.cs" />
+    <Compile Include="Source\Component\PortDefenitions\PortType.cs" />
+    <Compile Include="Source\Component\Runnables\RunnableDefenition.cs" />
+    <Compile Include="Source\Component\Runnables\RunnableDefenitionsList.cs" />
+    <Compile Include="Source\Component\Runnables\RunnableInstance.cs" />
+    <Compile Include="Source\Component\Runnables\RunnableInstancesList.cs" />
+    <Compile Include="Source\Composition\CompositionInstance.cs" />
+    <Compile Include="Source\Composition\CompositionInstancesList.cs" />
+    <Compile Include="Source\Controllers\AddObjectController.cs" />
+    <Compile Include="Source\Controllers\ChangeViewportScaleController.cs" />
+    <Compile Include="Source\Controllers\ArrayDataTypeController.cs" />
+    <Compile Include="Source\Controllers\ComponentDefenitionController.cs" />
+    <Compile Include="Source\Controllers\ComponentPropertiesController.cs" />
+    <Compile Include="Source\Controllers\CompositionInstanceController.cs" />
+    <Compile Include="Source\Controllers\ConnectionLineController.cs" />
+    <Compile Include="Source\Controllers\MoveObjectsController.cs" />
+    <Compile Include="Source\Controllers\MoveRunnablesToTasksController.cs" />
+    <Compile Include="Source\Controllers\OsTaskEditController.cs" />
+    <Compile Include="Source\DataTypes\ArrayDataType\ArrayDataType.cs" />
+    <Compile Include="Source\DataTypes\ArrayDataType\ArrayDataTypesList.cs" />
+    <Compile Include="Source\DataTypes\PlainDataType.cs" />
+    <Compile Include="Source\Fabrics\OsTaskFabric.cs" />
+    <Compile Include="Source\Fabrics\CDataFabric.cs" />
+    <Compile Include="Source\Fabrics\PimFabric.cs" />
+    <Compile Include="Source\Forms\CalibrationDataForm\CalibrationDataForm.xaml.cs">
+      <DependentUpon>CalibrationDataForm.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Source\Forms\ConsoleForm\ConsoleData.cs" />
+    <Compile Include="Source\Forms\ConsoleForm\ConsoleForm.xaml.cs">
+      <DependentUpon>ConsoleForm.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Source\Interfaces\IAutosarTreeItem.cs" />
+    <Compile Include="Source\Interfaces\IBoundary.cs" />
+    <Compile Include="Source\Interfaces\ISelectable.cs" />
+    <Compile Include="Source\Interfaces\ISpecifiedPortPainter.cs" />
+    <Compile Include="Source\Painters\Boundary\Boundary.cs" />
+    <Compile Include="Source\Painters\PortsPainters\ClientPort.cs" />
+    <Compile Include="Source\Painters\PortsPainters\PortPainter.cs" />
+    <Compile Include="Source\Painters\PortsPainters\PortPaintersList.cs" />
+    <Compile Include="Source\Painters\PortsPainters\ReceiverPort.cs" />
+    <Compile Include="Source\Painters\PortsPainters\RectangleSide.cs" />
+    <Compile Include="Source\Painters\PortsPainters\SenderPort.cs" />
+    <Compile Include="Source\Painters\PortsPainters\EmptyPort.cs" />
+    <Compile Include="Source\Painters\PortsPainters\ServerPort.cs" />
+    <Compile Include="Source\Controllers\ClientServerInterfaceController.cs" />
+    <Compile Include="Source\Controllers\ClientServerInterfaceGridView.cs" />
+    <Compile Include="Source\Controllers\ComplexDataTypeGridViewConverter.cs" />
+    <Compile Include="Source\Controllers\OpenSaveController.cs" />
+    <Compile Include="Source\Controllers\SenderReceiverInterfaceController.cs" />
+    <Compile Include="Source\DataTypes\BaseDataType\BaseDataType.cs" />
+    <Compile Include="Source\Painters\TextPainter.cs" />
+    <Compile Include="Source\RteGenerator\ArrayDataTypeGenerator.cs" />
+    <Compile Include="Source\RteGenerator\BaseDataTypesCodeGenerator.cs" />
+    <Compile Include="Source\DataTypes\BaseDataType\BaseDataTypesList.cs" />
+    <Compile Include="Source\AutosarInterfaces\ClientServer\ClientServerOperationFieldsList.cs" />
+    <Compile Include="Source\DataTypes\ComplexDataType\ComplexDataType.cs" />
+    <Compile Include="Source\DataTypes\ComplexDataType\ComplexDataTypeField.cs" />
+    <Compile Include="Source\DataTypes\ComplexDataType\ComplexDataTypeFieldsList.cs" />
+    <Compile Include="Source\DataTypes\ComplexDataType\ComplexDataTypesList.cs" />
+    <Compile Include="Source\DataTypes\DefaultValuesList.cs" />
+    <Compile Include="Source\DataTypes\Enum\EnumDataType.cs" />
+    <Compile Include="Source\DataTypes\Enum\EnumField.cs" />
+    <Compile Include="Source\DataTypes\Enum\EnumFieldList.cs" />
+    <Compile Include="Source\DataTypes\Enum\EnumsList.cs" />
+    <Compile Include="Source\DataTypes\Enum\EnumsMenu.cs" />
+    <Compile Include="Source\DataTypes\SimpleDataType\SimpleDataType.cs" />
+    <Compile Include="Source\DataTypes\SimpleDataType\SimpleDataTypesList.cs" />
+    <Compile Include="Source\Fabrics\ComponentFabric.cs" />
+    <Compile Include="Source\Fabrics\DataTypeFabric.cs" />
+    <Compile Include="Source\Fabrics\PortConnectionFabric.cs" />
+    <Compile Include="Source\Fabrics\PortsFabric.cs" />
+    <Compile Include="Source\Forms\AddPortForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Source\Forms\AddPortForm.Designer.cs">
+      <DependentUpon>AddPortForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Source\Forms\Controls\AutosarTreeViewControl.cs" />
+    <Compile Include="Source\Forms\Controls\TreeViewImagesConverter.cs" />
+    <Compile Include="Source\Forms\DatatypeForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Source\Forms\DatatypeForm.Designer.cs">
+      <DependentUpon>DatatypeForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Source\Forms\RteGenerationForm\ProjectSettingsForm.xaml.cs">
+      <DependentUpon>ProjectSettingsForm.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Source\Forms\RunnablesOrderForm\RunnablesOrderForm.xaml.cs">
+      <DependentUpon>RunnablesOrderForm.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Source\Forms\SystemErrorsWindow\SystemErrorWindow.xaml.cs">
+      <DependentUpon>SystemErrorWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Source\Forms\ViewControl\SimpleDataTypeViewControl.cs" />
+    <Compile Include="Source\Interfaces\IClickable.cs" />
+    <Compile Include="Source\Interfaces\ICommand.cs" />
+    <Compile Include="Source\Interfaces\IDraw.cs" />
+    <Compile Include="Source\Interfaces\IGuidList.cs" />
+    <Compile Include="Source\Interfaces\IXmlWriteable.cs" />
+    <Compile Include="Source\Menu\AddComponentCommand.cs" />
+    <Compile Include="Source\Menu\AddPortCommand.cs" />
+    <Compile Include="Source\Menu\ComplexDataTypeMenu.cs" />
+    <Compile Include="Source\Menu\CreateComplexDataTypeCommand.cs" />
+    <Compile Include="Source\Menu\CreateSimpleDataTypeCommand.cs" />
+    <Compile Include="Source\Menu\DeleteCommand.cs" />
+    <Compile Include="Source\Menu\GenerateRteCommand.cs" />
+    <Compile Include="Source\Menu\PaintWindowClicker.cs" />
+    <Compile Include="Source\Menu\SimpleDataTypeMenu.cs" />
+    <Compile Include="Source\Painters\ObjectSelectorPainter.cs" />
+    <Compile Include="Source\Painters\PortConnection.cs" />
+    <Compile Include="Source\Painters\PortsConnectionsList.cs" />
+    <Compile Include="Source\Render\AnchorList.cs" />
+    <Compile Include="Source\Render\AnchorPoint.cs" />
+    <Compile Include="Source\Render\IElementWithPorts.cs" />
+    <Compile Include="Source\Render\LineRenderer.cs" />
+    <Compile Include="Source\Render\RenderContext.cs" />
+    <Compile Include="Source\Render\RectanglePainter.cs" />
+    <Compile Include="Source\Render\Painter.cs" />
+    <Compile Include="Source\Render\ResizableRectangleElement.cs" />
+    <Compile Include="Source\Render\Scene.cs" />
+    <Compile Include="Source\RteGenerator\ReturnCodesGenerator.cs" />
+    <Compile Include="Source\RteGenerator\RteComponentGenerator.cs" />
+    <Compile Include="Source\RteGenerator\RteDataTypesGenerator.cs" />
+    <Compile Include="Source\RteGenerator\RteGenerator.cs" />
+    <Compile Include="Source\RteGenerator\RteFunctionsGenerator.cs" />
+    <Compile Include="Source\RteGenerator\RteOs\RteFreeRtosGenerator.cs" />
+    <Compile Include="Source\RteGenerator\RteOs\RteOsInterfaceGenerator.cs" />
+    <Compile Include="Source\RteGenerator\RteSchedulerGenerator.cs" />
+    <Compile Include="Source\RteGenerator\SystemErrorGenerator.cs" />
+    <Compile Include="Source\Interfaces\IGuid.cs" />
+    <Compile Include="Source\RteGenerator\TestEnvironmentGenerator.cs" />
+    <Compile Include="Source\RteGenerator\TestGenerator\TestRteEnvironmentGenerator.cs" />
+    <Compile Include="Source\Tester\ArxmlTester.cs" />
+    <Compile Include="Source\Utility\AllowUpdater.cs" />
+    <Compile Include="Source\Utility\ConsoleWorker.cs" />
+    <Compile Include="Source\Utility\GuidUtils.cs" />
+    <Compile Include="Source\Utility\GuiUtility\TabHiderHelper.cs" />
+    <Compile Include="Source\Utility\MathUtilits.cs" />
+    <Compile Include="Source\Utility\MessageUtilities.cs" />
+    <Compile Include="Source\Utility\NameConvenionControl.cs" />
+    <Compile Include="Source\Utility\RenderUtils.cs" />
+    <Compile Include="Source\Utility\XmlUtilits.cs" />
+    <Page Include="MainWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Compile Include="App.xaml.cs">
+      <DependentUpon>App.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="MainWindow.xaml.cs">
+      <DependentUpon>MainWindow.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+    <Page Include="Source\Forms\CalibrationDataForm\CalibrationDataForm.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Source\Forms\ConsoleForm\ConsoleForm.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Source\Forms\RteGenerationForm\ProjectSettingsForm.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Source\Forms\RunnablesOrderForm\RunnablesOrderForm.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Source\Forms\SystemErrorsWindow\SystemErrorWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Themes\Generic.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Properties\AssemblyInfo.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Source\Forms\AddPortForm.resx">
+      <DependentUpon>AddPortForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <None Include="packages.config" />
+    <None Include="Properties\Settings.settings">
+      <Generator>PublicSettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <AppDesigner Include="Properties\" />
+    <None Include="Resources\app.manifest" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Service References\" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Source\Images\Icon.png" />
+    <EmbeddedResource Include="Source\Forms\DatatypeForm.resx">
+      <DependentUpon>DatatypeForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Source\Images\ClientPort.png" />
+    <Resource Include="Source\Images\ReceiverPort.png" />
+    <Resource Include="Source\Images\ServerPort.png" />
+    <Resource Include="Source\Images\TransmitterPort.png" />
+    <None Include="Images\icons\tree\icon.png" />
+    <None Include="Images\icons\tree\icon.ico" />
+    <Resource Include="AppIcon.ico" />
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

@@ -1,0 +1,1078 @@
+﻿<Window
+    x:Class="AutosarGuiEditor.MainWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:AutosarControllers="clr-namespace:AutosarGuiEditor.Source.Controllers"
+    xmlns:MyNamespace="clr-namespace:AutosarGuiEditor.Source.Forms.Controls"
+    xmlns:local="clr-namespace:WpfTreeView"
+    Title="AUTOSAR Gui Editor"
+    Width="1141.734"
+    Height="774.045"
+    Closing="Window_Closing"
+    Icon="AppIcon.ico"
+    KeyDown="Window_KeyDown"
+    Loaded="Window_Loaded"
+    MouseUp="Window_MouseUp"
+    SizeChanged="Window_SizeChanged"
+    WindowStartupLocation="CenterScreen">
+    <Window.Resources>
+        <AutosarControllers:ClientServerGridViewObjectVisibilityConverter x:Key="ClientServerGridViewObjectVisibilityConverter" />
+        <AutosarControllers:ClientServerGridViewAddButtonVisibilityConverter x:Key="ClientServerGridViewAddButtonVisibilityConverter" />
+        <AutosarControllers:ComplexDataTypeGridViewConverter x:Key="ComplexDataTypeGridViewConverter" />
+        <AutosarControllers:InOutDirectionList x:Key="InOutDirectionList" />
+    </Window.Resources>
+    <Grid
+        Name="MainGrid"
+        Width="Auto"
+        Height="Auto"
+        HorizontalAlignment="Stretch"
+        VerticalAlignment="Stretch"
+        RenderTransformOrigin="0.387,0.507">
+
+
+        <Grid
+            Grid.ColumnSpan="2"
+            Margin="0,0,0,713"
+            VerticalAlignment="Stretch">
+            <Menu
+                Height="18"
+                HorizontalAlignment="Stretch"
+                VerticalAlignment="Top">
+                <MenuItem Header="File">
+                    <MenuItem Click="NewProject_Click" Header="New" />
+                    <Separator />
+                    <MenuItem Click="OpenProject_Click" Header="Open" />
+                    <Separator />
+                    <MenuItem Click="SaveProject_Click" Header="Save" />
+                    <MenuItem Click="SaveAsProject_Click" Header="Save as" />
+                </MenuItem>
+                <MenuItem Header="Project">
+                    <MenuItem Click="ProjectSettings_Click" Header="Settings..." />
+                    <Separator />
+                    <MenuItem Click="GenerateRTE_Click" Header="Generate RTE" />
+                    <MenuItem Click="GenerateTestEnvironment_Click" Header="Generate test environment" />
+                </MenuItem>
+                <MenuItem Header="Insert">
+                    <MenuItem Click="AddComponentDefenitionButton_Click" Header="Component defenition" />
+                    <MenuItem Click="AddCompositionButton_Click" Header="Composition" />
+                    <MenuItem Click="AddConnectionButton_Click" Header="Connection" />
+                    <Separator />
+                    <MenuItem Click="AddEnumDataTypeMenu_Click" Header="Enum" />
+                    <MenuItem Click="AddSimpleDataTypeMenu_Click" Header="Simple data type" />
+                    <MenuItem Click="AddComplexDataTypeMenu_Click" Header="Complex data type" />
+                    <MenuItem Click="AddArrayDataTypeMenu_Click" Header="Array data type" />
+                    <Separator />
+                    <MenuItem Click="AddSenderReceiverMenu_Click" Header="Sender-Receiver interface" />
+                    <MenuItem Click="AddClientServerMenu_Click" Header="Client-Server interface" />
+                </MenuItem>
+                <MenuItem Header="System">
+                    <MenuItem Click="RunnablesOrderMenu_Click" Header="Runnables order" />
+                    <MenuItem Click="SystemErrorsMenu_Click" Header="System errors" />
+                    <MenuItem Click="CheckErrorsMenu_Click" Header="Check errors" />
+                </MenuItem>
+            </Menu>
+        </Grid>
+        <GroupBox
+            x:Name="TreeViewGroupBox"
+            Width="302"
+            Margin="0,22,0,0"
+            HorizontalAlignment="Left"
+            Header="Component Tree view"
+            RenderTransformOrigin="0.5,0.5">
+            <MyNamespace:AutosarTreeViewControl
+                x:Name="AutosarTree"
+                Margin="5,5,5,5"
+                Background="AliceBlue"
+                KeyDown="AutosarTree_KeyDown"
+                PreviewMouseLeftButtonDown="AutosarTree_PreviewMouseLeftButtonDown"
+                SelectedItemChanged="AutosarTree_SelectedItemChanged">
+                <MyNamespace:AutosarTreeViewControl.Resources>
+
+                    <Style TargetType="{x:Type TreeViewItem}">
+                        <Setter Property="HeaderTemplate">
+                            <Setter.Value>
+                                <DataTemplate>
+                                    <StackPanel Orientation="Horizontal">
+                                        <Image
+                                            Width="17"
+                                            Height="17"
+                                            Margin="1"
+                                            Source="{Binding Tag, Converter={x:Static local:TreeViewImagesConverter.Instance}, RelativeSource={RelativeSource AncestorType={x:Type TreeViewItem}, Mode=FindAncestor}}" />
+                                        <TextBlock VerticalAlignment="Center" Text="{Binding}" />
+                                    </StackPanel>
+                                </DataTemplate>
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
+                </MyNamespace:AutosarTreeViewControl.Resources>
+            </MyNamespace:AutosarTreeViewControl>
+        </GroupBox>
+        <TabControl
+            Name="MainTabControl"
+            Margin="307,22,0,0"
+            SelectedIndex="1">
+            <TabItem
+                Name="CompositionTab"
+                Height="24"
+                VerticalAlignment="Top"
+                Background="AliceBlue"
+                Header="Composition">
+                <Grid Background="#FFE5E5E5">
+                    <Image
+                        Name="ViewPortImage"
+                        Margin="0,0,0,22"
+                        AllowDrop="True"
+                        ContextMenuClosing="ViewPortImage_ContextMenuClosing"
+                        ContextMenuOpening="ViewPortImage_ContextMenuOpening"
+                        Drop="ViewPortImage_Drop"
+                        KeyDown="ViewPortImage_KeyDown"
+                        MouseDown="Window_MouseDown"
+                        MouseLeftButtonDown="Viewport_MouseLeftButtonDown"
+                        MouseLeftButtonUp="Viewport_MouseLeftButtonUp"
+                        MouseMove="Viewport_MouseMove"
+                        MouseRightButtonDown="ViewPort_MouseRightButtonDown"
+                        MouseWheel="Viewport_MouseWheel"
+                        RenderOptions.BitmapScalingMode="NearestNeighbor"
+                        SnapsToDevicePixels="True"
+                        Stretch="Fill">
+
+                        <Image.ContextMenu>
+                            <ContextMenu Name="ImageContextMenu">
+                                <MenuItem Click="AddPointToConnectionLineMenu_Click" Header="Add point" />
+                                <MenuItem Click="ConnectionPointMenu_DeleteClick" Header="Delete" />
+                            </ContextMenu>
+
+                        </Image.ContextMenu>
+                    </Image>
+                    <StatusBar Name="statusBar" VerticalAlignment="Bottom">
+                        <StatusBarItem Height="22">
+                            <TextBlock Name="coordText">Coord:</TextBlock>
+                        </StatusBarItem>
+                    </StatusBar>
+                </Grid>
+            </TabItem>
+            <TabItem
+                Name="ComponentDefenitionTab"
+                Header="Component defenition"
+                IsEnabled="False">
+                <Grid Background="#FFE5E5E5">
+                    <Label
+                        Margin="27,26,0,0"
+                        HorizontalAlignment="Left"
+                        VerticalAlignment="Top"
+                        Content="Component name:"
+                        RenderTransformOrigin="0.579,-0.365" />
+                    <TextBox
+                        Name="ComponentDefenitionName_TextBox"
+                        Height="23"
+                        Margin="140,29,10,0"
+                        VerticalAlignment="Top"
+                        VerticalContentAlignment="Center"
+                        Text=""
+                        TextChanged="ComponentNameTextBox_TextChanged"
+                        TextWrapping="Wrap" />
+                    <TabControl Margin="10,115,10,8" SelectedIndex="3">
+                        <TabItem Header="Runnables">
+                            <Grid Background="#FFE5E5E5">
+                                <DataGrid
+                                    x:Name="ComponentRunnables_GridView"
+                                    Margin="10,57,10,10"
+                                    AutoGenerateColumns="False"
+                                    BeginningEdit="ComplexDataType_GridView_BeginningEdit"
+                                    CanUserAddRows="False">
+
+                                    <DataGrid.Columns>
+                                        <DataGridTemplateColumn Width="250" Header="Name">
+                                            <DataGridTemplateColumn.CellTemplate>
+                                                <DataTemplate>
+                                                    <TextBox
+                                                        VerticalContentAlignment="Center"
+                                                        BorderThickness="0"
+                                                        Text="{Binding Name}"
+                                                        TextChanged="ComponentRunnable_FieldName_TextEdit_TextChanged" />
+                                                </DataTemplate>
+                                            </DataGridTemplateColumn.CellTemplate>
+                                        </DataGridTemplateColumn>
+
+                                        <DataGridTemplateColumn Width="100" Header="Period, ms">
+                                            <DataGridTemplateColumn.CellTemplate>
+                                                <DataTemplate>
+                                                    <TextBox
+                                                        VerticalContentAlignment="Center"
+                                                        BorderThickness="0"
+                                                        Text="{Binding PeriodMs}"
+                                                        TextChanged="ComponentGridView_EditFrequency" />
+                                                </DataTemplate>
+                                            </DataGridTemplateColumn.CellTemplate>
+                                        </DataGridTemplateColumn>
+
+                                        <DataGridTemplateColumn Width="50" Header="X">
+                                            <DataGridTemplateColumn.CellTemplate>
+                                                <DataTemplate>
+                                                    <Button Click="ComponentRunnables_DeleteButton_Click" Content="x" />
+                                                </DataTemplate>
+                                            </DataGridTemplateColumn.CellTemplate>
+                                        </DataGridTemplateColumn>
+
+                                    </DataGrid.Columns>
+                                </DataGrid>
+                                <Button
+                                    Width="105"
+                                    Height="25"
+                                    Margin="10,19,0,0"
+                                    HorizontalAlignment="Left"
+                                    VerticalAlignment="Top"
+                                    Click="AddRunnable_ButtonClick"
+                                    Content="Add runnable" />
+                            </Grid>
+                        </TabItem>
+                        <TabItem Header="Ports">
+                            <Grid Background="#FFE5E5E5">
+                                <DataGrid
+                                    x:Name="ComponentPorts_GridView"
+                                    Margin="10,57,10,10"
+                                    AutoGenerateColumns="False"
+                                    BeginningEdit="ComplexDataType_GridView_BeginningEdit"
+                                    CanUserAddRows="False">
+
+                                    <DataGrid.Columns>
+                                        <DataGridTemplateColumn Width="250" Header="Name">
+                                            <DataGridTemplateColumn.CellTemplate>
+                                                <DataTemplate>
+                                                    <TextBox
+                                                        VerticalContentAlignment="Center"
+                                                        BorderThickness="0"
+                                                        Text="{Binding Name}"
+                                                        TextChanged="ComponentPorts_PortName_TextEdit_TextChanged" />
+                                                </DataTemplate>
+                                            </DataGridTemplateColumn.CellTemplate>
+                                        </DataGridTemplateColumn>
+
+                                        <DataGridTemplateColumn Width="200" Header="Interface name">
+                                            <DataGridTemplateColumn.CellTemplate>
+                                                <DataTemplate>
+                                                    <Grid>
+                                                        <TextBox
+                                                            VerticalContentAlignment="Center"
+                                                            BorderThickness="0"
+                                                            Text="{Binding InterfaceName, Mode=OneWay}" />
+                                                        <Button
+                                                            Margin="150,0,0,0"
+                                                            Click="ComponentPorts_SelectInterface_Button_Click"
+                                                            Content="..." />
+                                                    </Grid>
+                                                </DataTemplate>
+                                            </DataGridTemplateColumn.CellTemplate>
+                                        </DataGridTemplateColumn>
+
+                                        <DataGridTemplateColumn Width="80" Header="Type">
+                                            <DataGridTemplateColumn.CellTemplate>
+                                                <DataTemplate>
+                                                    <TextBox
+                                                        VerticalContentAlignment="Center"
+                                                        BorderThickness="0"
+                                                        IsReadOnly="True"
+                                                        Text="{Binding InterfaceType, Mode=OneWay}" />
+                                                </DataTemplate>
+                                            </DataGridTemplateColumn.CellTemplate>
+                                        </DataGridTemplateColumn>
+
+                                        <DataGridTemplateColumn Width="50" Header="     X">
+                                            <DataGridTemplateColumn.CellTemplate>
+                                                <DataTemplate>
+                                                    <Button Click="ComponentPorts_DeleteButton_Click" Content="x" />
+                                                </DataTemplate>
+                                            </DataGridTemplateColumn.CellTemplate>
+                                        </DataGridTemplateColumn>
+
+                                    </DataGrid.Columns>
+                                </DataGrid>
+                                <Button
+                                    Width="105"
+                                    Height="25"
+                                    Margin="10,19,0,0"
+                                    HorizontalAlignment="Left"
+                                    VerticalAlignment="Top"
+                                    Click="AddPortButton_Click"
+                                    Content="Add port" />
+                            </Grid>
+                        </TabItem>
+                        <TabItem Header="Per instance memory">
+                            <Grid Background="#FFE5E5E5">
+                                <DataGrid
+                                    x:Name="PerInstanceDefenition_Grid"
+                                    Margin="10,57,10,10"
+                                    AutoGenerateColumns="False"
+                                    BeginningEdit="ComplexDataType_GridView_BeginningEdit"
+                                    CanUserAddRows="False">
+                                    <DataGrid.Columns>
+                                        <DataGridTemplateColumn Width="200" Header="Name">
+                                            <DataGridTemplateColumn.CellTemplate>
+                                                <DataTemplate>
+                                                    <TextBox
+                                                        VerticalContentAlignment="Center"
+                                                        BorderThickness="0"
+                                                        Text="{Binding Name}"
+                                                        TextChanged="PerInstanceMemoryNameTextBox_TextChanged" />
+                                                </DataTemplate>
+                                            </DataGridTemplateColumn.CellTemplate>
+                                        </DataGridTemplateColumn>
+
+                                        <DataGridTemplateColumn Width="250" Header="Datatype">
+                                            <DataGridTemplateColumn.CellTemplate>
+                                                <DataTemplate>
+                                                    <Button Click="PerInstanceMemoryName_ChangeDatatype_Button_Click" Content="{Binding DataTypeName}" />
+                                                </DataTemplate>
+                                            </DataGridTemplateColumn.CellTemplate>
+                                        </DataGridTemplateColumn>
+
+                                        <DataGridTemplateColumn Width="50" Header="X">
+                                            <DataGridTemplateColumn.CellTemplate>
+                                                <DataTemplate>
+                                                    <Button Click="PerInstanceMemoryName_DeleteButton_Click" Content="x" />
+                                                </DataTemplate>
+                                            </DataGridTemplateColumn.CellTemplate>
+                                        </DataGridTemplateColumn>
+
+                                    </DataGrid.Columns>
+                                </DataGrid>
+                                <Button
+                                    Name="AddPerInstanceDefenition_Button"
+                                    Width="203"
+                                    Height="25"
+                                    Margin="10,19,0,0"
+                                    HorizontalAlignment="Left"
+                                    VerticalAlignment="Top"
+                                    Content="Add PerInstance field" />
+                            </Grid>
+                        </TabItem>
+                        <TabItem Header="CData">
+                            <Grid Background="#FFE5E5E5">
+                                <DataGrid
+                                    x:Name="CDataDescription_Grid"
+                                    Margin="10,57,10,10"
+                                    AutoGenerateColumns="False"
+                                    BeginningEdit="ComplexDataType_GridView_BeginningEdit"
+                                    CanUserAddRows="False">
+                                    <DataGrid.Columns>
+                                        <DataGridTemplateColumn Width="200" Header="Name">
+                                            <DataGridTemplateColumn.CellTemplate>
+                                                <DataTemplate>
+                                                    <TextBox
+                                                        VerticalContentAlignment="Center"
+                                                        BorderThickness="0"
+                                                        Text="{Binding Name}"
+                                                        TextChanged="CDataDescriptionNameTextBox_TextChanged" />
+                                                </DataTemplate>
+                                            </DataGridTemplateColumn.CellTemplate>
+                                        </DataGridTemplateColumn>
+
+                                        <DataGridTemplateColumn Width="250" Header="Datatype">
+                                            <DataGridTemplateColumn.CellTemplate>
+                                                <DataTemplate>
+                                                    <Button Click="CDataDefenition_ChangeDatatype_Button_Click" Content="{Binding DataTypeName}" />
+                                                </DataTemplate>
+                                            </DataGridTemplateColumn.CellTemplate>
+                                        </DataGridTemplateColumn>
+
+                                        <DataGridTemplateColumn Width="50" Header="X">
+                                            <DataGridTemplateColumn.CellTemplate>
+                                                <DataTemplate>
+                                                    <Button Click="CDataDescription_DeleteButton_Click" Content="x" />
+                                                </DataTemplate>
+                                            </DataGridTemplateColumn.CellTemplate>
+                                        </DataGridTemplateColumn>
+
+                                    </DataGrid.Columns>
+                                </DataGrid>
+                                <Button
+                                    x:Name="AddCDataDescription_Button"
+                                    Width="203"
+                                    Height="25"
+                                    Margin="10,19,0,0"
+                                    HorizontalAlignment="Left"
+                                    VerticalAlignment="Top"
+                                    Content="Add configuration data" />
+                            </Grid>
+                        </TabItem>
+
+                    </TabControl>
+                    <CheckBox
+                        Name="MultipleInstantiation_CheckBox"
+                        Width="196"
+                        Margin="27,69,0,0"
+                        HorizontalAlignment="Left"
+                        VerticalAlignment="Top"
+                        Content="Multiple instantiation" />
+                </Grid>
+            </TabItem>
+            <TabItem
+                Name="SimpleDataTypeTab"
+                Header="Simple data type"
+                IsEnabled="False">
+                <Grid Background="#FFE5E5E5">
+                    <Button
+                        Name="SimpleDataTypeMenu_ApplyButton"
+                        Width="75"
+                        Margin="329,202,0,0"
+                        HorizontalAlignment="Left"
+                        VerticalAlignment="Top"
+                        Content="Update" />
+                    <Label
+                        Margin="26,27,0,0"
+                        HorizontalAlignment="Left"
+                        VerticalAlignment="Top"
+                        Content="Datatype name:" />
+                    <TextBox
+                        Name="SimpleDataTypeMenu_NameTextBox"
+                        Width="280"
+                        Height="23"
+                        Margin="124,27,0,0"
+                        HorizontalAlignment="Left"
+                        VerticalAlignment="Top"
+                        VerticalContentAlignment="Center"
+                        Text=""
+                        TextWrapping="Wrap" />
+                    <Label
+                        Margin="55,116,0,0"
+                        HorizontalAlignment="Left"
+                        VerticalAlignment="Top"
+                        Content="Min value:" />
+                    <TextBox
+                        Name="SimpleDataTypeMenu_MinValueTextBox"
+                        Width="280"
+                        Height="23"
+                        Margin="124,116,0,0"
+                        HorizontalAlignment="Left"
+                        VerticalAlignment="Top"
+                        VerticalContentAlignment="Center"
+                        Text=""
+                        TextWrapping="Wrap" />
+                    <Label
+                        Margin="53,157,0,0"
+                        HorizontalAlignment="Left"
+                        VerticalAlignment="Top"
+                        Content="Max value:" />
+                    <TextBox
+                        Name="SimpleDataTypeMenu_MaxValueTextBox"
+                        Width="280"
+                        Height="23"
+                        Margin="124,157,0,0"
+                        HorizontalAlignment="Left"
+                        VerticalAlignment="Top"
+                        VerticalContentAlignment="Center"
+                        Text=""
+                        TextWrapping="Wrap" />
+                    <ComboBox
+                        Name="SimpleDataTypeMenu_DataTypeComboBox"
+                        Width="280"
+                        Margin="124,72,0,0"
+                        HorizontalAlignment="Left"
+                        VerticalAlignment="Top" />
+                    <Label
+                        Margin="55,71,0,0"
+                        HorizontalAlignment="Left"
+                        VerticalAlignment="Top"
+                        Content="Base type:" />
+                </Grid>
+            </TabItem>
+            <TabItem
+                Name="ArrayDataTypeTab"
+                Header="Array data type"
+                IsEnabled="False">
+                <Grid Background="#FFE5E5E5">
+                    <Label
+                        Margin="26,27,0,0"
+                        HorizontalAlignment="Left"
+                        VerticalAlignment="Top"
+                        Content="Datatype name:" />
+                    <TextBox
+                        Name="ArrayDataTypeMenu_NameTextBox"
+                        Width="280"
+                        Height="23"
+                        Margin="124,27,0,0"
+                        HorizontalAlignment="Left"
+                        VerticalAlignment="Top"
+                        VerticalContentAlignment="Center"
+                        Text=""
+                        TextWrapping="Wrap" />
+                    <Label
+                        Margin="55,116,0,0"
+                        HorizontalAlignment="Left"
+                        VerticalAlignment="Top"
+                        Content="Array size:" />
+                    <TextBox
+                        Name="ArrayDataType_SizeTextBox"
+                        Width="280"
+                        Height="23"
+                        Margin="124,116,0,0"
+                        HorizontalAlignment="Left"
+                        VerticalAlignment="Top"
+                        VerticalContentAlignment="Center"
+                        Text=""
+                        TextWrapping="Wrap" />
+                    <Label
+                        Margin="55,71,0,0"
+                        HorizontalAlignment="Left"
+                        VerticalAlignment="Top"
+                        Content="Base type:" />
+                    <Button
+                        Name="ArrayDataTypeUpdateButton"
+                        Width="280"
+                        Height="22"
+                        Margin="124,73,0,0"
+                        HorizontalAlignment="Left"
+                        VerticalAlignment="Top"
+                        Content="Set data type" />
+                </Grid>
+            </TabItem>
+            <TabItem
+                x:Name="ComplexDataTypeTab"
+                Height="22"
+                VerticalAlignment="Top"
+                Header="Complex data type"
+                IsEnabled="False">
+                <Grid Background="#FFE5E5E5">
+                    <Label
+                        Margin="26,27,0,0"
+                        HorizontalAlignment="Left"
+                        VerticalAlignment="Top"
+                        Content="Datatype name:" />
+                    <TextBox
+                        x:Name="ComplexDataType_NameTextBox"
+                        Height="23"
+                        Margin="124,27,10,0"
+                        VerticalAlignment="Top"
+                        VerticalContentAlignment="Center"
+                        Text=""
+                        TextWrapping="Wrap" />
+                    <DataGrid
+                        Name="ComplexDataTypeGridView"
+                        Margin="10,102,10,8"
+                        AutoGenerateColumns="False"
+                        BeginningEdit="ComplexDataType_GridView_BeginningEdit"
+                        CanUserAddRows="False">
+                        <DataGrid.Columns>
+                            <DataGridTemplateColumn Width="200" Header="Name">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <TextBox
+                                            VerticalContentAlignment="Center"
+                                            BorderThickness="0"
+                                            Text="{Binding Name}"
+                                            TextChanged="ComplexDatatype_NameTextEdit_TextChanged" />
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+
+                            <DataGridTemplateColumn Width="60" Header="IsPointer">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <CheckBox
+                                            HorizontalAlignment="Center"
+                                            VerticalAlignment="Center"
+                                            Click="ComplexDataType_IsPointerCheckBox_Click"
+                                            IsChecked="{Binding IsPointer}" />
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+
+                            <DataGridTemplateColumn Width="200" Header="Datatype">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Button Click="ComplexDatatype_DatatypeButton_Click" Content="{Binding DataTypeName}" />
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+
+                            <DataGridTemplateColumn Width="50" Header="X">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Button Click="ComplexDatatype_DeleteButton_Click" Content="x" />
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+
+                        </DataGrid.Columns>
+                    </DataGrid>
+                    <Button
+                        Name="ComplexDataType_AddFieldButton"
+                        Width="75"
+                        Margin="10,77,0,0"
+                        HorizontalAlignment="Left"
+                        VerticalAlignment="Top"
+                        Click="ComplexDataType_AddFieldButton_Click"
+                        Content="Add field" />
+                </Grid>
+            </TabItem>
+            <TabItem
+                Name="SenderReceiverTab"
+                Header="Sender-Receiver interface"
+                IsEnabled="False">
+                <Grid Background="#FFE5E5E5">
+                    <Label
+                        Margin="26,25,0,0"
+                        HorizontalAlignment="Left"
+                        VerticalAlignment="Top"
+                        Content="Interface name:" />
+                    <TextBox
+                        x:Name="SenderReceiver_NameTextBox"
+                        Height="23"
+                        Margin="124,27,10,0"
+                        VerticalAlignment="Top"
+                        VerticalContentAlignment="Center"
+                        Text=""
+                        TextWrapping="Wrap" />
+                    <DataGrid
+                        x:Name="SenderReceiver_GridView"
+                        Margin="10,102,10,8"
+                        AutoGenerateColumns="False"
+                        BeginningEdit="ComplexDataType_GridView_BeginningEdit"
+                        CanUserAddRows="False">
+                        <DataGrid.Columns>
+                            <DataGridTemplateColumn Width="200" Header="Name">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <TextBox
+                                            VerticalContentAlignment="Center"
+                                            BorderThickness="0"
+                                            Text="{Binding Name}"
+                                            TextChanged="SenderReceiver_FieldName_TextEdit_TextChanged" />
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+
+                            <DataGridTemplateColumn Width="70" Header="Is pointer">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <CheckBox
+                                            HorizontalAlignment="Center"
+                                            VerticalAlignment="Center"
+                                            Click="SenderReceiver_IsPointer_CheckBox_Click"
+                                            IsChecked="{Binding IsPointer}" />
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+
+                            <DataGridTemplateColumn Width="250" Header="Datatype">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Button Click="SenderReceiver_ChangeDatatype_Button_Click" Content="{Binding DataTypeName}" />
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+
+                            <DataGridTemplateColumn Width="50" Header="X">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Button Click="SenderReceiver_DeleteButton_Click" Content="x" />
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+
+                        </DataGrid.Columns>
+                    </DataGrid>
+                    <Button
+                        x:Name="SenderReceiver_AddField_Button"
+                        Width="75"
+                        Margin="10,77,0,0"
+                        HorizontalAlignment="Left"
+                        VerticalAlignment="Top"
+                        Click="SenderReceiver_AddField_Button_Click"
+                        Content="Add field" />
+
+                </Grid>
+            </TabItem>
+            <TabItem
+                x:Name="ClientServerTab"
+                Header="Client-Server interface"
+                IsEnabled="False">
+                <Grid Background="#FFE5E5E5">
+                    <Label
+                        Margin="26,26,0,0"
+                        HorizontalAlignment="Left"
+                        VerticalAlignment="Top"
+                        Content="Interface name:" />
+                    <TextBox
+                        x:Name="ClientServer_NameTextBox"
+                        Height="23"
+                        Margin="124,27,10,0"
+                        VerticalAlignment="Top"
+                        VerticalContentAlignment="Center"
+                        Text=""
+                        TextWrapping="Wrap" />
+                    <DataGrid
+                        x:Name="ClientServer_GridView"
+                        Margin="10,102,10,8"
+                        AutoGenerateColumns="False"
+                        BeginningEdit="ComplexDataType_GridView_BeginningEdit"
+                        CanUserAddRows="False">
+
+                        <DataGrid.Columns>
+                            <DataGridTemplateColumn Width="200" Header="Name">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Grid>
+                                            <TextBox
+                                                Margin="{Binding TextBoxMargin}"
+                                                VerticalContentAlignment="Center"
+                                                BorderThickness="0"
+                                                Text="{Binding Name}"
+                                                TextChanged="ClientServer_FieldName_TextEdit_TextChanged" />
+                                            <Button
+                                                Margin="150,0,0,0"
+                                                Click="ClientServer_AddField_Button_Click"
+                                                Content="+"
+                                                Visibility="{Binding DataContext, Converter={StaticResource ClientServerGridViewAddButtonVisibilityConverter}, RelativeSource={RelativeSource AncestorType={x:Type DataGridRow}, Mode=FindAncestor}}" />
+                                        </Grid>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+
+                            <DataGridTemplateColumn Width="70" Header="Direction">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <ComboBox
+                                            ItemsSource="{StaticResource InOutDirectionList}"
+                                            SelectedItem="{Binding Direction}"
+                                            SelectionChanged="ClientServer_DirectionComboBox_SelectionChanged"
+                                            Visibility="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=DataGridRow}, Path=DataContext, Converter={StaticResource ClientServerGridViewObjectVisibilityConverter}}" />
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+
+                            <DataGridTemplateColumn Width="250" Header="Datatype">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Grid>
+                                            <TextBox
+                                                VerticalContentAlignment="Center"
+                                                BorderThickness="0"
+                                                IsReadOnly="True"
+                                                Text="{Binding DataType, Mode=OneWay}" />
+                                            <Button
+                                                Margin="200,0,0,0"
+                                                Click="ClientServer_ChangeDatatype_Button_Click"
+                                                Content="..."
+                                                Visibility="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=DataGridRow}, Path=DataContext, Converter={StaticResource ClientServerGridViewObjectVisibilityConverter}}" />
+                                        </Grid>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+
+                            <DataGridTemplateColumn Width="50" Header="X">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Button Click="ClientServer_DeleteButton_Click" Content="x" />
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+
+                        </DataGrid.Columns>
+                    </DataGrid>
+                    <Button
+                        x:Name="ClientServer_AddOperation_Button"
+                        Width="92"
+                        Margin="10,77,0,0"
+                        HorizontalAlignment="Left"
+                        VerticalAlignment="Top"
+                        Click="ClientServer_AddOperation_Button_Click"
+                        Content="Add operation" />
+
+                </Grid>
+            </TabItem>
+            <TabItem
+                x:Name="EnumDataTypeTab"
+                Height="22"
+                VerticalAlignment="Top"
+                Header="Enum"
+                IsEnabled="False">
+                <Grid Margin="0,0,0,0" Background="#FFE5E5E5">
+                    <Label
+                        Margin="60,26,0,0"
+                        HorizontalAlignment="Left"
+                        VerticalAlignment="Top"
+                        Content="Enum name:"
+                        RenderTransformOrigin="0.579,-0.365" />
+                    <TextBox
+                        x:Name="EnumDataType_NameEdit"
+                        Height="23"
+                        Margin="140,29,10,0"
+                        VerticalAlignment="Top"
+                        VerticalContentAlignment="Center"
+                        Text=""
+                        TextWrapping="Wrap" />
+                    <DataGrid
+                        x:Name="Enums_GridView"
+                        Margin="10,107,10,10"
+                        AutoGenerateColumns="False"
+                        BeginningEdit="ComplexDataType_GridView_BeginningEdit"
+                        CanUserAddRows="False">
+
+                        <DataGrid.Columns>
+                            <DataGridTemplateColumn Width="250" Header="Name">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <TextBox
+                                            VerticalContentAlignment="Center"
+                                            BorderThickness="0"
+                                            Text="{Binding Name}"
+                                            TextChanged="EnumField_NameTextBox_TextChanged" />
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+
+                            <DataGridTemplateColumn Width="250" Header="Value">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <TextBox
+                                            VerticalContentAlignment="Center"
+                                            BorderThickness="0"
+                                            Text="{Binding Value}"
+                                            TextChanged="EnumField_ValueTextBox_TextChanged" />
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+
+                            <DataGridTemplateColumn Width="50" Header="     X">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Button Click="EnumField_DeleteButton_Click" Content="x" />
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+
+                        </DataGrid.Columns>
+                    </DataGrid>
+                    <Button
+                        Width="105"
+                        Height="25"
+                        Margin="10,69,0,0"
+                        HorizontalAlignment="Left"
+                        VerticalAlignment="Top"
+                        Click="AddEnumField_Button_Click"
+                        Content="Add field" />
+                </Grid>
+            </TabItem>
+            <TabItem
+                x:Name="Component_Properties_Tab"
+                Header="Component properties"
+                IsEnabled="False">
+                <Grid Background="#FFE5E5E5">
+                    <Label
+                        Margin="27,26,0,0"
+                        HorizontalAlignment="Left"
+                        VerticalAlignment="Top"
+                        Content="Component name:"
+                        RenderTransformOrigin="0.579,-0.365" />
+                    <TextBox
+                        x:Name="ComponentInstanceName_TextBox"
+                        Height="23"
+                        Margin="175,29,10,0"
+                        VerticalAlignment="Top"
+                        VerticalContentAlignment="Center"
+                        Text=""
+                        TextWrapping="Wrap" />
+                    <Label
+                        Margin="27,68,0,0"
+                        HorizontalAlignment="Left"
+                        VerticalAlignment="Top"
+                        Content="Component defenition:"
+                        RenderTransformOrigin="0.579,-0.365" />
+                    <TextBox
+                        x:Name="ComponentDefenitionNameTextBox"
+                        Height="23"
+                        Margin="175,71,10,0"
+                        VerticalAlignment="Top"
+                        VerticalContentAlignment="Center"
+                        IsReadOnly="True"
+                        Text=""
+                        TextWrapping="Wrap" />
+                    <TabControl
+                        Width="788"
+                        Height="533"
+                        Margin="18,114,0,0"
+                        HorizontalAlignment="Left"
+                        VerticalAlignment="Top"
+                        SelectedIndex="1">
+                        <TabItem Header="Per Instance Memory">
+                            <Grid Background="#FFE5E5E5">
+                                <DataGrid
+                                    x:Name="ComponentInstance_PerInstanceMemory_DataGrid"
+                                    Margin="11,12,15,12"
+                                    AutoGenerateColumns="False"
+                                    BeginningEdit="ComplexDataType_GridView_BeginningEdit"
+                                    CanUserAddRows="False">
+
+                                    <DataGrid.Columns>
+                                        <DataGridTemplateColumn Width="300" Header="Variable Name">
+                                            <DataGridTemplateColumn.CellTemplate>
+                                                <DataTemplate>
+                                                    <TextBox
+                                                        VerticalContentAlignment="Center"
+                                                        BorderThickness="0"
+                                                        IsReadOnly="True"
+                                                        Text="{Binding Name}" />
+                                                </DataTemplate>
+                                            </DataGridTemplateColumn.CellTemplate>
+                                        </DataGridTemplateColumn>
+
+                                        <DataGridTemplateColumn Width="300" Header="Value">
+                                            <DataGridTemplateColumn.CellTemplate>
+                                                <DataTemplate>
+                                                    <TextBox
+                                                        VerticalContentAlignment="Center"
+                                                        BorderThickness="0"
+                                                        Text="{Binding DefaultValue}"
+                                                        TextChanged="PimDefaultValue_ValueColomn_TextEdit" />
+                                                </DataTemplate>
+                                            </DataGridTemplateColumn.CellTemplate>
+                                        </DataGridTemplateColumn>
+                                    </DataGrid.Columns>
+                                </DataGrid>
+                            </Grid>
+                        </TabItem>
+                        <TabItem Header="CData">
+                            <Grid Background="#FFE5E5E5">
+                                <DataGrid
+                                    x:Name="CDataInstance_DataGrid"
+                                    Margin="11,12,15,12"
+                                    AutoGenerateColumns="False"
+                                    BeginningEdit="ComplexDataType_GridView_BeginningEdit"
+                                    CanUserAddRows="False"
+                                    IsReadOnly="True">
+
+                                    <DataGrid.Columns>
+                                        <DataGridTemplateColumn Width="300" Header="Variable Name">
+                                            <DataGridTemplateColumn.CellTemplate>
+                                                <DataTemplate>
+                                                    <TextBox
+                                                        VerticalContentAlignment="Center"
+                                                        BorderThickness="0"
+                                                        Text="{Binding Name}" />
+                                                </DataTemplate>
+                                            </DataGridTemplateColumn.CellTemplate>
+                                        </DataGridTemplateColumn>
+
+                                        <DataGridTemplateColumn Width="300" Header="Value">
+                                            <DataGridTemplateColumn.CellTemplate>
+                                                <DataTemplate>
+                                                    <TextBox
+                                                        VerticalContentAlignment="Center"
+                                                        BorderThickness="0"
+                                                        Text="{Binding DefaultValue}"
+                                                        TextChanged="CDataDefaultValue_ValueColomn_TextEdit" />
+                                                </DataTemplate>
+                                            </DataGridTemplateColumn.CellTemplate>
+                                        </DataGridTemplateColumn>
+                                    </DataGrid.Columns>
+                                </DataGrid>
+
+                            </Grid>
+                        </TabItem>
+                    </TabControl>
+                </Grid>
+            </TabItem>
+            <TabItem
+                x:Name="CompositionProperties_TabItem"
+                Header="Composition properties"
+                IsEnabled="False">
+                <Grid Background="#FFE5E5E5">
+                    <TabControl Margin="10,67,10,8" SelectedIndex="3">
+                        <TabItem Header="Ports">
+                            <Grid Background="#FFE5E5E5">
+                                <DataGrid
+                                    x:Name="CompositionPorts_Grid"
+                                    Margin="10,57,10,10"
+                                    AutoGenerateColumns="False"
+                                    BeginningEdit="ComplexDataType_GridView_BeginningEdit"
+                                    CanUserAddRows="False">
+
+                                    <DataGrid.Columns>
+                                        <DataGridTemplateColumn Width="250" Header="Name">
+                                            <DataGridTemplateColumn.CellTemplate>
+                                                <DataTemplate>
+                                                    <TextBox
+                                                        VerticalContentAlignment="Center"
+                                                        BorderThickness="0"
+                                                        Text="{Binding Name}"
+                                                        TextChanged="CompositionPorts_PortName_TextEdit_TextChanged" />
+                                                </DataTemplate>
+                                            </DataGridTemplateColumn.CellTemplate>
+                                        </DataGridTemplateColumn>
+
+                                        <DataGridTemplateColumn Width="200" Header="Interface name">
+                                            <DataGridTemplateColumn.CellTemplate>
+                                                <DataTemplate>
+                                                    <Grid>
+                                                        <TextBox
+                                                            VerticalContentAlignment="Center"
+                                                            BorderThickness="0"
+                                                            Text="{Binding InterfaceName, Mode=OneWay}" />
+                                                        <Button
+                                                            Margin="150,0,0,0"
+                                                            Click="CompositionPorts_SelectInterface_Button_Click"
+                                                            Content="..." />
+                                                    </Grid>
+                                                </DataTemplate>
+                                            </DataGridTemplateColumn.CellTemplate>
+                                        </DataGridTemplateColumn>
+
+                                        <DataGridTemplateColumn Width="80" Header="Type">
+                                            <DataGridTemplateColumn.CellTemplate>
+                                                <DataTemplate>
+                                                    <TextBox
+                                                        VerticalContentAlignment="Center"
+                                                        BorderThickness="0"
+                                                        IsReadOnly="True"
+                                                        Text="{Binding InterfaceType, Mode=OneWay}" />
+                                                </DataTemplate>
+                                            </DataGridTemplateColumn.CellTemplate>
+                                        </DataGridTemplateColumn>
+
+                                        <DataGridTemplateColumn Width="50" Header="     X">
+                                            <DataGridTemplateColumn.CellTemplate>
+                                                <DataTemplate>
+                                                    <Button Click="CompositionPort_DeleteButton_Click" Content="x" />
+                                                </DataTemplate>
+                                            </DataGridTemplateColumn.CellTemplate>
+                                        </DataGridTemplateColumn>
+
+                                    </DataGrid.Columns>
+                                </DataGrid>
+                                <Button
+                                    Name="AddPortToComposition_Button"
+                                    Width="105"
+                                    Height="25"
+                                    Margin="10,19,0,0"
+                                    HorizontalAlignment="Left"
+                                    VerticalAlignment="Top"
+                                    Content="Add port" />
+                            </Grid>
+                        </TabItem>
+
+                    </TabControl>
+                    <Label
+                        Margin="27,26,0,0"
+                        HorizontalAlignment="Left"
+                        VerticalAlignment="Top"
+                        Content="Name:"
+                        RenderTransformOrigin="0.579,-0.365" />
+                    <TextBox
+                        x:Name="CompositionName_TextBox"
+                        Height="23"
+                        Margin="77,29,10,0"
+                        VerticalAlignment="Top"
+                        VerticalContentAlignment="Center"
+                        Text=""
+                        TextChanged="ComponentNameTextBox_TextChanged"
+                        TextWrapping="Wrap" />
+                </Grid>
+            </TabItem>
+        </TabControl>
+
+
+
+    </Grid>
+
+</Window>

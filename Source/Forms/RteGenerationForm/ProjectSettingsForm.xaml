@@ -1,0 +1,84 @@
+﻿<Window
+    x:Class="AutosarGuiEditor.Source.Forms.ProjectSettingsForm"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    Title="Project Settings"
+    Width="506"
+    Height="356"
+    Icon="/AutosarGuiEditor;component/AppIcon.ico"
+    WindowStartupLocation="CenterOwner">
+    <Grid>
+        <Button
+            Width="75"
+            Height="23"
+            Margin="0,0,10,10"
+            HorizontalAlignment="Right"
+            VerticalAlignment="Bottom"
+            Click="Button_Click"
+            Content="OK" />
+        <GroupBox Margin="10,10,10,43" Header="Project Settings">
+            <Grid Margin="0,0,0,0">
+                <TextBox
+                    Name="ComponentsGeneratingFolderEdit"
+                    Height="23"
+                    Margin="10,36,52,0"
+                    VerticalAlignment="Top"
+                    VerticalContentAlignment="Center"
+                    IsReadOnly="False"
+                    TextWrapping="Wrap" />
+                <Label
+                    Margin="10,10,0,0"
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Top"
+                    Content="Components skeleton folder" />
+                <TextBox
+                    Name="SysTickFrequencyEdit"
+                    Height="23"
+                    Margin="10,193,10,0"
+                    VerticalAlignment="Top"
+                    VerticalContentAlignment="Center"
+                    Text="1000"
+                    TextChanged="SysTickFrequencyEdit_TextChanged"
+                    TextWrapping="Wrap" />
+                <Label
+                    Margin="10,167,0,0"
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Top"
+                    Content="System timer frequency:" />
+                <Button
+                    Name="OpenDirDialogButton"
+                    Width="37"
+                    Height="23"
+                    Margin="0,36,10,0"
+                    HorizontalAlignment="Right"
+                    VerticalAlignment="Top"
+                    Click="OpenDirDialogButton_Click"
+                    Content="..." />
+                <TextBox
+                    x:Name="RteGeneratingFolderEdit"
+                    Height="23"
+                    Margin="10,115,52,0"
+                    VerticalAlignment="Top"
+                    VerticalContentAlignment="Center"
+                    IsReadOnly="False"
+                    TextWrapping="Wrap" />
+                <Label
+                    Margin="10,89,0,0"
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Top"
+                    Content="Rte generation folder" />
+                <Button
+                    x:Name="OpenRteDirDialogButton"
+                    Width="37"
+                    Height="23"
+                    Margin="0,115,10,0"
+                    HorizontalAlignment="Right"
+                    VerticalAlignment="Top"
+                    Click="OpenRteDirDialogButton_Click"
+                    Content="..." />
+
+            </Grid>
+
+        </GroupBox>
+    </Grid>
+</Window>

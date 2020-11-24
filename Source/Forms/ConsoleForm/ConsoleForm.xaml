@@ -1,0 +1,31 @@
+﻿<Window
+    x:Class="AutosarGuiEditor.Source.Forms.ConsoleForm.ConsoleForm"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    x:Name="consoleForm"
+    Title="ConsoleForm"
+    Width="543"
+    Height="583"
+    x:FieldModifier="public"
+    Closing="consoleForm_Closing">
+
+    <Grid>
+        <TabControl x:Name="abcd" Margin="0">
+            <TabItem Header="Console">
+                <Grid Background="#FFE5E5E5">
+                    <RichTextBox
+                        Margin="0"
+                        IsReadOnly="True"
+                        VerticalScrollBarVisibility="Visible">
+                        <FlowDocument>
+                            <Paragraph>
+                                <Run Name="txt" Text="{Binding ConsoleText.Data, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, Mode=OneWay}" />
+                            </Paragraph>
+                        </FlowDocument>
+                    </RichTextBox>
+                </Grid>
+            </TabItem>
+        </TabControl>
+
+    </Grid>
+</Window>
