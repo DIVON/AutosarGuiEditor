@@ -1,14 +1,14 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
-VisualStudioVersion = 12.0.21005.1
+VisualStudioVersion = 12.0.40629.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AutosarGuiEditor", "AutosarGuiEditor.csproj", "{C87CB053-50A4-454E-9436-6B0A96AF2FA3}"
 	ProjectSection(ProjectDependencies) = postProject
 		{B0AA6A94-6784-4221-81F0-244A68C374C0} = {B0AA6A94-6784-4221-81F0-244A68C374C0}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WriteableBitmapEx.Wpf", "..\WritableBitmapEx\FastWpfGrid-master\WriteableBitmapEx\WriteableBitmapEx.Wpf.csproj", "{B0AA6A94-6784-4221-81F0-244A68C374C0}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WriteableBitmapEx.Wpf", "WriteableBitmapEx\WriteableBitmapEx.Wpf.csproj", "{B0AA6A94-6784-4221-81F0-244A68C374C0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

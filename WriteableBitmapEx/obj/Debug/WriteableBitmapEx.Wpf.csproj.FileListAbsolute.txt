@@ -1,0 +1,9 @@
+D:\Projects\MASS\WritableBitmapEx\Build\Debug\WriteableBitmapEx.Wpf.dll
+D:\Projects\MASS\WritableBitmapEx\Build\Debug\WriteableBitmapEx.Wpf.pdb
+D:\Projects\MASS\WritableBitmapEx\FastWpfGrid-master\WriteableBitmapEx\obj\Debug\WriteableBitmapEx.Wpf.dll
+D:\Projects\MASS\WritableBitmapEx\FastWpfGrid-master\WriteableBitmapEx\obj\Debug\WriteableBitmapEx.Wpf.pdb
+D:\Projects\MASS\WritableBitmapEx\FastWpfGrid-master\WriteableBitmapEx\obj\Debug\WriteableBitmapEx.Wpf.csprojResolveAssemblyReference.cache
+D:\Projects\MASS\Build\Debug\WriteableBitmapEx.Wpf.dll
+D:\Projects\MASS\Build\Debug\WriteableBitmapEx.Wpf.pdb
+D:\Projects\MASS\AutosarGuiEditor\WriteableBitmapEx\obj\Debug\WriteableBitmapEx.Wpf.dll
+D:\Projects\MASS\AutosarGuiEditor\WriteableBitmapEx\obj\Debug\WriteableBitmapEx.Wpf.pdb
