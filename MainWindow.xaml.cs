@@ -104,7 +104,13 @@ namespace AutosarGuiEditor
 
             AutosarTree.Autosar = autosarApp;
             String prevProject = SettingsProvider.GetInstance().LastProjectFileName;
-            autosarApp.LoadFromFile(prevProject);
+            bool loaded = autosarApp.LoadFromFile(prevProject);
+            if (!loaded)
+            {
+                AutosarApplication.GetInstance().Clear();
+                AutosarApplication.GetInstance().CreateNewProject();
+                openSaveController.Clear();
+            }
             AutosarTree.UpdateAutosarTreeView(null);
             UpdateMainWindowTitle();
             tabHideHelper.ProcessTabs();            
