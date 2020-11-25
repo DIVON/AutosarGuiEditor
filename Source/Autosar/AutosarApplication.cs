@@ -348,6 +348,14 @@ namespace System
 
         }
 
+        public void CreateNewProject()
+        {
+            CompositionInstance mainComposition = new CompositionInstance();
+            mainComposition.Name = CompositionInstancesList.MainCompositionName;
+            compositions.Add(mainComposition);
+            BaseDataTypes.CheckBaseDataTypes();
+        }
+
         public List<IGUID> GetAllDataTypes(string exception = "")
         {
             List<IGUID> datatypes = new List<IGUID>();

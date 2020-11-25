@@ -1187,6 +1187,7 @@ namespace AutosarGuiEditor
         private void NewProject_Click(object sender, RoutedEventArgs e)
         {
             AutosarApplication.GetInstance().Clear();
+            AutosarApplication.GetInstance().CreateNewProject();
             openSaveController.Clear();
             AutosarTree.UpdateAutosarTreeView();
         }        
