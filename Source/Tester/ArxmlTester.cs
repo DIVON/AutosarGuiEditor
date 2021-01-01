@@ -1,4 +1,5 @@
-﻿using AutosarGuiEditor.Source.AutosarInterfaces;
+﻿using AutosarGuiEditor.Source.Autosar.OsTasks;
+using AutosarGuiEditor.Source.AutosarInterfaces;
 using AutosarGuiEditor.Source.AutosarInterfaces.ClientServer;
 using AutosarGuiEditor.Source.AutosarInterfaces.SenderReceiver;
 using AutosarGuiEditor.Source.Component;
@@ -47,6 +48,7 @@ namespace AutosarGuiEditor.Source.Tester
             TestForComplexDependency();
             TestArrays();
             TestConnections();
+            TestOsTasks();
         }
 
         const string ERROR = "ERROR: ";
@@ -411,7 +413,7 @@ namespace AutosarGuiEditor.Source.Tester
 
         protected void TestErrorNames()
         {
-            /* Check if there is with similar names */
+            /* Check if there is errors with similar names */
             CheckSimilarNames(autosarApp.SystemErrors.ConvertAll(x => x as IGUID), " System errors");
 
             /* Check errors with similar indexes */
@@ -423,6 +425,18 @@ namespace AutosarGuiEditor.Source.Tester
                     {
                         AppendText("There is errors with similar ID. " + autosarApp.SystemErrors[i].Name + " and " +  autosarApp.SystemErrors[j].Name + " value: " + autosarApp.SystemErrors[i].Value.ToString(), Error: true);
                     }                    
+                }
+            }
+        }
+
+        protected void TestOsTasks()
+        {
+            for (int i = 0; i < autosarApp.OsTasks.Count; i++)
+            {
+                OsTask task = autosarApp.OsTasks[i];
+                if (task.PeriodMs == 0)
+                {
+                    AppendText("OsTask : " + task.Name + " has zero frequency", Error: true);
                 }
             }
         }
@@ -458,5 +472,7 @@ namespace AutosarGuiEditor.Source.Tester
             }
             return result;
         }
+
+        
     }
 }

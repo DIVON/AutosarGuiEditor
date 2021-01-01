@@ -406,12 +406,6 @@ namespace System
                 componentsFontNewSize = 1;
             }
 
-            double portsFontNewSize = DefaultPortsFontSize * newScale;
-            if ((int)portsFontNewSize == 0)
-            {
-                portsFontNewSize = 1;
-            }
-
             int compDefFontSize = (int)(componentsFontNewSize - 2);
             if (compDefFontSize < 1)
             {

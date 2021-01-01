@@ -125,7 +125,7 @@ namespace AutosarGuiEditor.Source.Composition
             textCoord.Y = Painter.Top;
             textCoord = context.GetImageCoordinate(textCoord);
             textCoord.Y += textHeight;
-            textCoord.X -= width / 2;
+            textCoord.X -= (double)width / 2;
             context.Bitmap.DrawString((int)textCoord.X, (int)textCoord.Y, Colors.Black, AutosarApplication.GetInstance().ComponentNameFont, Name);
         }
 

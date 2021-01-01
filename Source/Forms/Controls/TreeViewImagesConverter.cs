@@ -204,11 +204,6 @@ namespace WpfTreeView
                     var image = Path.GetDirectoryName(System.Windows.Forms.Application.ExecutablePath) + "\\Images\\icons\\tree\\gears.png";
                     return new BitmapImage(new Uri(image));
                 }
-                if (value is ClientServerOperationField)
-                {
-                    var image = Path.GetDirectoryName(System.Windows.Forms.Application.ExecutablePath) + "\\Images\\icons\\tree\\Brick.png";
-                    return new BitmapImage(new Uri(image));
-                }
             }
             return null;
         }

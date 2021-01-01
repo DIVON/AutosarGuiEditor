@@ -381,72 +381,90 @@ namespace AutosarGuiEditor.Source.RteGenerator
             PortDefenitionsList senderPorts = component.ComponentDefenition.Ports.PortsWithSenderInterface();
             for (int i = 0; i < senderPorts.Count; i++)
             {
-                if (component.Name == "IntegralSliderPosition")
-                {
-
-                }
-
                 SenderReceiverInterface srInterface = (SenderReceiverInterface)senderPorts[i].InterfaceDatatype;
-                for (int j = 0; j < srInterface.Fields.Count; j++)
+                WriteZeroDefaultValueForSenderPort(writer, senderPorts[i], srInterface);
+
+                if (i < senderPorts.Count - 1)
                 {
-                    SenderReceiverInterfaceField field = srInterface.Fields[j];
-                    
-                    writer.Write("    ." + RteFunctionsGenerator.GenerateRteWriteFieldInComponentDefenitionStruct(senderPorts[i], field) + " = ");
-
-                    if (field.DataType is PlainDataType)
-                    {
-                        writer.Write("0");
-                        if ((i != senderPorts.Count - 1) || (j < srInterface.Fields.Count - 1))
-                        {
-                            writer.WriteLine(",");
-                        }
-                        else
-                        {
-                            writer.WriteLine();
-                        }
-                    }
-                    else
-                    {
-                        if (field.DataType is ArrayDataType)
-                        {
-                            writer.Write("{ ");
-                            if(!((field.DataType as ArrayDataType).DataType is PlainDataType))
-                            {
-                                writer.Write("{ ");
-                            }
-                        }
-                        
-
-                        writer.Write("{ 0 ");
-
-                        if (field.DataType is ArrayDataType)
-                        {
-                            writer.Write("} ");
-                            if (!((field.DataType as ArrayDataType).DataType is PlainDataType))
-                            {
-                                writer.Write("} ");
-                            }
-                        }
-
-                        if ((i != senderPorts.Count - 1) || (j < srInterface.Fields.Count - 1))
-                        {
-                            writer.WriteLine("},");
-                        }
-                        else
-                        {
-                            writer.WriteLine("}");
-                        }
-
-                        
-                    }
+                    writer.WriteLine(",");
                 }
             }
-
+            writer.WriteLine();
             writer.WriteLine("};");
             writer.WriteLine("");
         }
 
-        
+
+        void WriteZeroDefaultValueForSenderPort(StreamWriter writer, PortDefenition portDef, SenderReceiverInterface srInterface)
+        {
+            for (int j = 0; j < srInterface.Fields.Count; j++)
+            {
+                SenderReceiverInterfaceField field = srInterface.Fields[j];
+
+                writer.Write("    ." + RteFunctionsGenerator.GenerateRteWriteFieldInComponentDefenitionStruct(portDef, field) + " = ");
+
+                WriteZeroDefaultValue(writer, field.DataType);
+
+                if (j < srInterface.Fields.Count - 1)
+                {
+                    writer.WriteLine(",");
+                }
+            }
+        }
+
+        void WriteZeroDefaultValueForPlainDataType(StreamWriter writer)
+        {
+            writer.Write("0");
+        }
+
+        void WriteZeroDefaultValuesForArrays(StreamWriter writer, ArrayDataType datatype)
+        {
+            writer.Write("{ { ");
+            for (int i = 0; i < datatype.Size; i++)
+            {
+                WriteZeroDefaultValue(writer, datatype.DataType);
+                if (i < datatype.Size - 1)
+                {
+                    writer.Write(", ");
+                }
+            }
+            writer.Write(" } }");
+        }
+
+        void WriteZeroDefaultValuesForComplexDataType(StreamWriter writer, ComplexDataType datatype)
+        {
+            writer.Write("{ ");
+            for (int i = 0; i < datatype.Fields.Count; i++)
+            {
+                WriteZeroDefaultValue(writer, datatype.Fields[i].DataType);
+                if (i < datatype.Fields.Count - 1)
+                {
+                    writer.Write(", ");
+                }
+            }
+
+            writer.Write(" }");
+        }
+
+        void WriteZeroDefaultValue(StreamWriter writer, object dataType)
+        {
+            if (dataType is PlainDataType)
+            {
+                WriteZeroDefaultValueForPlainDataType(writer);
+            }
+            else if (dataType is ArrayDataType)
+            {
+                WriteZeroDefaultValuesForArrays(writer, dataType as ArrayDataType);
+            }
+            else if (dataType is ComplexDataType)
+            {
+                WriteZeroDefaultValuesForComplexDataType(writer, dataType as ComplexDataType);
+            }
+            else
+            {
+                /* ? */
+            }
+        }
 
         void GenerateStaticVariablesForSenderPortsWithoutMultipleInstantiation(StreamWriter writer, PortPainter port, SenderReceiverInterfaceField field)
         {

@@ -26,35 +26,35 @@ namespace AutosarGuiEditor.Source.RteGenerator
 {
     public static class RteFunctionsGenerator
     {
-        public const String IncludesLine                         = "/*    INCLUDES    */";
-        public const String EndOfIncludesLine                    = "/*    END OF INCLUDES    */";
+        public const String IncludesLine                         = "/* INCLUDES */";
+        public const String EndOfIncludesLine                    = "/* END OF INCLUDES */";
 
-        public const String MacrosLine                           = "/*    MACROS    */";
-        public const String EndOfMacrosLine                      = "/*    END OF MACROS    */";
+        public const String MacrosLine                           = "/* MACROS */";
+        public const String EndOfMacrosLine                      = "/* END OF MACROS */";
 
-        public const String TypeDefenitionsLine                  = "/*    TYPE DEFINITIONS    */";
-        public const String EndOfTypeDefenitionsLine             = "/*    END OF TYPE DEFINITIONS    */";
+        public const String TypeDefenitionsLine                  = "/* TYPE DEFINITIONS */";
+        public const String EndOfTypeDefenitionsLine             = "/* END OF TYPE DEFINITIONS */";
 
-        public const String VariablesLine                        = "/*    VARIABLES    */";
-        public const String EndOfVariableLine                    = "/*    END OF VARIABLES    */";
+        public const String VariablesLine                        = "/* VARIABLES */";
+        public const String EndOfVariableLine                    = "/* END OF VARIABLES */";
  
-        public const String ExternalVariablesLine                = "/*    EXTERNAL VARIABLES    */";
-        public const String EndOfExternalVariableLine            = "/*    END OF EXTERNAL VARIABLES    */";
+        public const String ExternalVariablesLine                = "/* EXTERNAL VARIABLES */";
+        public const String EndOfExternalVariableLine            = "/* END OF EXTERNAL VARIABLES */";
 
-        public const String LocalFunctionsDeclarationLine        = "/*    LOCAL FUNCTION DECLARATIONS    */";
-        public const String EndOfLocalFunctionsDeclarationLine   = "/*    END OF LOCAL FUNCTION DECLARATIONS    */";
+        public const String LocalFunctionsDeclarationLine        = "/* LOCAL FUNCTION DECLARATIONS */";
+        public const String EndOfLocalFunctionsDeclarationLine   = "/* END OF LOCAL FUNCTION DECLARATIONS */";
 
-        public const String GlobalFunctionsDeclarationLine       = "/*    GLOBAL FUNCTION DECLARATIONS    */";
-        public const String EndOfGlobalFunctionsDeclarationLine  = "/*    END OF GLOBAL FUNCTION DECLARATIONS    */";
+        public const String GlobalFunctionsDeclarationLine       = "/* GLOBAL FUNCTION DECLARATIONS */";
+        public const String EndOfGlobalFunctionsDeclarationLine  = "/* END OF GLOBAL FUNCTION DECLARATIONS */";
 
-        public const String LocalFunctionsDefenitionsLine        = "/*    LOCAL FUNCTION DEFINITIONS    */";
-        public const String EndOfLocalFunctionsDefenitionsLine   = "/*    END OF LOCAL FUNCTION DEFINITIONS    */";
+        public const String LocalFunctionsDefenitionsLine        = "/* LOCAL FUNCTION DEFINITIONS */";
+        public const String EndOfLocalFunctionsDefenitionsLine   = "/* END OF LOCAL FUNCTION DEFINITIONS */";
 
-        public const String GlobalFunctionsDefenitionsLine       = "/*    GLOBAL FUNCTION DEFINITIONS    */";
-        public const String EndOfGlobalFunctionsDefenitionsLine  = "/*    END OF GLOBAL FUNCTION DEFINITIONS    */";
+        public const String GlobalFunctionsDefenitionsLine       = "/* GLOBAL FUNCTION DEFINITIONS */";
+        public const String EndOfGlobalFunctionsDefenitionsLine  = "/* END OF GLOBAL FUNCTION DEFINITIONS */";
 
-        public const String RteFunctionsDefenitionsLine          = "/*    RTE FUNCTION DECLARATIONS    */";
-        public const String EndOfRteFunctionsDefenitionsLine     = "/*    END OF RTE FUNCTION DECLARATIONS    */";
+        public const String RteFunctionsDefenitionsLine          = "/* RTE FUNCTION DECLARATIONS */";
+        public const String EndOfRteFunctionsDefenitionsLine     = "/* END OF RTE FUNCTION DECLARATIONS */";
 
         public const String ComponentInstancePointerDatatype     = "Rte_ComponentInstance";
 

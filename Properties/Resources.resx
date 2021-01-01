@@ -199,4 +199,13 @@
   <data name="RTE_CONNECTIONS_C_FILENAME" xml:space="preserve">
     <value>Rte_Connections.c</value>
   </data>
+  <data name="RTE_TASK_SCHEDULER_C_FILENAME" xml:space="preserve">
+    <value>Rte_Task_Scheduler.c</value>
+  </data>
+  <data name="RTE_TASK_SCHEDULER_FILE_DESCRIPTION" xml:space="preserve">
+    <value>This file contains extern functions defenitions and variables for organizing task scheduling.</value>
+  </data>
+  <data name="RTE_TASK_SCHEDULER_H_FILENAME" xml:space="preserve">
+    <value>Rte_Task_Scheduler.h</value>
+  </data>
 </root>

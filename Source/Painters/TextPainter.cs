@@ -59,12 +59,12 @@ namespace AutosarGuiEditor.Source.Painters
 
             if (Direction == TextDirection.LeftToRight)
             {
-                textCoord.Y -= textHeight / 2;
+                textCoord.Y -= (double)textHeight / 2.0d;
                 context.Bitmap.DrawString((int)textCoord.X, (int)textCoord.Y, TextColor, Font, Text);
             }
             else if (Direction == TextDirection.RightToLeft)
             {
-                textCoord.Y -= textHeight / 2;
+                textCoord.Y -= (double)textHeight / 2.0d;
                 textCoord.X -= textWidth;
                 context.Bitmap.DrawString((int)textCoord.X, (int)textCoord.Y, TextColor, Font, Text);
             }
@@ -97,11 +97,11 @@ namespace AutosarGuiEditor.Source.Painters
             {
                 Point topLeftImageCoord = new Point();
                 topLeftImageCoord.X = imageCoord.X;
-                topLeftImageCoord.Y = imageCoord.Y - textHeight / 2;
+                topLeftImageCoord.Y = (double)imageCoord.Y - (double)textHeight / 2;
 
                 Point bottomRightImageCoord = new Point();
-                bottomRightImageCoord.X = imageCoord.X + textWidth;
-                bottomRightImageCoord.Y = imageCoord.Y + textHeight / 2;
+                bottomRightImageCoord.X = (double)imageCoord.X + (double)textWidth;
+                bottomRightImageCoord.Y = (double)imageCoord.Y + (double)textHeight / 2;
 
                 Point topLeftWorldCoord = context.GetWorldCoordinate(topLeftImageCoord);
                 Point bottomRightWorldCoord = context.GetWorldCoordinate(bottomRightImageCoord);
@@ -115,11 +115,11 @@ namespace AutosarGuiEditor.Source.Painters
             {
                 Point topLeftImageCoord = new Point();
                 topLeftImageCoord.X = imageCoord.X - textWidth;
-                topLeftImageCoord.Y = imageCoord.Y - textHeight / 2;
+                topLeftImageCoord.Y = (double)imageCoord.Y - (double)textHeight / 2;
 
                 Point bottomRightImageCoord = new Point();
                 bottomRightImageCoord.X = imageCoord.X;
-                bottomRightImageCoord.Y = imageCoord.Y + textHeight / 2;
+                bottomRightImageCoord.Y = (double)imageCoord.Y + (double)textHeight / 2;
 
                 Point topLeftWorldCoord = context.GetWorldCoordinate(topLeftImageCoord);
                 Point bottomRightWorldCoord = context.GetWorldCoordinate(bottomRightImageCoord);
@@ -132,11 +132,11 @@ namespace AutosarGuiEditor.Source.Painters
             else if (Direction == TextDirection.TopToBottom)
             {
                 Point topLeftImageCoord = new Point();
-                topLeftImageCoord.X = imageCoord.X - textHeight / 2;
+                topLeftImageCoord.X = (double)imageCoord.X - (double)textHeight / 2;
                 topLeftImageCoord.Y = imageCoord.Y;
 
                 Point bottomRightImageCoord = new Point();
-                bottomRightImageCoord.X = imageCoord.X + textHeight / 2;
+                bottomRightImageCoord.X = (double)imageCoord.X + (double)textHeight / 2;
                 bottomRightImageCoord.Y = imageCoord.Y + textWidth;
 
                 Point topLeftWorldCoord = context.GetWorldCoordinate(topLeftImageCoord);
@@ -150,11 +150,11 @@ namespace AutosarGuiEditor.Source.Painters
             else
             {
                 Point topLeftImageCoord = new Point();
-                topLeftImageCoord.X = imageCoord.X - textHeight / 2;
+                topLeftImageCoord.X = (double)imageCoord.X - (double)textHeight / 2;
                 topLeftImageCoord.Y = imageCoord.Y - textWidth;
 
                 Point bottomRightImageCoord = new Point();
-                bottomRightImageCoord.X = imageCoord.X + textHeight / 2;
+                bottomRightImageCoord.X = (double)imageCoord.X + (double)textHeight / 2;
                 bottomRightImageCoord.Y = imageCoord.Y;
 
                 Point topLeftWorldCoord = context.GetWorldCoordinate(topLeftImageCoord);

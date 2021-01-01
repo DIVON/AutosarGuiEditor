@@ -75,18 +75,17 @@ namespace AutosarGuiEditor.Source.Painters
             textCoord.Y = Painter.Top;
             textCoord = context.GetImageCoordinate(textCoord);
             textCoord.Y += textHeight;
-            textCoord.X -= width / 2;
+            textCoord.X -= (double)width / 2.0d;
             context.Bitmap.DrawString((int)textCoord.X, (int)textCoord.Y, Colors.Black, AutosarApplication.GetInstance().ComponentNameFont, Name);
 
             String defName = "<" + this.ComponentDefenition.Name + ">";
             glyphFont = LetterGlyphTool.GetFont(AutosarApplication.GetInstance().ComponentDefinitionNameFont);
             width = glyphFont.GetTextWidth(defName);
-            textHeight = glyphFont.GetTextHeight(defName);
 
             textCoord = Painter.Center;
             textCoord.Y = Painter.Top;
             textCoord = context.GetImageCoordinate(textCoord);
-            textCoord.X -= width / 2;
+            textCoord.X -= (double)width / 2.0d;
             
             context.Bitmap.DrawString((int)textCoord.X, (int)textCoord.Y, Colors.Black, AutosarApplication.GetInstance().ComponentDefinitionNameFont, defName);
         }

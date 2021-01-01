@@ -21,6 +21,14 @@ namespace System {
     {
         public Guid DataTypeGUID { set; get; }
                 
+        public IGUID DataType
+        {
+            get
+            {
+                return AutosarApplication.GetInstance().GetDataType(DataTypeGUID);
+            }
+        }
+
         public bool IsPointer { set; get; }
 		public ComplexDataTypeField()
         {            

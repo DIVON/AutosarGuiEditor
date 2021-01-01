@@ -35,14 +35,14 @@ namespace AutosarGuiEditor.Source.Render
 
         public double GetMinHeight()
         {
-            double MinSize = 50;
-            return MinSize;
+            double MinHeight = 50;
+            return MinHeight;
         }
 
         public double GetMinWidth()
         {
-            double MinSize = 50;
-            return MinSize;
+            double MinWidth = 50;
+            return MinWidth;
         }
 
         public ResizableRectangleElement()

@@ -42,5 +42,30 @@ namespace AutosarGuiEditor.Source.Autosar.OsTasks
         {
             return "OsTasks";
         }
+
+        public int GetSchedulerNecessaryStepsCount()
+        {
+            double minPeriod = double.MaxValue;
+            double maxPeriod = 0;
+
+            foreach(OsTask task in this)
+            {
+                if (minPeriod > task.PeriodMs)
+                {
+                    minPeriod = task.PeriodMs;
+                }
+                if (maxPeriod < task.PeriodMs)
+                {
+                    maxPeriod = task.PeriodMs;
+                }
+            }
+
+            int count = 0;
+            if ((maxPeriod != 0) && (minPeriod != 0))
+            {
+                count = (int)(maxPeriod / minPeriod);
+            }
+            return count;
+        }
     }
 }

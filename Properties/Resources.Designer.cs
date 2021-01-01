@@ -225,6 +225,33 @@ namespace AutosarGuiEditor.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Rte_Task_Scheduler.c.
+        /// </summary>
+        internal static string RTE_TASK_SCHEDULER_C_FILENAME {
+            get {
+                return ResourceManager.GetString("RTE_TASK_SCHEDULER_C_FILENAME", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This file contains extern functions defenitions and variables for organizing task scheduling..
+        /// </summary>
+        internal static string RTE_TASK_SCHEDULER_FILE_DESCRIPTION {
+            get {
+                return ResourceManager.GetString("RTE_TASK_SCHEDULER_FILE_DESCRIPTION", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Rte_Task_Scheduler.h.
+        /// </summary>
+        internal static string RTE_TASK_SCHEDULER_H_FILENAME {
+            get {
+                return ResourceManager.GetString("RTE_TASK_SCHEDULER_H_FILENAME", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
         internal static System.Drawing.Bitmap ServerPort {
