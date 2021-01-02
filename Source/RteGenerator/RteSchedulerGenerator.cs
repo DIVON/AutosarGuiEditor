@@ -247,7 +247,7 @@ namespace AutosarGuiEditor.Source.RteGenerator
                         /* Close previous period */
                         if ((lastPeriod != runnableDefenition.PeriodMs) && wasBracersOpen)
                         {
-                            writer.WriteLine("        }");
+                            writer.WriteLine("    }");
                         }
 
                         /* Add open bracers */
@@ -622,6 +622,7 @@ namespace AutosarGuiEditor.Source.RteGenerator
             writer.WriteLine("            }");
             writer.WriteLine("        }");
             writer.WriteLine("        schedulingCounter++;");
+            writer.WriteLine("        timeEventOccured = FALSE;");
             writer.WriteLine("    }");
             writer.WriteLine("}");
 
