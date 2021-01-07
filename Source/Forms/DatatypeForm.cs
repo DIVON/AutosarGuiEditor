@@ -98,7 +98,11 @@ namespace AutosarGuiEditor.Source.Forms
 
         private void datatypesListBox_DoubleClick(object sender, EventArgs e)
         {
-            this.DialogResult = System.Windows.Forms.DialogResult.OK;
+            if (datatypesListBox.SelectedItem is IGUID)
+            {
+                SelectedDatatype = datatypesListBox.SelectedItem as IGUID;
+                this.DialogResult = System.Windows.Forms.DialogResult.OK;
+            }
         }
 
 
