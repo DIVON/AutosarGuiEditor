@@ -553,7 +553,10 @@ namespace AutosarGuiEditor
         private void SelectElement(ISelectable element)
         {
             autosarApp.UnselectComponents();
-            element.Select();           
+            if (element != null)
+            {
+                element.Select();
+            }
         }
 
         private void SimpleDataTypeMenu_ApplyButton_Click(object sender, RoutedEventArgs e)
@@ -1128,10 +1131,18 @@ namespace AutosarGuiEditor
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
+            /* Get main composition and open it */
+            CompositionInstance mainComposition = AutosarApplication.GetInstance().Compositions.GetMainComposition();
+
+            compositionInstanceController.Composition = mainComposition;
+            CompositionProperties_TabItem.IsEnabled = true;
+            SelectElement(mainComposition);
+            tabHideHelper.SelectTab(CompositionTab);
+            tabHideHelper.ProcessTabs();
             Render(null, null);
-            AutosarApplication.GetInstance().UpdateFontAccordingScale(scene.Context.Scale);            
             changeViewportScaleController.FitWorldToImage(ViewPortImage.ActualWidth, ViewPortImage.ActualHeight);
-            
+            AutosarApplication.GetInstance().UpdateFontAccordingScale(scene.Context.Scale);
+
             Render(null, null);
             //loaded = true;
         }

@@ -1,4 +1,5 @@
 ﻿using AutosarGuiEditor.Source.Component;
+using AutosarGuiEditor.Source.Composition;
 using AutosarGuiEditor.Source.Forms.Controls;
 using AutosarGuiEditor.Source.Painters;
 using System;
@@ -55,7 +56,8 @@ namespace AutosarGuiEditor.Source.Controllers
                 {
                     ComponentInstance compInstance = ComponentFabric.GetInstance().CreateComponent(realDefenition, worldCoordX, worldCoordY);
                     compInstance.UpdateAnchorsPositions();
-                    AutosarApplication.GetInstance().ActiveComposition.ComponentInstances.Add(compInstance);
+                    CompositionInstance activeComposition = AutosarApplication.GetInstance().ActiveComposition;
+                    activeComposition.ComponentInstances.Add(compInstance);
                 }
             }
         }

@@ -352,6 +352,7 @@ namespace System
         {
             CompositionInstance mainComposition = new CompositionInstance();
             mainComposition.Name = CompositionInstancesList.MainCompositionName;
+            ActiveComposition = mainComposition;
             compositions.Add(mainComposition);
             BaseDataTypes.CheckBaseDataTypes();
         }
