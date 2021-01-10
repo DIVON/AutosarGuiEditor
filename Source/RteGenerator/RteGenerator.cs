@@ -675,7 +675,7 @@ namespace AutosarGuiEditor.Source.RteGenerator
 
         void GenerateRtePimFunction(StreamWriter writer, ComponentDefenition compDef, PimDefenition pimDef)
         {
-            String returnValue = pimDef.DataTypeName + " * ";
+            String returnValue = pimDef.DataTypeName + " * const ";
             String RteFuncName = RteFunctionsGenerator.GenerateFullPimFunctionName(compDef, pimDef);
 
             String fieldVariable = RteFunctionsGenerator.GenerateMultipleInstanceFunctionArguments(compDef.MultipleInstantiation);
