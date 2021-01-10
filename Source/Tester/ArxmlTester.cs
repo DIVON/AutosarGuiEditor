@@ -473,6 +473,16 @@ namespace AutosarGuiEditor.Source.Tester
             return result;
         }
 
-        
+        public Boolean IsErrorExist(String result)
+        {
+            if (result.Contains(ERROR))
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
     }
 }

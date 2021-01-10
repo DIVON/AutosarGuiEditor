@@ -87,6 +87,8 @@ namespace AutosarGuiEditor.Source.Forms
 
         public void ShowForm()
         {
+            LoadData();
+            moveController.UpdateAllRunnablesGrid();
             osTaskEditController.UpdateGrid();
             this.ShowDialog();
         }

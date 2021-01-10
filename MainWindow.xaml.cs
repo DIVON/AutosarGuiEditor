@@ -849,8 +849,28 @@ namespace AutosarGuiEditor
 
         private void GenerateRTE_Click(object sender, RoutedEventArgs e)
         {
-            RteGenerator rteGenerator = new RteGenerator();
-            rteGenerator.Generate();
+            StringWriter writer = new StringWriter();
+
+            ArxmlTester tester = new ArxmlTester(autosarApp, writer);
+            tester.Test();
+            String testResult = writer.ToString();
+            if(!tester.IsErrorExist(testResult))
+            {
+                RteGenerator rteGenerator = new RteGenerator();
+                bool result = rteGenerator.Generate(); 
+                if (result == true)
+                {
+                    MessageBox.Show("RTE has been generated.");
+                }
+                else
+                {
+                    MessageBox.Show("There is a problem with RTE generation.");
+                }
+            }
+            else
+            {
+                MessageBox.Show("There are errors in the project. RTE generation is impossible. Check project for errors.");
+            }
         }
 
         private void EnumField_DeleteButton_Click(object sender, RoutedEventArgs e)

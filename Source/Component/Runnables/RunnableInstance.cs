@@ -44,7 +44,7 @@ namespace AutosarGuiEditor.Source.Painters.Components.Runables
             get
             {
                 ComponentInstance componentInstance = AutosarApplication.GetInstance().FindComponentInstanceByRunnableGuid(this.GUID);
-                String fullName = componentInstance.Name + "_ru" + this.Name;
+                String fullName = componentInstance.Name + "_ru" + Defenition.Name;
                 return fullName;
             }
         }
