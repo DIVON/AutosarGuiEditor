@@ -422,7 +422,7 @@ namespace AutosarGuiEditor.Source.RteGenerator
                     arguments += RteFunctionsGenerator.ComponentInstancePointerDatatype + " instance";
                 }
                 arguments += ");";
-                writer.WriteLine(datatype + " * " + pimFuncName + arguments);
+                writer.WriteLine(datatype + " * const " + pimFuncName + arguments);
             }
 
             /* Add CData functions */

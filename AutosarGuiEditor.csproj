@@ -140,6 +140,7 @@
     <Compile Include="Source\Interfaces\IBoundary.cs" />
     <Compile Include="Source\Interfaces\ISelectable.cs" />
     <Compile Include="Source\Interfaces\ISpecifiedPortPainter.cs" />
+    <Compile Include="Source\MCUType.cs" />
     <Compile Include="Source\Painters\Boundary\Boundary.cs" />
     <Compile Include="Source\Painters\PortsPainters\ClientPort.cs" />
     <Compile Include="Source\Painters\PortsPainters\PortPainter.cs" />

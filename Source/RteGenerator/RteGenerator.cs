@@ -78,7 +78,19 @@ namespace AutosarGuiEditor.Source.RteGenerator
     
             /*Add #include */
             RteFunctionsGenerator.AddInclude(writer, "<string.h>");
-            RteFunctionsGenerator.AddInclude(writer, "<stm32f4xx.h>");
+            switch (AutosarApplication.GetInstance().MCUType.Type)
+            {
+                case MCUTypeDef.STM32F1xx:
+                {
+                    RteFunctionsGenerator.AddInclude(writer, "<stm32f1xx.h>");
+                    break;
+                }
+                case MCUTypeDef.STM32F4xx:
+                {
+                    RteFunctionsGenerator.AddInclude(writer, "<stm32f4xx.h>");
+                    break;
+                }
+            }
             RteFunctionsGenerator.AddInclude(writer, Properties.Resources.RTE_DATATYPES_H_FILENAME);
             RteFunctionsGenerator.AddInclude(writer, Properties.Resources.SYSTEM_ERRORS_H_FILENAME);
             RteFunctionsGenerator.AddInclude(writer, Properties.Resources.RTE_EXTERNAL_RUNNABLES_H_FILENAME);

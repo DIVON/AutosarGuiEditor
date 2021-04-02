@@ -4,7 +4,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     Title="Project Settings"
     Width="506"
-    Height="356"
+    Height="411"
     Icon="/AutosarGuiEditor;component/AppIcon.ico"
     WindowStartupLocation="CenterOwner">
     <Grid>
@@ -76,6 +76,17 @@
                     VerticalAlignment="Top"
                     Click="OpenRteDirDialogButton_Click"
                     Content="..." />
+                <ComboBox
+                    x:Name="McuTypeComboBox"
+                    Width="446"
+                    Margin="10,262,0,0"
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Top" />
+                <Label
+                    Margin="10,236,0,0"
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Top"
+                    Content="MCU type:" />
 
             </Grid>
 

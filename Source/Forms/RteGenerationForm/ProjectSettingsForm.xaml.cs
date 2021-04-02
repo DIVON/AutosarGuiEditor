@@ -22,6 +22,12 @@ namespace AutosarGuiEditor.Source.Forms
         public ProjectSettingsForm()
         {
             InitializeComponent();
+
+            var mcuTypes = Enum.GetValues(typeof(MCUTypeDef));
+            foreach (var mcuType in mcuTypes)
+            {
+                McuTypeComboBox.Items.Add(mcuType.ToString());
+            }
         }
 
         private void TextBox_TextChanged(object sender, TextChangedEventArgs e)
@@ -67,6 +73,7 @@ namespace AutosarGuiEditor.Source.Forms
             }
         }
 
+        
         private void SysTickFrequencyEdit_TextChanged(object sender, TextChangedEventArgs e)
         {
             uint newFreq = 0;

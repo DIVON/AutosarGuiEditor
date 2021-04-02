@@ -36,6 +36,7 @@ using AutosarGuiEditor.Source.Component.CData;
 using AutosarGuiEditor.Source.Composition;
 using AutosarGuiEditor.Source.Render;
 using AutosarGuiEditor.Source.DataTypes.ArrayDataType;
+using AutosarGuiEditor.Source;
 
 
 namespace System 
@@ -142,6 +143,14 @@ namespace System
             }
         }
 
+        CMCUType mcuType = new CMCUType();
+        public CMCUType MCUType
+        {
+            get
+            {
+                return mcuType;
+            }
+        }
 
         public uint SystickFrequencyHz = 1000;
         public String GenerateRtePath = "";
@@ -153,9 +162,7 @@ namespace System
         public PortableFontDesc ComponentNameFont = new PortableFontDesc(isbold: true);
         public PortableFontDesc PortsNamesFont;
         public PortableFontDesc ComponentDefinitionNameFont;
-
        
-
         public String FileName;
 
         public CompositionInstance ActiveComposition;
@@ -219,6 +226,7 @@ namespace System
                 Compositions.LoadFromXML(xroot);
                 OsTasks.LoadFromXML(xroot);
                 arrayDataTypes.LoadFromXML(xroot);
+                MCUType.LoadFromXML(xroot);
                 BaseDataTypes.CheckBaseDataTypes();
                 SyncronizeRunnables(null, true);
                 UpdateConnections();
@@ -315,7 +323,7 @@ namespace System
             systemErrors.WriteToXML(root);
             OsTasks.WriteToXML(root);
             Compositions.WriteToXML(root);
-            
+            MCUType.WriteToXML(root);
             xdoc.Save(filename);
             return true;
         }

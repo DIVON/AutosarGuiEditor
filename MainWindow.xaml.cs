@@ -37,6 +37,7 @@ using AutosarGuiEditor.Source.Utility.GuiUtility;
 using AutosarGuiEditor.Source.RteGenerator.TestGenerator;
 using AutosarGuiEditor.Source.Painters.Boundaries;
 using AutosarGuiEditor.Source.App.Settings;
+using AutosarGuiEditor.Source;
 
 
 namespace AutosarGuiEditor
@@ -838,12 +839,14 @@ namespace AutosarGuiEditor
             projectSettingsForm.RteGenerationPath = autosarApp.GenerateRtePath;
             projectSettingsForm.ComponentGenerationPath = autosarApp.GenerateComponentsPath;
             projectSettingsForm.Frequency = autosarApp.SystickFrequencyHz;
+            projectSettingsForm.McuTypeComboBox.SelectedIndex = autosarApp.MCUType.ToInt();
             projectSettingsForm.ShowDialog();
             if (projectSettingsForm.DialogResult == true)
             {
                 autosarApp.SystickFrequencyHz = projectSettingsForm.Frequency;
                 autosarApp.GenerateRtePath = projectSettingsForm.RteGenerationPath;
                 autosarApp.GenerateComponentsPath = projectSettingsForm.ComponentGenerationPath;
+                autosarApp.MCUType.Type = (MCUTypeDef)projectSettingsForm.McuTypeComboBox.SelectedIndex;
             }
         }
 

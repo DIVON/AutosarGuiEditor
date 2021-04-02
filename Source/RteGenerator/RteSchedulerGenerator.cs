@@ -348,7 +348,19 @@ namespace AutosarGuiEditor.Source.RteGenerator
             writer.WriteLine();
             RteFunctionsGenerator.AddInclude(writer, Properties.Resources.RTE_DATATYPES_H_FILENAME);
             RteFunctionsGenerator.AddInclude(writer, Properties.Resources.RTE_EXTERNAL_RUNNABLES_H_FILENAME);
-            RteFunctionsGenerator.AddInclude(writer, "<stm32f4xx.h>");
+            switch (AutosarApplication.GetInstance().MCUType.Type)
+            {
+                case MCUTypeDef.STM32F1xx:
+                {
+                    RteFunctionsGenerator.AddInclude(writer, "<stm32f1xx.h>");
+                    break;
+                }
+                case MCUTypeDef.STM32F4xx:
+                {
+                    RteFunctionsGenerator.AddInclude(writer, "<stm32f4xx.h>");
+                    break;
+                }
+            }
             writer.WriteLine();
 
             writer.WriteLine("/* Time periods */");
@@ -539,7 +551,7 @@ namespace AutosarGuiEditor.Source.RteGenerator
             writer.WriteLine("static uint32 schedulingCounter = 0u;");
 
             writer.WriteLine();
-            writer.WriteLine("volatile boolean timeEventOccured = FALSE;");
+            writer.WriteLine("extern TIM_HandleTypeDef htim13;");
 
             writer.WriteLine();
             writer.WriteLine("static Rte_Scheduler_Sequence  taskScheduling =");
@@ -607,8 +619,9 @@ namespace AutosarGuiEditor.Source.RteGenerator
             /* Writing DoScheduling function */
             writer.WriteLine("void DoScheduling(void)");
             writer.WriteLine("{");
-            writer.WriteLine("    if (FALSE != timeEventOccured)");
+            writer.WriteLine("    if (__HAL_TIM_GET_FLAG(&htim13, TIM_FLAG_UPDATE) != RESET)");
             writer.WriteLine("    {");
+            writer.WriteLine("        __HAL_TIM_CLEAR_FLAG(&htim13, TIM_FLAG_UPDATE);");
             writer.WriteLine("        uint32 index = schedulingCounter % RTE_SCHEDULER_STEPS;");
             writer.WriteLine("        for (uint32 i = 0; i < RTE_TASKS_COUNT; i++)");
             writer.WriteLine("        {");
@@ -622,7 +635,6 @@ namespace AutosarGuiEditor.Source.RteGenerator
             writer.WriteLine("            }");
             writer.WriteLine("        }");
             writer.WriteLine("        schedulingCounter++;");
-            writer.WriteLine("        timeEventOccured = FALSE;");
             writer.WriteLine("    }");
             writer.WriteLine("}");
 
