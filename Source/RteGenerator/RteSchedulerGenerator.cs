@@ -551,7 +551,25 @@ namespace AutosarGuiEditor.Source.RteGenerator
             writer.WriteLine("static uint32 schedulingCounter = 0u;");
 
             writer.WriteLine();
-            writer.WriteLine("extern TIM_HandleTypeDef htim13;");
+
+            String htim = "Not defined!";
+           
+            switch (AutosarApplication.GetInstance().MCUType.Type)
+            {
+                case MCUTypeDef.STM32F1xx:
+                {
+                    htim = "htim4";
+                    break;
+                }
+                case MCUTypeDef.STM32F4xx:
+                {
+                    htim = "htim13";
+                    break;
+                }
+            }
+
+            writer.WriteLine("extern TIM_HandleTypeDef " + htim + ";");
+
 
             writer.WriteLine();
             writer.WriteLine("static Rte_Scheduler_Sequence  taskScheduling =");
@@ -619,9 +637,9 @@ namespace AutosarGuiEditor.Source.RteGenerator
             /* Writing DoScheduling function */
             writer.WriteLine("void DoScheduling(void)");
             writer.WriteLine("{");
-            writer.WriteLine("    if (__HAL_TIM_GET_FLAG(&htim13, TIM_FLAG_UPDATE) != RESET)");
+            writer.WriteLine("    if (__HAL_TIM_GET_FLAG(&" + htim + ", TIM_FLAG_UPDATE) != RESET)");
             writer.WriteLine("    {");
-            writer.WriteLine("        __HAL_TIM_CLEAR_FLAG(&htim13, TIM_FLAG_UPDATE);");
+            writer.WriteLine("        __HAL_TIM_CLEAR_FLAG(&" + htim + ", TIM_FLAG_UPDATE);");
             writer.WriteLine("        uint32 index = schedulingCounter % RTE_SCHEDULER_STEPS;");
             writer.WriteLine("        for (uint32 i = 0; i < RTE_TASKS_COUNT; i++)");
             writer.WriteLine("        {");
