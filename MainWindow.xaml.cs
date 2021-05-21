@@ -822,8 +822,6 @@ namespace AutosarGuiEditor
             ViewPortImage.Source = viewPort.WriteableBmp;
             scene.UpdateBitmap(viewPort.WriteableBmp);
         }
-
-
         
         private void RunnablesOrderMenu_Click(object sender, RoutedEventArgs e)
         {
@@ -1230,7 +1228,23 @@ namespace AutosarGuiEditor
             AutosarApplication.GetInstance().CreateNewProject();
             openSaveController.Clear();
             AutosarTree.UpdateAutosarTreeView();
-        }        
+        }
+
+        private void GridSplitter_DragCompleted(object sender, System.Windows.Controls.Primitives.DragCompletedEventArgs e)
+        {
+            UpdateImageSize();
+            Render(null, null);
+            Render(null, null);
+            changeViewportScaleController.FitWorldToImage(ViewPortImage.ActualWidth, ViewPortImage.ActualHeight);
+        }
+
+        private void GridSplitter_DragDelta(object sender, System.Windows.Controls.Primitives.DragDeltaEventArgs e)
+        {
+            UpdateImageSize();
+            Render(null, null);
+            Render(null, null);
+            changeViewportScaleController.FitWorldToImage(ViewPortImage.ActualWidth, ViewPortImage.ActualHeight);
+        }
     }
 
 }

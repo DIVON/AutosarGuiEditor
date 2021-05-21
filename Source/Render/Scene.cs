@@ -40,7 +40,10 @@ namespace System
         public void UpdateBitmap(WriteableBitmap bitmap)
         {
             bmp = bitmap;
-            _context = new RenderContext(bmp);
+            RenderContext newcontext = new RenderContext(bmp);
+            newcontext.Offset = _context.Offset;
+            newcontext.scale = _context.scale;
+            _context = newcontext;
         }
 
 		public Point MouseToXY(Point mouseCoord)

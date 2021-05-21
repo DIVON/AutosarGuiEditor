@@ -29,58 +29,68 @@
         VerticalAlignment="Stretch"
         RenderTransformOrigin="0.387,0.507">
 
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="94*" />
+            <ColumnDefinition Width="95*" />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="18" />
+            <RowDefinition Height="725*" />
+        </Grid.RowDefinitions>
 
-        <Grid
+        <Menu
+            Grid.Row="0"
             Grid.ColumnSpan="2"
-            Margin="0,0,0,713"
-            VerticalAlignment="Stretch">
-            <Menu
-                Height="18"
-                HorizontalAlignment="Stretch"
-                VerticalAlignment="Top">
-                <MenuItem Header="File">
-                    <MenuItem Click="NewProject_Click" Header="New" />
-                    <Separator />
-                    <MenuItem Click="OpenProject_Click" Header="Open" />
-                    <Separator />
-                    <MenuItem Click="SaveProject_Click" Header="Save" />
-                    <MenuItem Click="SaveAsProject_Click" Header="Save as" />
-                </MenuItem>
-                <MenuItem Header="Project">
-                    <MenuItem Click="ProjectSettings_Click" Header="Settings..." />
-                    <Separator />
-                    <MenuItem Click="GenerateRTE_Click" Header="Generate RTE" />
-                    <MenuItem Click="GenerateTestEnvironment_Click" Header="Generate test environment" />
-                </MenuItem>
-                <MenuItem Header="Insert">
-                    <MenuItem Click="AddComponentDefenitionButton_Click" Header="Component defenition" />
-                    <MenuItem Click="AddCompositionButton_Click" Header="Composition" />
-                    <MenuItem Click="AddConnectionButton_Click" Header="Connection" />
-                    <Separator />
-                    <MenuItem Click="AddEnumDataTypeMenu_Click" Header="Enum" />
-                    <MenuItem Click="AddSimpleDataTypeMenu_Click" Header="Simple data type" />
-                    <MenuItem Click="AddComplexDataTypeMenu_Click" Header="Complex data type" />
-                    <MenuItem Click="AddArrayDataTypeMenu_Click" Header="Array data type" />
-                    <Separator />
-                    <MenuItem Click="AddSenderReceiverMenu_Click" Header="Sender-Receiver interface" />
-                    <MenuItem Click="AddClientServerMenu_Click" Header="Client-Server interface" />
-                </MenuItem>
-                <MenuItem Header="System">
-                    <MenuItem Click="RunnablesOrderMenu_Click" Header="Runnables order" />
-                    <MenuItem Click="SystemErrorsMenu_Click" Header="System errors" />
-                    <MenuItem Click="CheckErrorsMenu_Click" Header="Check errors" />
-                </MenuItem>
-            </Menu>
-        </Grid>
+            Height="18"
+            HorizontalAlignment="Stretch"
+            VerticalAlignment="Top">
+            <MenuItem Header="File">
+                <MenuItem Click="NewProject_Click" Header="New" />
+                <Separator />
+                <MenuItem Click="OpenProject_Click" Header="Open" />
+                <Separator />
+                <MenuItem Click="SaveProject_Click" Header="Save" />
+                <MenuItem Click="SaveAsProject_Click" Header="Save as" />
+            </MenuItem>
+            <MenuItem Header="Project">
+                <MenuItem Click="ProjectSettings_Click" Header="Settings..." />
+                <Separator />
+                <MenuItem Click="GenerateRTE_Click" Header="Generate RTE" />
+                <MenuItem Click="GenerateTestEnvironment_Click" Header="Generate test environment" />
+            </MenuItem>
+            <MenuItem Header="Insert">
+                <MenuItem Click="AddComponentDefenitionButton_Click" Header="Component defenition" />
+                <MenuItem Click="AddCompositionButton_Click" Header="Composition" />
+                <MenuItem Click="AddConnectionButton_Click" Header="Connection" />
+                <Separator />
+                <MenuItem Click="AddEnumDataTypeMenu_Click" Header="Enum" />
+                <MenuItem Click="AddSimpleDataTypeMenu_Click" Header="Simple data type" />
+                <MenuItem Click="AddComplexDataTypeMenu_Click" Header="Complex data type" />
+                <MenuItem Click="AddArrayDataTypeMenu_Click" Header="Array data type" />
+                <Separator />
+                <MenuItem Click="AddSenderReceiverMenu_Click" Header="Sender-Receiver interface" />
+                <MenuItem Click="AddClientServerMenu_Click" Header="Client-Server interface" />
+            </MenuItem>
+            <MenuItem Header="System">
+                <MenuItem Click="RunnablesOrderMenu_Click" Header="Runnables order" />
+                <MenuItem Click="SystemErrorsMenu_Click" Header="System errors" />
+                <MenuItem Click="CheckErrorsMenu_Click" Header="Check errors" />
+            </MenuItem>
+        </Menu>
+
         <GroupBox
             x:Name="TreeViewGroupBox"
-            Width="302"
-            Margin="0,22,0,0"
-            HorizontalAlignment="Left"
+            Grid.Row="1"
+            Grid.Column="0"
+            Margin="4,0"
+            HorizontalAlignment="Stretch"
+            VerticalAlignment="Stretch"
             Header="Component Tree view"
             RenderTransformOrigin="0.5,0.5">
             <MyNamespace:AutosarTreeViewControl
                 x:Name="AutosarTree"
+                Grid.Row="1"
+                Grid.Column="1"
                 Margin="5,5,5,5"
                 Background="AliceBlue"
                 KeyDown="AutosarTree_KeyDown"
@@ -109,7 +119,11 @@
         </GroupBox>
         <TabControl
             Name="MainTabControl"
-            Margin="307,22,0,0"
+            Grid.Row="1"
+            Grid.Column="1"
+            Margin="0,0,0,0"
+            HorizontalAlignment="Stretch"
+            VerticalAlignment="Stretch"
             SelectedIndex="1">
             <TabItem
                 Name="CompositionTab"
@@ -1070,9 +1084,14 @@
                 </Grid>
             </TabItem>
         </TabControl>
-
-
-
+        <GridSplitter
+            Grid.Row="1"
+            Grid.Column="1"
+            Width="2"
+            HorizontalAlignment="Left"
+            Background="Gray"
+            DragCompleted="GridSplitter_DragCompleted"
+            DragDelta="GridSplitter_DragDelta" />
     </Grid>
 
 </Window>
