@@ -43,29 +43,45 @@ namespace AutosarGuiEditor.Source.Autosar.OsTasks
             return "OsTasks";
         }
 
-        public int GetSchedulerNecessaryStepsCount()
+        int gcd(int a, int b)
         {
-            double minPeriod = double.MaxValue;
-            double maxPeriod = 0;
+            if (b == 0)
+            {
+                return a;
+            }
+            else
+            {
+                return gcd(b, a % b);
+            }
+        }
+ 
+        // Returns Least Common Multiply of array elements
+        int findlcm(List<int> arr)
+        {
+            // Initialize result
+            int ans = arr[0];
+ 
+            // ans contains LCM of arr[0], ..arr[i]
+            // after i'th iteration,
+            for (int i = 1; i < arr.Count; i++)
+            {
+                ans = (((arr[i] * ans)) / (gcd(arr[i], ans)));
+            }
+ 
+            return ans;
+        }
+
+        public int GetSchedulerNecessaryStepsCount(double schedulerPeriodUs)
+        {
+            List<int> schedulerTaskSteps = new List<int>();
 
             foreach(OsTask task in this)
             {
-                if (minPeriod > task.PeriodMs)
-                {
-                    minPeriod = task.PeriodMs;
-                }
-                if (maxPeriod < task.PeriodMs)
-                {
-                    maxPeriod = task.PeriodMs;
-                }
+                schedulerTaskSteps.Add(Convert.ToInt32(task.PeriodMs * 1000 / schedulerPeriodUs));
             }
 
-            int count = 0;
-            if ((maxPeriod != 0) && (minPeriod != 0))
-            {
-                count = (int)(maxPeriod / minPeriod);
-            }
-            return count;
+            int stepsPeriod = findlcm(schedulerTaskSteps);
+            return stepsPeriod;
         }
     }
 }

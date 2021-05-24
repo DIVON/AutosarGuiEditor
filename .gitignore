@@ -3,3 +3,5 @@
 /bin
 /obj
 obj
+/WriteableBitmapEx/Build/Debug/WriteableBitmapEx.Wpf.dll
+/WriteableBitmapEx/Build/Debug/WriteableBitmapEx.Wpf.pdb

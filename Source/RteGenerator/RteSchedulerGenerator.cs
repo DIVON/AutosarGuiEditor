@@ -468,6 +468,10 @@ namespace AutosarGuiEditor.Source.RteGenerator
                         periods.Add(runnables[i].Defenition.PeriodMs);
                     }
                 }
+                else
+                {
+                    prevPeriod = task.PeriodMs;
+                }
             }
 
             return periods;
@@ -518,6 +522,9 @@ namespace AutosarGuiEditor.Source.RteGenerator
 
         void Generate_RteTaskScheduler_Source_File()
         {
+            double systickfreq = AutosarApplication.GetInstance().SystickFrequencyHz;
+            int schedulerStepMicrosec = (int)((1000.0d / systickfreq) * 1000.0);
+
             String FileName = RteFunctionsGenerator.GetRteFolder() + "\\" + Properties.Resources.RTE_TASK_SCHEDULER_C_FILENAME;
             StreamWriter writer = new StreamWriter(FileName);
 
@@ -530,7 +537,7 @@ namespace AutosarGuiEditor.Source.RteGenerator
             int tasksCount = AutosarApplication.GetInstance().OsTasks.Count;
             writer.WriteLine(RteFunctionsGenerator.CreateDefine("RTE_TASKS_COUNT", tasksCount.ToString(), false));
 
-            int stepsCount = AutosarApplication.GetInstance().OsTasks.GetSchedulerNecessaryStepsCount();
+            int stepsCount = AutosarApplication.GetInstance().OsTasks.GetSchedulerNecessaryStepsCount(schedulerStepMicrosec);
 
             writer.WriteLine();
             writer.WriteLine(RteFunctionsGenerator.CreateDefine("RTE_SCHEDULER_STEPS", stepsCount.ToString(), false));
@@ -572,12 +579,12 @@ namespace AutosarGuiEditor.Source.RteGenerator
 
 
             writer.WriteLine();
-            writer.WriteLine("static Rte_Scheduler_Sequence  taskScheduling =");
+            writer.WriteLine("static const Rte_Scheduler_Sequence  taskScheduling =");
             writer.WriteLine("{");
             /* Sort tasks by priority is necessary */
             AutosarApplication.GetInstance().OsTasks.DoSort();
-            double systickfreq = AutosarApplication.GetInstance().SystickFrequencyHz;
-            int schedulerStepMicrosec = (int)((1000.0d / systickfreq) * 1000.0);
+            
+            
             
             for (int i = 0; i < stepsCount; i++)
             {
