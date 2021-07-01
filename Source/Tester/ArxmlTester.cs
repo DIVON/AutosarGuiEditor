@@ -431,12 +431,16 @@ namespace AutosarGuiEditor.Source.Tester
 
         protected void TestOsTasks()
         {
+            OsTask initTask = autosarApp.OsTasks.GetInitTask();
             for (int i = 0; i < autosarApp.OsTasks.Count; i++)
             {
                 OsTask task = autosarApp.OsTasks[i];
                 if (task.PeriodMs == 0)
                 {
-                    AppendText("OsTask : " + task.Name + " has zero frequency", Error: true);
+                    if (initTask != task)
+                    {
+                        AppendText("OsTask : " + task.Name + " has zero frequency", Error: true);
+                    }
                 }
             }
         }

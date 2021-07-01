@@ -123,11 +123,6 @@ namespace AutosarGuiEditor
         /* Action by timer */
         public void Render(object sender, EventArgs e)
         {
-            scene.RenderScene();  
-
-            /* Render not connected connectionPainter */
-            connectionLineController.Render(scene.Context);
-
             if (lastWidth == 0)
             {
                 lastWidth = this.Width;
@@ -140,6 +135,11 @@ namespace AutosarGuiEditor
 
                 UpdateImageSize();
             }
+
+            scene.RenderScene();  
+
+            /* Render not connected connectionPainter */
+            connectionLineController.Render(scene.Context);
         }
 
         /* Create new component defenition */

@@ -534,7 +534,16 @@ namespace AutosarGuiEditor.Source.RteGenerator
             RteFunctionsGenerator.AddInclude(writer, Properties.Resources.RTE_RUNTIME_ENVIRONMENT_H_FILENAME);
             writer.WriteLine();
 
+            
+            OsTask initTask = AutosarApplication.GetInstance().OsTasks.GetInitTask();
+
+            if (initTask != null)
+            {
+                AutosarApplication.GetInstance().OsTasks.Remove(initTask);
+            }
+
             int tasksCount = AutosarApplication.GetInstance().OsTasks.Count;
+
             writer.WriteLine(RteFunctionsGenerator.CreateDefine("RTE_TASKS_COUNT", tasksCount.ToString(), false));
 
             int stepsCount = AutosarApplication.GetInstance().OsTasks.GetSchedulerNecessaryStepsCount(schedulerStepMicrosec);
@@ -570,7 +579,7 @@ namespace AutosarGuiEditor.Source.RteGenerator
                 }
                 case MCUTypeDef.STM32F4xx:
                 {
-                    htim = "htim13";
+                    htim = "htim2";
                     break;
                 }
             }
@@ -593,25 +602,28 @@ namespace AutosarGuiEditor.Source.RteGenerator
                 for (int j = 0; j < tasksCount; j++)
                 {
                     OsTask task = AutosarApplication.GetInstance().OsTasks[j];
-                    bool includeCondition = true;
-
-                    int TaskMicrosec = (int)(task.PeriodMs * 1000);
-
-                    int ost = schedulerStepMicrosec * i % TaskMicrosec;
-                    includeCondition = (ost == 0);
-                    if (includeCondition)
+                    if (task.Name != "Init")
                     {
-                         String osTaskName = RteFunctionsGenerator.GenerateRteOsTaskFunctionName(task);
-                         writer.Write("        " + osTaskName);
-                         if (writtenFunctions < tasksCount - 1)
-                         {
-                             writer.WriteLine(",");
-                         }
-                         else
-                         {
-                             writer.WriteLine();
-                         }
-                         writtenFunctions++;
+                        bool includeCondition = true;
+
+                        int TaskMicrosec = (int)(task.PeriodMs * 1000);
+
+                        int ost = schedulerStepMicrosec * i % TaskMicrosec;
+                        includeCondition = (ost == 0);
+                        if (includeCondition)
+                        {
+                            String osTaskName = RteFunctionsGenerator.GenerateRteOsTaskFunctionName(task);
+                            writer.Write("        " + osTaskName);
+                            if (writtenFunctions < tasksCount - 1)
+                            {
+                                writer.WriteLine(",");
+                            }
+                            else
+                            {
+                                writer.WriteLine();
+                            }
+                            writtenFunctions++;
+                        }
                     }
                 }
 
@@ -666,6 +678,11 @@ namespace AutosarGuiEditor.Source.RteGenerator
 
             RteFunctionsGenerator.WriteEndOfFile(writer);
             writer.Close();
+
+            if (initTask != null)
+            {
+                AutosarApplication.GetInstance().OsTasks.Add(initTask);
+            }
         }
     }
 }

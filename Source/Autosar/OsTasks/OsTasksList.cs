@@ -74,14 +74,34 @@ namespace AutosarGuiEditor.Source.Autosar.OsTasks
         public int GetSchedulerNecessaryStepsCount(double schedulerPeriodUs)
         {
             List<int> schedulerTaskSteps = new List<int>();
-
+            OsTask initTask = GetInitTask();
             foreach(OsTask task in this)
             {
-                schedulerTaskSteps.Add(Convert.ToInt32(task.PeriodMs * 1000 / schedulerPeriodUs));
+                if (task != initTask)
+                {
+                    schedulerTaskSteps.Add(Convert.ToInt32(task.PeriodMs * 1000 / schedulerPeriodUs));
+                }
             }
 
             int stepsPeriod = findlcm(schedulerTaskSteps);
             return stepsPeriod;
+        }
+
+        public OsTask GetInitTask()
+        {
+            return GetTaskByName("Init");
+        }
+
+        public OsTask GetTaskByName(String taskName)
+        {
+            foreach (OsTask task in this)
+            {
+                if (task.Name == taskName)
+                {
+                    return task;
+                }
+            }
+            return null;
         }
     }
 }
