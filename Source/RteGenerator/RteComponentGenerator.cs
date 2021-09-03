@@ -229,7 +229,7 @@ namespace AutosarGuiEditor.Source.RteGenerator
             if (lines.Count > 0)
             {
                 writer.WriteLine("/* ");
-                writer.WriteLine(" *  This RTE function could be used: ");
+                writer.WriteLine(" *  This RTE functions could be used: ");
                 foreach(String str in lines)
                 {
                     writer.WriteLine(str);

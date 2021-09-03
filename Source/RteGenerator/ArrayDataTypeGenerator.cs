@@ -31,7 +31,7 @@ namespace AutosarGuiEditor.Source.RteGenerator
                 {
                     /* Write array size */
                     String arraySizeNameMacro = arrayDT.Name + "_ELEMENTS_COUNT";
-                    writer.WriteLine(RteFunctionsGenerator.CreateDefine(arraySizeNameMacro, arrayDT.Size.ToString() + "U"));
+                    writer.WriteLine(RteFunctionsGenerator.CreateDefine(arraySizeNameMacro, arrayDT.Size.ToString() + "U", false));
 
                     writer.WriteLine();
                     /* Write a structure with array */

@@ -334,10 +334,10 @@ namespace AutosarGuiEditor.Source.RteGenerator
                 minValue = acceptFloatValue(datatype.MinValue);
                 maxValue = acceptFloatValue(datatype.MaxValue);
             }
-            writer.WriteLine(RteFunctionsGenerator.CreateDefine(upperLimit, maxValue));
+            writer.WriteLine(RteFunctionsGenerator.CreateDefine(upperLimit, maxValue, false));
 
             String lowerLimit = datatype.Name + "_LOWER_LIMIT";
-            writer.WriteLine(RteFunctionsGenerator.CreateDefine(lowerLimit, minValue));
+            writer.WriteLine(RteFunctionsGenerator.CreateDefine(lowerLimit, minValue, false));
 
             /* Write datatype */
             String dataTypeName = AutosarApplication.GetInstance().GetDataTypeName(datatype.BaseDataTypeGUID);
@@ -371,12 +371,16 @@ namespace AutosarGuiEditor.Source.RteGenerator
             writer.WriteLine("");
 
             int minLimit = datatype.GetLimit(LimitType.ltLowerLimit);
-            String defineMin = RteFunctionsGenerator.CreateDefine(datatype.Name + "_LOWER_LIMIT", minLimit.ToString());
+            String defineMin = RteFunctionsGenerator.CreateDefine(datatype.Name + "_LOWER_LIMIT", minLimit.ToString(), false);
             writer.WriteLine(defineMin);
 
             int upperLimit = datatype.GetLimit(LimitType.ltUpperLimit);
-            String defineMax = RteFunctionsGenerator.CreateDefine(datatype.Name + "_UPPER_LIMIT", upperLimit.ToString());
+            String defineMax = RteFunctionsGenerator.CreateDefine(datatype.Name + "_UPPER_LIMIT", upperLimit.ToString(), false);
             writer.WriteLine(defineMax);
+
+            int elementsCount = datatype.Fields.Count;
+            String elementsCountStr = RteFunctionsGenerator.CreateDefine(datatype.Name + "_ELEMENTS_COUNT", elementsCount.ToString(), false);
+            writer.WriteLine(elementsCountStr);
 
             writer.WriteLine("");
 

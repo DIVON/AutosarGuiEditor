@@ -70,10 +70,12 @@ namespace AutosarGuiEditor.Source.Painters
             }
             else if (Direction == TextDirection.TopToBottom)
             {
+                textCoord.X += (double)textHeight / 2.0d;
                 context.Bitmap.DrawStringVertical((int)textCoord.X, (int)textCoord.Y, TextColor, Font, Text, true);
             }
             else
             {
+                textCoord.X -= (double)textHeight / 2.0d;
                 context.Bitmap.DrawStringVertical((int)textCoord.X, (int)textCoord.Y, TextColor, Font, Text, false);
             }
         }
