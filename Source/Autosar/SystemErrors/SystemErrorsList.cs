@@ -20,15 +20,28 @@ namespace AutosarGuiEditor.Source.Autosar.SystemErrors
         public override void LoadFromXML(XElement xmlApp, string NameId = "")
         {
             base.LoadFromXML(xmlApp, NameId);
-            SortErrorsByID();
+            //SortErrorsByID();
         }
 
-        public void SortErrorsByID()
+        public int ErrorCount(SystemErrorStrictness strictness)
         {
-            this.Sort(delegate(SystemErrorObject x, SystemErrorObject y)
+            int count = 0;
+            foreach (SystemErrorObject error in this)
             {
-                return x.Value.CompareTo(y.Value);
-            });
+                if (error.Strictness == strictness)
+                {
+                    count++;
+                }
+            }
+            return count;
         }
+
+        //public void SortErrorsByID()
+        //{
+        //    this.Sort(delegate(SystemErrorObject x, SystemErrorObject y)
+        //    {
+        //        return x.Value.CompareTo(y.Value);
+        //    });
+        //}
     }
 }

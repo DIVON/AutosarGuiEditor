@@ -24,11 +24,20 @@ namespace AutosarGuiEditor.Source.Forms.SystemErrorsForm
         public SystemErrorWindow(AutosarApplication autosarApp)
         {
             InitializeComponent();
+            strictnessList = new SystemErrorStrictnessList();
+            strictnessList.Add(SystemErrorStrictness.ImmediateSafeState);
+            strictnessList.Add(SystemErrorStrictness.NoRestriction);
             this.autosarApp = autosarApp;
-            UpdateGrid();           
+            UpdateGrid();
         }
 
-        AutosarApplication autosarApp;   
+        AutosarApplication autosarApp;
+        public SystemErrorStrictnessList strictnessList
+        {
+            set;
+            get;
+        }
+        
 
         private void DeleteError_Click(object sender, RoutedEventArgs e)
         {
@@ -63,20 +72,20 @@ namespace AutosarGuiEditor.Source.Forms.SystemErrorsForm
             }
         }
 
-        private void Value_TextEdit_TextChanged(object sender, TextChangedEventArgs e)
-        {
-            TextBox box = sender as TextBox;
-            int index = SystemErrorsGrid.SelectedIndex;
-            if ((index < SystemErrorsGrid.Items.Count) && (index >= 0))
-            {
-                UInt32 val;
-                if (UInt32.TryParse(box.Text, out val))
-                {
-                    autosarApp.SystemErrors[index].Value = val;
-                }
+        //private void Value_TextEdit_TextChanged(object sender, TextChangedEventArgs e)
+        //{
+        //    TextBox box = sender as TextBox;
+        //    int index = SystemErrorsGrid.SelectedIndex;
+        //    if ((index < SystemErrorsGrid.Items.Count) && (index >= 0))
+        //    {
+        //        UInt32 val;
+        //        if (UInt32.TryParse(box.Text, out val))
+        //        {
+        //            autosarApp.SystemErrors[index].Value = val;
+        //        }
 
-            }
-        }
+        //    }
+        //}
 
 
         private void AddError_Click(object sender, RoutedEventArgs e)
@@ -88,9 +97,19 @@ namespace AutosarGuiEditor.Source.Forms.SystemErrorsForm
 
         public void UpdateGrid()
         {
-            autosarApp.SystemErrors.SortErrorsByID();
+            //autosarApp.SystemErrors.SortErrorsByID();
             SystemErrorsGrid.ItemsSource = null;       
             SystemErrorsGrid.ItemsSource = autosarApp.SystemErrors;
+        }
+
+        private void Strictness_Changed(object sender, SelectionChangedEventArgs e)
+        {
+            ComboBox box = sender as ComboBox;
+            int index = SystemErrorsGrid.SelectedIndex;
+            if ((index < SystemErrorsGrid.Items.Count) && (index >= 0))
+            {
+                autosarApp.SystemErrors[index].StrictnessInt = box.SelectedIndex;
+            }
         }
     }
 }

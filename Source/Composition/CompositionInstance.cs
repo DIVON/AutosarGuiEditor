@@ -236,8 +236,8 @@ namespace AutosarGuiEditor.Source.Composition
             internalPort.IsDelegatePort = true;
             InternalPortsInstances.Add(internalPort);
 
-            Ports.DoSort();
-            InternalPortsInstances.DoSort();
+            //Ports.DoSort();
+            //InternalPortsInstances.DoSort();
         }
     }
 }

@@ -34,7 +34,7 @@ namespace AutosarGuiEditor.Source.RteGenerator
         void GenerateComponent(ComponentDefenition component)
         {
             /* Generate component Folder */
-            String componentFolder = RteFunctionsGenerator.GetComponentsFolder() + "\\" + component.Name;
+            String componentFolder = RteFunctionsGenerator.GetComponentsFolder() + "\\" + component.Name + "\\contracts\\skeleton";
             String rteDir = RteFunctionsGenerator.GetRteFolder() + "\\";
             String incDir = componentFolder + "\\include\\";
             String srcDir = componentFolder + "\\src\\";

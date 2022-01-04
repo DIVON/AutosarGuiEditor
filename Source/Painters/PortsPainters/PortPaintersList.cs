@@ -72,5 +72,10 @@ namespace AutosarGuiEditor.Source.Painters.PortsPainters
             }
             return null;
         }
+
+        public override void DoSort()
+        {
+            /* Do nothing */
+        }
     }
 }

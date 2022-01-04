@@ -83,7 +83,7 @@ namespace AutosarGuiEditor.Source.RteGenerator
         public static String GetComponentsFolder()
         {
             String resFolder = "";
-            if (Path.IsPathRooted(AutosarApplication.GetInstance().GenerateComponentsPath))
+            if (Path.IsPathRooted(AutosarApplication.GetInstance().GenerateRtePath))
             {
                 resFolder = AutosarApplication.GetInstance().GenerateComponentsPath + "\\" + Properties.Resources.COMPONENTS_FOLDER;
             }

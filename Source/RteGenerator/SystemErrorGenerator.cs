@@ -28,26 +28,49 @@ namespace AutosarGuiEditor.Source.RteGenerator
 
             writer.WriteLine("/*  System errors */");
             WriteErrorsCount(writer);
-            writer.WriteLine();
             WriteAllErrors(writer);
-            writer.WriteLine();
             RteFunctionsGenerator.CloseGuardDefine(writer);
             RteFunctionsGenerator.WriteEndOfFile(writer);
             writer.Close();
         }
 
         void WriteErrorsCount(StreamWriter writer)
-        {            
-            writer.WriteLine(RteFunctionsGenerator.CreateDefine("SYSTEM_ERRORS_COUNT", AutosarApplication.GetInstance().SystemErrors.Count.ToString()));   
+        {
+            int immediateSafeStateCount = AutosarApplication.GetInstance().SystemErrors.ErrorCount(SystemErrorStrictness.ImmediateSafeState);
+            int totalErrorCount =  AutosarApplication.GetInstance().SystemErrors.Count;
+            writer.WriteLine(RteFunctionsGenerator.CreateDefine("SYSTEM_ERRORS_COUNT", totalErrorCount.ToString()));
+            writer.WriteLine(RteFunctionsGenerator.CreateDefine("IMMEDIATE_SAFE_STATE_ERROR_COUNT", immediateSafeStateCount.ToString()));
+            writer.WriteLine();
         }
 
         void WriteAllErrors(StreamWriter writer)
         {
-            AutosarApplication.GetInstance().SystemErrors.SortErrorsByID();
-            foreach (SystemErrorObject obj in AutosarApplication.GetInstance().SystemErrors)
+            SystemErrorsList errList = AutosarApplication.GetInstance().SystemErrors;
+            int errCount = 0;
+
+            writer.WriteLine("/* Immediate Safe State errors */");
+            /* Write only immediate safe safe state errors */
+            for (int i = 0; i < errList.Count; i++)
             {
-                writer.WriteLine(RteFunctionsGenerator.CreateDefine(obj.Name, obj.Value.ToString()));   
-            }            
+                if (errList[i].Strictness == SystemErrorStrictness.ImmediateSafeState)
+                {
+                    writer.WriteLine(RteFunctionsGenerator.CreateDefine(errList[i].Name, errCount.ToString() + "u"));
+                    errCount++;
+                }                
+            }
+
+            writer.WriteLine();
+            writer.WriteLine("/* No Restriction errors */");
+            /* Write left errors */
+            for (int i = 0; i < errList.Count; i++)
+            {
+                if (errList[i].Strictness == SystemErrorStrictness.NoRestriction)
+                {
+                    writer.WriteLine(RteFunctionsGenerator.CreateDefine(errList[i].Name, errCount.ToString() + "u"));
+                    errCount++;
+                }
+            }
+            writer.WriteLine();
         }
     }
 }

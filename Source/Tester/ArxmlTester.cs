@@ -421,10 +421,10 @@ namespace AutosarGuiEditor.Source.Tester
             {
                 for (int j = i + 1; j < autosarApp.SystemErrors.Count; j++)
                 {
-                    if (autosarApp.SystemErrors[i].Value == autosarApp.SystemErrors[j].Value)
-                    {
-                        AppendText("There is errors with similar ID. " + autosarApp.SystemErrors[i].Name + " and " +  autosarApp.SystemErrors[j].Name + " value: " + autosarApp.SystemErrors[i].Value.ToString(), Error: true);
-                    }                    
+                    //if (autosarApp.SystemErrors[i].Value == autosarApp.SystemErrors[j].Value)
+                    //{
+                    //    AppendText("There is errors with similar ID. " + autosarApp.SystemErrors[i].Name + " and " +  autosarApp.SystemErrors[j].Name + " value: " + autosarApp.SystemErrors[i].Value.ToString(), Error: true);
+                    //}                    
                 }
             }
         }
