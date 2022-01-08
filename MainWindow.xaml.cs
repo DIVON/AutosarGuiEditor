@@ -259,7 +259,7 @@ namespace AutosarGuiEditor
             }
 
             needRedraw |= connectionLineController.Viewport_MouseMove(e, SceneCursorPosition);
-            if (needRedraw != false)
+            if (needRedraw == true)
             {
                 Render(null, null);
             }

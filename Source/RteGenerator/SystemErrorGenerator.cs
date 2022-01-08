@@ -45,7 +45,18 @@ namespace AutosarGuiEditor.Source.RteGenerator
 
         void WriteAllErrors(StreamWriter writer)
         {
+            int maxLen = 0;
+            
+
             SystemErrorsList errList = AutosarApplication.GetInstance().SystemErrors;
+
+            foreach (SystemErrorObject err in errList)
+            {
+                maxLen = maxLen < err.Name.Length ?  err.Name.Length : maxLen;
+            }
+
+            maxLen += 20; /* + #define and ERR_IR_ length */
+
             int errCount = 0;
 
             writer.WriteLine("/* Immediate Safe State errors */");
@@ -54,7 +65,7 @@ namespace AutosarGuiEditor.Source.RteGenerator
             {
                 if (errList[i].Strictness == SystemErrorStrictness.ImmediateSafeState)
                 {
-                    writer.WriteLine(RteFunctionsGenerator.CreateDefine(errList[i].Name, errCount.ToString() + "u"));
+                    writer.WriteLine(RteFunctionsGenerator.CreateDefine("ERR_ID_" + errList[i].Name, errCount.ToString() + "u", false, maxLen));
                     errCount++;
                 }                
             }
@@ -66,7 +77,7 @@ namespace AutosarGuiEditor.Source.RteGenerator
             {
                 if (errList[i].Strictness == SystemErrorStrictness.NoRestriction)
                 {
-                    writer.WriteLine(RteFunctionsGenerator.CreateDefine(errList[i].Name, errCount.ToString() + "u"));
+                    writer.WriteLine(RteFunctionsGenerator.CreateDefine("ERR_ID_" + errList[i].Name, errCount.ToString() + "u", false, maxLen));
                     errCount++;
                 }
             }

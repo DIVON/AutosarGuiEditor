@@ -79,10 +79,16 @@ namespace AutosarGuiEditor.Source.Controllers
             }
         }
 
+        String correctUnderscores(String str)
+        {
+            /* This function is needed because single underscore is removed from header. */
+            return str.Replace("_", "__");
+        }
+
         public void UpdateControls()
         {
             compositoinNameTextBox.Text = composition.Name;
-            compositionTab.Header = composition.Name;
+            compositionTab.Header = correctUnderscores(composition.Name);
             AutosarApplication.GetInstance().ActiveComposition = composition;
             UpdatePortsGrid();
         }

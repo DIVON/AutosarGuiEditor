@@ -106,6 +106,7 @@ namespace System
             }
             componentInstance.UpdateCData();
             componentInstance.UpdatePims();
+            componentInstance.SyncronizeRunnablesWithDefenition();
             return componentInstance;
 		}
 

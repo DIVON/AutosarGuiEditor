@@ -415,15 +415,15 @@ namespace AutosarGuiEditor.Source.RteGenerator
             return "FREQUENCY_" + Math.Floor(frequency * 1000).ToString();
         }
 
-        public static String CreateDefine(String source, String destination, bool useBracers = true)
+        public static String CreateDefine(String source, String destination, bool useBracers = true, int macroStart = 50)
         {
             if (useBracers)
             {
-                return FillStringForCount("#define " + source, ' ', 50) + "(" + destination + ")";
+                return FillStringForCount("#define " + source, ' ', macroStart) + "(" + destination + ")";
             }
             else
             {
-                return FillStringForCount("#define " + source, ' ', 50) + destination;
+                return FillStringForCount("#define " + source, ' ', macroStart) + destination;
             }
         }
 
