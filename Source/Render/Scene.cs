@@ -35,6 +35,7 @@ namespace System
         {
             bmp = bitmap;
             _context = new RenderContext(bmp);
+            RenderAllElements = false;
 		}
 
         public void UpdateBitmap(WriteableBitmap bitmap)
@@ -51,6 +52,11 @@ namespace System
             return _context.GetWorldCoordinate(mouseCoord);
 		}
 
+        public Boolean RenderAllElements
+        {
+            set;
+            get;
+        }
 
 		public void RenderScene()
         {
@@ -77,7 +83,7 @@ namespace System
                 /* Render composition entrails */
                 if (AutosarApplication.GetInstance().ActiveComposition != null)
                 {
-                    AutosarApplication.GetInstance().ActiveComposition.RenderCompositionEntrails(_context);
+                    AutosarApplication.GetInstance().ActiveComposition.RenderCompositionEntrails(_context, RenderAllElements);
                 }
             }
 		}

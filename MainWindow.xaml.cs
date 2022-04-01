@@ -1168,7 +1168,6 @@ namespace AutosarGuiEditor
             //loaded = true;
         }
 
-        Boolean loaded = false;
 
         private void Window_SizeChanged(object sender, SizeChangedEventArgs e)
         {
@@ -1244,6 +1243,31 @@ namespace AutosarGuiEditor
             Render(null, null);
             Render(null, null);
             changeViewportScaleController.FitWorldToImage(ViewPortImage.ActualWidth, ViewPortImage.ActualHeight);
+        }
+
+        private void ChangeRenderStyle_click(object sender, RoutedEventArgs e)
+        {
+            MenuItem changeRenderStyleItem = sender as MenuItem;
+            scene.RenderAllElements = changeRenderStyleItem.IsChecked;
+            Render(null, null);
+        }
+
+        private void HideConnectionLine_Click(object sender, RoutedEventArgs e)
+        {
+            if (moveObjectsController.SelectedObject is PortConnection)
+            {
+                (moveObjectsController.SelectedObject as PortConnection).Visible = false;
+                Render(null, null);
+            }
+        }
+
+        private void ShowConnectionLinePermanent_Click(object sender, RoutedEventArgs e)
+        {
+            if (moveObjectsController.SelectedObject is PortConnection)
+            {
+                (moveObjectsController.SelectedObject as PortConnection).Visible = true;
+                Render(null, null);
+            }
         }
     }
 

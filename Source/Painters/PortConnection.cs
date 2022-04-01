@@ -38,8 +38,14 @@ namespace System
 
 		public PortConnection()
         {
-
+            Visible = true;
 		}
+
+        public Boolean Visible
+        {
+            set;
+            get;
+        }
 
 		public void Render(RenderContext context)
         {
@@ -360,6 +366,7 @@ namespace System
             base.WriteToXML(xmlElement);
             xmlElement.Add(new XElement("PortPainter1Guid", PortPainter1Guid.ToString("B")));
             xmlElement.Add(new XElement("PortPainter2Guid", PortPainter2Guid.ToString("B")));
+            xmlElement.Add(new XElement("Visible", Visible.ToString()));
             anchors.WriteToXML(xmlElement);
             root.Add(xmlElement);
         }
@@ -381,6 +388,9 @@ namespace System
 
             String Component2Str = XmlUtilits.GetFieldValue(xml, "PortPainter2Guid", "");
             PortPainter2Guid = GuidUtils.GetGuid(Component2Str, false);
+
+            String visible = XmlUtilits.GetFieldValue(xml, "Visible", "true");
+            Visible = Convert.ToBoolean(visible);
 
             anchors.LoadFromXML(xml, this);
             RecreateLines();

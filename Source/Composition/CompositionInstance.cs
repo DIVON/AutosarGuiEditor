@@ -164,7 +164,7 @@ namespace AutosarGuiEditor.Source.Composition
         }
 
 
-        public void RenderCompositionEntrails(RenderContext renderContext)
+        public void RenderCompositionEntrails(RenderContext renderContext, Boolean renderAllElements)
         {            
             foreach(ComponentInstance componentInstance in ComponentInstances)
             {
@@ -173,7 +173,10 @@ namespace AutosarGuiEditor.Source.Composition
 
             foreach(PortConnection connection in Connections)
             {
-                connection.Render(renderContext);
+                if (connection.Visible || renderAllElements)
+                {
+                    connection.Render(renderContext);
+                }
             }
 
             InternalPortsInstances.RenderPorts(renderContext);

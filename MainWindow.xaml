@@ -76,6 +76,12 @@
                 <MenuItem Click="SystemErrorsMenu_Click" Header="System errors" />
                 <MenuItem Click="CheckErrorsMenu_Click" Header="Check errors" />
             </MenuItem>
+            <MenuItem Header="Tools">
+                <MenuItem
+                    Click="ChangeRenderStyle_click"
+                    Header="Render all elements"
+                    IsCheckable="True" />
+            </MenuItem>
         </Menu>
 
         <GroupBox
@@ -154,6 +160,8 @@
                             <ContextMenu Name="ImageContextMenu">
                                 <MenuItem Click="AddPointToConnectionLineMenu_Click" Header="Add point" />
                                 <MenuItem Click="ConnectionPointMenu_DeleteClick" Header="Delete" />
+                                <MenuItem Click="HideConnectionLine_Click" Header="Hide" />
+                                <MenuItem Click="ShowConnectionLinePermanent_Click" Header="Show permanent" />
                             </ContextMenu>
 
                         </Image.ContextMenu>
