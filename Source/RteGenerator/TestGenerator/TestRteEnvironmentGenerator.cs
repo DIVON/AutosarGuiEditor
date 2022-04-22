@@ -22,12 +22,18 @@ namespace AutosarGuiEditor.Source.RteGenerator.TestGenerator
 {
     class TestRteEnvironmentGenerator
     {
-        public void GenerateRteEnvironment(ComponentDefenition compDef, String outputDir)
+        public void GenerateRteEnvironment(ApplicationSwComponentType compDef, String outputDir)
         {
             /* Generate Rte_<ComponentName>.h file */
             RteComponentGenerator compGenerator = new RteComponentGenerator();
             compGenerator.CreateRteIncludes(outputDir, compDef);
 
+            GenerateTestRteHFile(compDef, outputDir);
+            GenerateTestRteCFile(compDef, outputDir);
+        }
+
+        public void GenerateCommonFiles(String outputDir)
+        {
             /* Generate Rte_DataTypes.h file */
             RteDataTypesGenerator datatypeGenerator = new RteDataTypesGenerator();
             datatypeGenerator.GenerateDataTypesFile(outputDir);
@@ -36,18 +42,16 @@ namespace AutosarGuiEditor.Source.RteGenerator.TestGenerator
             SystemErrorGenerator systemErrorGenerator = new SystemErrorGenerator();
             systemErrorGenerator.GenerateSystemErrorsFile(outputDir);
 
-            GenerateTestRteHFile(compDef, outputDir);
-            GenerateTestRteCFile(compDef, outputDir);
-
-            GenerateTestInitializationFile(compDef, outputDir);
+            /* Generate TestInitialization.h */
+            GenerateTestInitializationFile(AutosarApplication.GetInstance().ComponentDefenitionsList, outputDir);
 
             ReturnCodesGenerator returnCodesGenerator = new ReturnCodesGenerator();
             returnCodesGenerator.GenerateReturnCodesFile(outputDir);
         }
 
-        void GenerateTestRteHFile(ComponentDefenition compDef, String outputDir)
+        void GenerateTestRteHFile(ApplicationSwComponentType compDef, String outputDir)
         {
-            String FileName = outputDir + "\\" + Properties.Resources.TEST_RTE_H_FILENAME ;
+            String FileName = outputDir + "\\" +  compDef.Name +"_" + Properties.Resources.TEST_RTE_H_FILENAME;
             StreamWriter writer = new StreamWriter(FileName);
             RteFunctionsGenerator.GenerateFileTitle(writer, Properties.Resources.TEST_RTE_H_FILENAME, "This file contains structure for provide test environment.");
             String guardDefine = RteFunctionsGenerator.OpenGuardDefine(writer);
@@ -55,7 +59,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.TestGenerator
             /* Add includes */
             RteFunctionsGenerator.AddInclude(writer, Properties.Resources.RTE_DATATYPES_H_FILENAME);
             RteFunctionsGenerator.AddInclude(writer, "Rte_" + compDef.Name + ".h");
-            RteFunctionsGenerator.AddInclude(writer, Properties.Resources.TEST_FRAMEWORK_H_FILENAME);
+            //RteFunctionsGenerator.AddInclude(writer, Properties.Resources.TEST_FRAMEWORK_H_FILENAME);
             RteFunctionsGenerator.AddInclude(writer, "<string.h>");
 
             /* Create structure */
@@ -79,13 +83,21 @@ namespace AutosarGuiEditor.Source.RteGenerator.TestGenerator
             writer.Close();
         }
 
-        const string TestArtefactsStructureDataType = "TestArtefacts";
-        const string TestArtefactsVariable = "testArtefacts";
+        string TestArtefactsStructureDataType(ApplicationSwComponentType compDef)
+        {
+            return "TestArtefacts" + "_" + compDef.Name;
+        }
+
+        string TestArtefactsVariable(ApplicationSwComponentType compDef)
+        {
+            return "testArtefacts" + "_" + compDef.Name;
+        }
+
         const string CallCount = "CallCount";
-        const string TestInitializationFunctionName = "TestInitialization";
+        const string TestInitializationFunctionName = "Rte_TestInitialization";
         const string ParametersCount = "ParametersCount";
 
-        void CreateTestArtefactStructure(StreamWriter writer, ComponentDefenition compDef)
+        void CreateTestArtefactStructure(StreamWriter writer, ApplicationSwComponentType compDef)
         {
             writer.WriteLine("typedef struct");
             writer.WriteLine("{");
@@ -156,6 +168,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.TestGenerator
                             writer.WriteLine("            " + field.DataTypeName + " " + field.Name + ";");
                         }
                         writer.WriteLine("        } Arguments;");
+                        writer.WriteLine("        Std_ReturnType (*redirection)" + RteFunctionsGenerator.GenerateClientServerInterfaceArguments(csOperation, compDef.MultipleInstantiation) + ";");
                         String operationName = RteFunctionsGenerator.Generate_RteCall_FunctionName(portDef, csOperation);
                         writer.WriteLine("    } " + operationName + ";");
                         writer.WriteLine();
@@ -163,26 +176,25 @@ namespace AutosarGuiEditor.Source.RteGenerator.TestGenerator
                 }
             }
 
-            writer.WriteLine("} " + TestArtefactsStructureDataType + ";");
+            writer.WriteLine("} " + TestArtefactsStructureDataType(compDef) + ";");
             writer.WriteLine();
-            writer.WriteLine("extern " + TestArtefactsStructureDataType + " " + TestArtefactsVariable + ";");
+            writer.WriteLine("extern " + TestArtefactsStructureDataType(compDef) + " " + TestArtefactsVariable(compDef) + ";");
             writer.WriteLine();
         }
 
-        void GenerateTestRteCFile(ComponentDefenition compDef, String outputDir)
+        void GenerateTestRteCFile(ApplicationSwComponentType compDef, String outputDir)
         {
-            String FileName = outputDir + "\\" + Properties.Resources.TEST_RTE_C_FILENAME ;
+            String FileName = outputDir + "\\" + compDef.Name + "_" + Properties.Resources.TEST_RTE_C_FILENAME;
             StreamWriter writer = new StreamWriter(FileName);
-            RteFunctionsGenerator.GenerateFileTitle(writer, Properties.Resources.TEST_RTE_C_FILENAME, "This file contains function for test environment.");
-            String guardDefine = RteFunctionsGenerator.OpenGuardDefine(writer);
+            RteFunctionsGenerator.GenerateFileTitle(writer, compDef.Name + "_" + Properties.Resources.TEST_RTE_C_FILENAME, "This file contains function for test environment.");
 
             /* Add includes */
-            RteFunctionsGenerator.AddInclude(writer, Properties.Resources.TEST_RTE_H_FILENAME);
+            RteFunctionsGenerator.AddInclude(writer, compDef.Name + "_" + Properties.Resources.TEST_RTE_H_FILENAME);
             
             writer.WriteLine();
 
             /* Declare test structure */
-            writer.WriteLine(TestArtefactsStructureDataType + " " + TestArtefactsVariable + ";");
+            writer.WriteLine(TestArtefactsStructureDataType(compDef) + " " + TestArtefactsVariable(compDef) + ";");
             
             writer.WriteLine();
 
@@ -198,12 +210,11 @@ namespace AutosarGuiEditor.Source.RteGenerator.TestGenerator
             CreateRteCallFunctions(writer, compDef);
           
 
-            RteFunctionsGenerator.CloseGuardDefine(writer);
             RteFunctionsGenerator.WriteEndOfFile(writer);
             writer.Close();
         }
 
-        void CreateRteWriteFunctions(StreamWriter writer, ComponentDefenition compDefenition)
+        void CreateRteWriteFunctions(StreamWriter writer, ApplicationSwComponentType compDefenition)
         {
             foreach (PortDefenition port in compDefenition.Ports)
             {
@@ -221,7 +232,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.TestGenerator
             }
         }
         
-        void CreateRteReadFunctions(StreamWriter writer, ComponentDefenition compDefenition)
+        void CreateRteReadFunctions(StreamWriter writer, ApplicationSwComponentType compDefenition)
         {
             foreach (PortDefenition port in compDefenition.Ports)
             {
@@ -239,7 +250,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.TestGenerator
             }
         }
 
-        void CreateRteCDataFunctions(StreamWriter writer, ComponentDefenition compDefenition)
+        void CreateRteCDataFunctions(StreamWriter writer, ApplicationSwComponentType compDefenition)
         {
             foreach (CDataDefenition cdataDef in compDefenition.CDataDefenitions)
             {
@@ -247,7 +258,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.TestGenerator
             }
         }
 
-        void CreateRtePimFunctions(StreamWriter writer, ComponentDefenition compDefenition)
+        void CreateRtePimFunctions(StreamWriter writer, ApplicationSwComponentType compDefenition)
         {
             foreach (PimDefenition pim in compDefenition.PerInstanceMemoryList)
             {
@@ -256,7 +267,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.TestGenerator
         }
 
 
-        void CreateRteCallFunctions(StreamWriter writer, ComponentDefenition compDefenition)
+        void CreateRteCallFunctions(StreamWriter writer, ApplicationSwComponentType compDefenition)
         {
             foreach (PortDefenition port in compDefenition.Ports)
             {
@@ -272,7 +283,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.TestGenerator
         }
 
 
-        void CreateRteCallFunctionDeclarations(StreamWriter writer, ComponentDefenition compDefenition)
+        void CreateRteCallFunctionDeclarations(StreamWriter writer, ApplicationSwComponentType compDefenition)
         {
             foreach (PortDefenition port in compDefenition.Ports)
             {
@@ -291,7 +302,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.TestGenerator
             }
         }
 
-        void GenerateRteWritePortFieldFunction(StreamWriter writer, ComponentDefenition compDef, PortDefenition port, SenderReceiverInterfaceField field)
+        void GenerateRteWritePortFieldFunction(StreamWriter writer, ApplicationSwComponentType compDef, PortDefenition port, SenderReceiverInterfaceField field)
         {
             String returnValue = Properties.Resources.STD_RETURN_TYPE;
             String RteFuncName = RteFunctionsGenerator.GenerateReadWriteConnectionFunctionName(port, field);
@@ -301,14 +312,14 @@ namespace AutosarGuiEditor.Source.RteGenerator.TestGenerator
 
             writer.WriteLine(returnValue + RteFuncName + fieldVariable);
             writer.WriteLine("{");
-            writer.WriteLine("    " + TestArtefactsVariable + "." + fieldName + "." + CallCount + "++;");
-            writer.WriteLine("    memcpy(&" + TestArtefactsVariable + "." + fieldName + ".Arguments.data, " + field.Name +", sizeof(" + field.DataTypeName + "));");            
-            writer.WriteLine("    return " + TestArtefactsVariable + "." + fieldName + ".ReturnValue;");
+            writer.WriteLine("    " + TestArtefactsVariable(compDef) + "." + fieldName + "." + CallCount + "++;");
+            writer.WriteLine("    memcpy(&" + TestArtefactsVariable(compDef) + "." + fieldName + ".Arguments.data, " + field.Name + ", sizeof(" + field.DataTypeName + "));");
+            writer.WriteLine("    return " + TestArtefactsVariable(compDef) + "." + fieldName + ".ReturnValue;");
             writer.WriteLine("}");
             writer.WriteLine("");
         }
 
-        void GenerateRteReadPortFieldFunction(StreamWriter writer, ComponentDefenition compDef, PortDefenition port, SenderReceiverInterfaceField field)
+        void GenerateRteReadPortFieldFunction(StreamWriter writer, ApplicationSwComponentType compDef, PortDefenition port, SenderReceiverInterfaceField field)
         {
             String returnValue = Properties.Resources.STD_RETURN_TYPE;
             String RteFuncName = RteFunctionsGenerator.GenerateReadWriteConnectionFunctionName(port, field);
@@ -318,14 +329,14 @@ namespace AutosarGuiEditor.Source.RteGenerator.TestGenerator
 
             writer.WriteLine(returnValue + RteFuncName + fieldVariable);
             writer.WriteLine("{");
-            writer.WriteLine("    " + TestArtefactsVariable + "." + fieldName + "." + CallCount + "++;");
-            writer.WriteLine("    memcpy(" + field.Name + ", &" + TestArtefactsVariable + "." + fieldName + ".Arguments.data, sizeof(" + field.DataTypeName + "));");
-            writer.WriteLine("    return " + TestArtefactsVariable + "." + fieldName + ".ReturnValue;");
+            writer.WriteLine("    " + TestArtefactsVariable(compDef) + "." + fieldName + "." + CallCount + "++;");
+            writer.WriteLine("    memcpy(" + field.Name + ", &" + TestArtefactsVariable(compDef) + "." + fieldName + ".Arguments.data, sizeof(" + field.DataTypeName + "));");
+            writer.WriteLine("    return " + TestArtefactsVariable(compDef) + "." + fieldName + ".ReturnValue;");
             writer.WriteLine("}");
             writer.WriteLine("");
         }
 
-        void GenerateRteCDataFunction(StreamWriter writer, ComponentDefenition compDef, CDataDefenition cdataDef)
+        void GenerateRteCDataFunction(StreamWriter writer, ApplicationSwComponentType compDef, CDataDefenition cdataDef)
         {
             String returnValue = cdataDef.DataTypeName + " ";
             String RteFuncName = RteFunctionsGenerator.GenerateShortCDataFunctionName(cdataDef);
@@ -334,13 +345,13 @@ namespace AutosarGuiEditor.Source.RteGenerator.TestGenerator
 
             writer.WriteLine(returnValue + RteFuncName + fieldVariable);
             writer.WriteLine("{");
-            writer.WriteLine("    " + TestArtefactsVariable + "." + RteFuncName + "." + CallCount + "++;");
-            writer.WriteLine("    return " + TestArtefactsVariable + "." + RteFuncName + ".Value;");
+            writer.WriteLine("    " + TestArtefactsVariable(compDef) + "." + RteFuncName + "." + CallCount + "++;");
+            writer.WriteLine("    return " + TestArtefactsVariable(compDef) + "." + RteFuncName + ".Value;");
             writer.WriteLine("}");
             writer.WriteLine("");
         }
 
-        void GenerateRtePimFunction(StreamWriter writer, ComponentDefenition compDef, PimDefenition pimDef)
+        void GenerateRtePimFunction(StreamWriter writer, ApplicationSwComponentType compDef, PimDefenition pimDef)
         {
             String returnValue = pimDef.DataTypeName + " * ";
             String RteFuncName = RteFunctionsGenerator.GenerateShortPimFunctionName(pimDef);
@@ -349,31 +360,47 @@ namespace AutosarGuiEditor.Source.RteGenerator.TestGenerator
 
             writer.WriteLine(returnValue + RteFuncName + fieldVariable);
             writer.WriteLine("{");
-            writer.WriteLine("    " + TestArtefactsVariable + "." + RteFuncName + "." + CallCount + "++;");
-            writer.WriteLine("    return &" + TestArtefactsVariable + "." + RteFuncName + ".data;");
+            writer.WriteLine("    " + TestArtefactsVariable(compDef) + "." + RteFuncName + "." + CallCount + "++;");
+            writer.WriteLine("    return &" + TestArtefactsVariable(compDef) + "." + RteFuncName + ".data;");
             writer.WriteLine("}");
             writer.WriteLine("");
         }
 
-        void GenerateRteCallPortFieldFunction(StreamWriter writer, ComponentDefenition compDef, PortDefenition port, ClientServerOperation operation)
+        void GenerateRteCallPortFieldFunction(StreamWriter writer, ApplicationSwComponentType compDef, PortDefenition port, ClientServerOperation operation)
         {
             String returnValue = Properties.Resources.STD_RETURN_TYPE;
-            String RteFuncName = RteFunctionsGenerator.Generate_RteCall_FunctionName(port, operation);
+            String RteFuncName = RteFunctionsGenerator.Generate_RteCall_ConnectionGroup_FunctionName(compDef, port, operation);
             String fieldVariable = RteFunctionsGenerator.GenerateClientServerInterfaceArguments(operation, compDef.MultipleInstantiation);
 
             writer.WriteLine(returnValue + RteFuncName + fieldVariable);
             writer.WriteLine("{");
-            writer.WriteLine("    " + TestArtefactsVariable + "." + RteFuncName + "." + CallCount + "++;");
+            writer.WriteLine("    if (" + TestArtefactsVariable(compDef) + "." + RteFuncName + "." + "redirection != NULL)");
+            writer.WriteLine("    {");
+            writer.WriteLine("        " + TestArtefactsVariable(compDef) + "." + RteFuncName + "." + CallCount + "++;");
             foreach (var csField in operation.Fields)
             {
-                writer.WriteLine("    " + TestArtefactsVariable + "." + RteFuncName + ".Arguments." + csField.Name + " = *" + csField.Name + ";");
+                writer.WriteLine("        " + TestArtefactsVariable(compDef) + "." + RteFuncName + ".Arguments." + csField.Name + " = *" + csField.Name + ";");
             }
-            writer.WriteLine("    return " + TestArtefactsVariable + "." + RteFuncName + ".ReturnValue;");
+            writer.WriteLine("        return " + TestArtefactsVariable(compDef) + "." + RteFuncName + ".ReturnValue;");
+            writer.WriteLine("    }");
+            writer.WriteLine("    else");
+            writer.WriteLine("    {");
+            string fparams = "";
+            for(int i = 0; i < operation.Fields.Count; i++)
+            {
+                if (i != 0)
+                {
+                    fparams += ", ";
+                }
+                fparams += operation.Fields[i].Name;
+            }
+            writer.WriteLine("        return " + TestArtefactsVariable(compDef) + "." + RteFuncName + "." + "redirection(" + fparams + ");");
+            writer.WriteLine("    }");
             writer.WriteLine("}");
             writer.WriteLine("");
         }
 
-        void GenerateTestInitializationFile(ComponentDefenition compDef, String outputDir)
+        void GenerateTestInitializationFile(ComponentDefenitionList compDefs, String outputDir)
         {
             String FileName = outputDir + "\\" + Properties.Resources.TEST_INITIALIZATION_FILENAME;
             StreamWriter writer = new StreamWriter(FileName);
@@ -381,20 +408,23 @@ namespace AutosarGuiEditor.Source.RteGenerator.TestGenerator
             String guardDefine = RteFunctionsGenerator.OpenGuardDefine(writer);
 
             /* Add includes */
-            RteFunctionsGenerator.AddInclude(writer, Properties.Resources.TEST_RTE_H_FILENAME);
             RteFunctionsGenerator.AddInclude(writer, Properties.Resources.RTE_DATATYPES_H_FILENAME);
-
+            foreach (ApplicationSwComponentType swCompType in compDefs)
+            {
+                RteFunctionsGenerator.AddInclude(writer, swCompType.Name + "_TestRte.h");
+            }
+            
             writer.WriteLine();
 
             /* Write parameters count as equal value to component instances */
-            ComponentInstancesList componentInstances = AutosarApplication.GetInstance().GetComponentInstanceByDefenition(compDef);
+            //ComponentInstancesList componentInstances = AutosarApplication.GetInstance().GetComponentInstanceByDefenition(compDef);
 
-            writer.WriteLine("const int " + ParametersCount + " = " + componentInstances.Count.ToString() + ";");
-            writer.WriteLine();
+            //writer.WriteLine("const int " + ParametersCount + " = " + componentInstances.Count.ToString() + ";");
+            //writer.WriteLine();
 
             /* Add function for component variable initialization */
-            writer.WriteLine("/* User function for variable initialization */");
-            writer.WriteLine("extern void  VariableInitialization();");
+            //writer.WriteLine("/* User function for variable initialization */");
+            //writer.WriteLine("extern void  VariableInitialization();");
             writer.WriteLine();
             
 
@@ -404,65 +434,70 @@ namespace AutosarGuiEditor.Source.RteGenerator.TestGenerator
             writer.WriteLine("{");
             
             /* Clear test structure */
-            writer.WriteLine("    memset(&" + TestArtefactsVariable +", 0, sizeof(" + TestArtefactsStructureDataType + " ));");
-
-            if (componentInstances.Count > 0)
+            foreach (ApplicationSwComponentType swCompType in compDefs)
             {
-                /* Fill CData constants */
-                writer.WriteLine("    switch(paramIndex)");
-                writer.WriteLine("    {");
-                for (int i = 0; i < componentInstances.Count; i++)
-                {
-                    writer.WriteLine("        case " + i.ToString() + ":");
-                    writer.WriteLine("        {");
-
-                    /* CDATA */
-                    for (int j = 0; j < compDef.CDataDefenitions.Count; j++)
-                    {
-                        CDataDefenition cdataDef = compDef.CDataDefenitions[j];
-                        CDataInstance cdataInstance = componentInstances[i].CDataInstances.GetCData(cdataDef.GUID);
-
-                        writer.Write("            " + TestArtefactsVariable + "." + RteFunctionsGenerator.GenerateShortCDataFunctionName(cdataDef) + ".Value = ");
-                
-                        IGUID datatype = cdataDef.DataType;
-                        if ((datatype is BaseDataType) || (datatype is SimpleDataType) || (datatype is EnumDataType))
-                        {
-                            RteFunctionsGenerator.WriteDefaultValueForCDataDefenition(writer, componentInstances[i], cdataInstance);
-                        }
-                        writer.WriteLine(";");
-                    }
-
-                    for (int j = 0; j < compDef.PerInstanceMemoryList.Count; j++)
-                    {
-                        PimDefenition pimDef = compDef.PerInstanceMemoryList[j];
-                        PimInstance pimInstance = componentInstances[i].PerInstanceMemories.GetPim(pimDef.GUID);
-
-                        WritePIMDefaultValues(writer, pimInstance);
-                    }
-
-                    writer.WriteLine("            break;");
-                    writer.WriteLine("        }");
-                }
-                writer.WriteLine("    }");
+                writer.WriteLine("    memset(&" + TestArtefactsVariable(swCompType) + ", 0, sizeof(" + TestArtefactsVariable(swCompType) + " ));");
             }
+            //if (componentInstances.Count > 0)
+            //{
+            //    /* Fill CData constants */
+            //    writer.WriteLine("    switch(paramIndex)");
+            //    writer.WriteLine("    {");
+            //    for (int i = 0; i < componentInstances.Count; i++)
+            //    {
+            //        writer.WriteLine("        case " + i.ToString() + ":");
+            //        writer.WriteLine("        {");
+
+            //        /* CDATA */
+            //        for (int j = 0; j < compDef.CDataDefenitions.Count; j++)
+            //        {
+            //            CDataDefenition cdataDef = compDef.CDataDefenitions[j];
+            //            CDataInstance cdataInstance = componentInstances[i].CDataInstances.GetCData(cdataDef.GUID);
+
+            //            writer.Write("            " + TestArtefactsVariable + "." + RteFunctionsGenerator.GenerateShortCDataFunctionName(cdataDef) + ".Value = ");
+                
+            //            IGUID datatype = cdataDef.DataType;
+            //            if ((datatype is BaseDataType) || (datatype is SimpleDataType) || (datatype is EnumDataType))
+            //            {
+            //                RteFunctionsGenerator.WriteDefaultValueForCDataDefenition(writer, componentInstances[i], cdataInstance);
+            //            }
+            //            writer.WriteLine(";");
+            //        }
+
+            //        for (int j = 0; j < compDef.PerInstanceMemoryList.Count; j++)
+            //        {
+            //            PimDefenition pimDef = compDef.PerInstanceMemoryList[j];
+            //            PimInstance pimInstance = componentInstances[i].PerInstanceMemories.GetPim(pimDef.GUID);
+
+            //            WritePIMDefaultValues(writer, pimInstance);
+            //        }
+
+            //        writer.WriteLine("            break;");
+            //        writer.WriteLine("        }");
+            //    }
+            //    writer.WriteLine("    }");
+            //}
 
             /* Write RTE_OK to all return functions */
-            foreach (PortDefenition portDef in compDef.Ports)
+            foreach (ApplicationSwComponentType compDef in compDefs)
             {
-                if (portDef.InterfaceDatatype is SenderReceiverInterface)
+                foreach (PortDefenition portDef in compDef.Ports)
                 {
-                    SenderReceiverInterface srInterface = (SenderReceiverInterface)portDef.InterfaceDatatype;
-                    foreach (SenderReceiverInterfaceField srField in srInterface.Fields)
+                    if (portDef.InterfaceDatatype is SenderReceiverInterface)
                     {
-                        String fieldName = RteFunctionsGenerator.GenerateReadWriteFunctionName(portDef, srField);
-                        writer.WriteLine("    " + TestArtefactsVariable + "." + fieldName + ".ReturnValue = RTE_E_OK;");                        
+                        SenderReceiverInterface srInterface = (SenderReceiverInterface)portDef.InterfaceDatatype;
+                        foreach (SenderReceiverInterfaceField srField in srInterface.Fields)
+                        {
+                            String fieldName = RteFunctionsGenerator.GenerateReadWriteFunctionName(portDef, srField);
+                            writer.WriteLine("    " + TestArtefactsVariable(compDef) + "." + fieldName + ".ReturnValue = RTE_E_OK;");                        
+                        }
                     }
                 }
             }
-            writer.WriteLine(); 
+            //writer.WriteLine(); 
 
             /* Initialize component variables */
-            writer.WriteLine("    VariableInitialization();");
+            //writer.WriteLine("    VariableInitialization();");
 
             writer.WriteLine("}");           
 
@@ -471,9 +506,9 @@ namespace AutosarGuiEditor.Source.RteGenerator.TestGenerator
             writer.Close();
         }
 
-        void WritePIMDefaultValues(StreamWriter writer, PimInstance pim)
+        void WritePIMDefaultValues(StreamWriter writer, ApplicationSwComponentType compDef, PimInstance pim)
         {
-            String FieldValue = "            " + TestArtefactsVariable + "." + RteFunctionsGenerator.GenerateShortPimFunctionName(pim.Defenition) + ".data";
+            String FieldValue = "            " + TestArtefactsVariable(compDef) + "." + RteFunctionsGenerator.GenerateShortPimFunctionName(pim.Defenition) + ".data";
 
             IGUID datatype = pim.Defenition.DataType;
 

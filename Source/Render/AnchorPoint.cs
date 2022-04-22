@@ -10,6 +10,12 @@ using System.Xml.Linq;
 
 namespace AutosarGuiEditor.Source.Render
 {
+    static class AnchorsStep
+    {
+        public static int Step = 5;
+    }
+
+
     public delegate void OnTranslate(object sender, Point translate);
 
     public class AnchorPoint : IRender
@@ -58,12 +64,36 @@ namespace AutosarGuiEditor.Source.Render
             get;
         }
 
+        Point cummulatedShift = new Point(0, 0);
+
         public void Move(double X, double Y)
         {
-            Point translate = new Point(X, Y);
-            this.Position.X += X;
-            this.Position.Y += Y;
-            if (OnMove != null)
+            Point translate = new Point(0, 0);
+
+            cummulatedShift.X += X;
+            cummulatedShift.Y += Y;
+
+            bool doMove = false;
+
+            if (Math.Abs(cummulatedShift.X) > AnchorsStep.Step)
+            {
+                double ceilPart = Math.Round(cummulatedShift.X / 5) * 5;
+                this.Position.X += ceilPart;
+                cummulatedShift.X -= ceilPart;
+                translate.X = ceilPart;
+                doMove = true;
+            }
+
+            if (Math.Abs(cummulatedShift.Y) > AnchorsStep.Step)
+            {
+                double ceilPart = Math.Round(cummulatedShift.Y / 5) * 5;
+                this.Position.Y += ceilPart;
+                cummulatedShift.Y -= ceilPart;
+                translate.Y = ceilPart;
+                doMove = true;
+            }
+
+            if ((OnMove != null) && (doMove == true))
             {
                 OnMove(this, translate);
             }

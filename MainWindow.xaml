@@ -81,6 +81,9 @@
                     Click="ChangeRenderStyle_click"
                     Header="Render all elements"
                     IsCheckable="True" />
+                <MenuItem Click="Step1Px" Header="Step 1px" />
+                <MenuItem Click="Step5Px" Header="Step 5px" />
+                <MenuItem Click="Step10Px" Header="Step 10px" />
             </MenuItem>
         </Menu>
 

@@ -61,6 +61,18 @@ namespace AutosarGuiEditor.Source.Forms
             }
         }
 
+        public String TestRteGenerationPath
+        {
+            set
+            {
+                TestRteGeneratingFolderEdit.Text = value;
+            }
+            get
+            {
+                return TestRteGeneratingFolderEdit.Text;
+            }
+        }
+
         public String ComponentGenerationPath
         {
             set
@@ -122,6 +134,22 @@ namespace AutosarGuiEditor.Source.Forms
                 if (result == System.Windows.Forms.DialogResult.OK)
                 {
                     RteGeneratingFolderEdit.Text = dialog.SelectedPath;
+                }
+            }
+        }
+
+        private void OpenTestRteDirDialogButton_Click(object sender, RoutedEventArgs e)
+        {
+            using (var dialog = new System.Windows.Forms.FolderBrowserDialog())
+            {
+                dialog.RootFolder = Environment.SpecialFolder.MyComputer;
+                dialog.SelectedPath = TestRteGeneratingFolderEdit.Text;
+
+                dialog.ShowNewFolderButton = true;
+                System.Windows.Forms.DialogResult result = dialog.ShowDialog();
+                if (result == System.Windows.Forms.DialogResult.OK)
+                {
+                    TestRteGeneratingFolderEdit.Text = dialog.SelectedPath;
                 }
             }
         }

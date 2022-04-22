@@ -25,13 +25,13 @@ namespace AutosarGuiEditor.Source.RteGenerator
 
         public void GenerateComponentsFiles()
         {
-            foreach (ComponentDefenition component in AutosarApplication.GetInstance().ComponentDefenitionsList)
+            foreach (ApplicationSwComponentType component in AutosarApplication.GetInstance().ComponentDefenitionsList)
             {
                 GenerateComponent(component);
             }
         }
 
-        void GenerateComponent(ComponentDefenition component)
+        void GenerateComponent(ApplicationSwComponentType component)
         {
             /* Generate component Folder */
             String componentFolder = RteFunctionsGenerator.GetComponentsFolder() + "\\" + component.Name + "\\contracts\\skeleton";
@@ -65,7 +65,7 @@ namespace AutosarGuiEditor.Source.RteGenerator
             CreateComponentIncludes(incDir, component);
         }
 
-        void CreateComponentIncludes(String dir, ComponentDefenition componentDefenition)
+        void CreateComponentIncludes(String dir, ApplicationSwComponentType componentDefenition)
         {
             String filename = dir + componentDefenition.Name + ".h";
             StreamWriter writer = new StreamWriter(filename);
@@ -110,7 +110,7 @@ namespace AutosarGuiEditor.Source.RteGenerator
 
         void CreateRunnable(String dir, PeriodicRunnableDefenition runnable)
         {
-            ComponentDefenition compDefenition = AutosarApplication.GetInstance().FindComponentDefenitionByRunnnable(runnable);
+            ApplicationSwComponentType compDefenition = AutosarApplication.GetInstance().FindComponentDefenitionByRunnnable(runnable);
             String filename = dir + compDefenition.Name + "_" + runnable.Name + ".c";
             StreamWriter writer = new StreamWriter(filename);
             RteFunctionsGenerator.GenerateFileTitle(writer, filename, "Implementation for " + compDefenition.Name + "_" + runnable.Name);
@@ -175,7 +175,7 @@ namespace AutosarGuiEditor.Source.RteGenerator
             writer.Close();
         }
 
-        private static void WriteAllFunctionWhichComponentCouldUse(ComponentDefenition compDefenition, StreamWriter writer)
+        private static void WriteAllFunctionWhichComponentCouldUse(ApplicationSwComponentType compDefenition, StreamWriter writer)
         {
             List<String> lines = new List<string>();
 
@@ -238,7 +238,7 @@ namespace AutosarGuiEditor.Source.RteGenerator
             }
         }
 
-        void CreateServerCalls(String dir, ComponentDefenition compDefenition, PortDefenition portDefenition)
+        void CreateServerCalls(String dir, ApplicationSwComponentType compDefenition, PortDefenition portDefenition)
         {
             String filename = dir + compDefenition.Name + "_" + portDefenition.Name + ".c";
             StreamWriter writer = new StreamWriter(filename);
@@ -315,7 +315,7 @@ namespace AutosarGuiEditor.Source.RteGenerator
         }
 
         /* Generate funcitons for Sender-Receiver ports and call operations from client ports */
-        public void CreateRteIncludes(String dir, ComponentDefenition componentDefenition)
+        public void CreateRteIncludes(String dir, ApplicationSwComponentType componentDefenition)
         {
             String filename = dir + "\\" +"Rte_" + componentDefenition.Name + ".h";
             StreamWriter writer = new StreamWriter(filename);
@@ -323,6 +323,16 @@ namespace AutosarGuiEditor.Source.RteGenerator
             string guardDefine = RteFunctionsGenerator.OpenGuardDefine(writer);
 
             writer.WriteLine("");
+
+            writer.WriteLine("#ifdef RTE_DEFINED");
+            writer.WriteLine("#ifndef TEST_RTE");
+            writer.WriteLine("#error \"Multiple RTE files included\"");
+            writer.WriteLine("#endif");
+            writer.WriteLine("#endif");
+
+            writer.WriteLine("#define RTE_DEFINED");
+            writer.WriteLine("");
+
             writer.WriteLine(RteFunctionsGenerator.IncludesLine);
             RteFunctionsGenerator.AddInclude(writer, Properties.Resources.SYSTEM_ERRORS_H_FILENAME);
             RteFunctionsGenerator.AddInclude(writer, Properties.Resources.RTE_DATATYPES_H_FILENAME);
@@ -336,9 +346,12 @@ namespace AutosarGuiEditor.Source.RteGenerator
             
             /* Write all runnables frequences */
             writer.WriteLine("/* Runnables frequences */");
+            
             foreach (PeriodicRunnableDefenition runnable in componentDefenition.Runnables)
             {
                 String runnableFreqMacroName = "Rte_Period_" + componentDefenition.Name + "_ru" + runnable.Name;
+
+                writer.WriteLine("#undef " + runnableFreqMacroName);
                 String define = RteFunctionsGenerator.CreateDefine(runnableFreqMacroName, (runnable.PeriodMs * 1000).ToString() + "UL");
                 writer.WriteLine(define);
             }
@@ -346,6 +359,7 @@ namespace AutosarGuiEditor.Source.RteGenerator
             /* Write all pims */
             foreach (PimDefenition pim in componentDefenition.PerInstanceMemoryList)
             {
+                writer.WriteLine("#undef " + RteFunctionsGenerator.GenerateShortPimFunctionName(pim));
                 String define = RteFunctionsGenerator.CreateDefine(RteFunctionsGenerator.GenerateShortPimFunctionName(pim), RteFunctionsGenerator.GenerateFullPimFunctionName(componentDefenition, pim), false);
                 writer.WriteLine(define);
             }
@@ -353,6 +367,7 @@ namespace AutosarGuiEditor.Source.RteGenerator
             /* Write all cdata */
             foreach (CDataDefenition cdata in componentDefenition.CDataDefenitions)
             {
+                writer.WriteLine("#undef " + RteFunctionsGenerator.GenerateShortCDataFunctionName(cdata));
                 String define = RteFunctionsGenerator.CreateDefine(RteFunctionsGenerator.GenerateShortCDataFunctionName(cdata), RteFunctionsGenerator.GenerateFullCDataFunctionName(componentDefenition, cdata), false);
                 writer.WriteLine(define);
             }
@@ -369,6 +384,7 @@ namespace AutosarGuiEditor.Source.RteGenerator
                     {
                         String funcName = RteFunctionsGenerator.GenerateReadWriteFunctionName(portDefenition, field);
                         String RteFuncName = RteFunctionsGenerator.GenerateReadWriteConnectionFunctionName(portDefenition, field);
+                        writer.WriteLine("#undef " + funcName);
                         writer.WriteLine(RteFunctionsGenerator.CreateDefine(funcName, RteFuncName, false));
                         String fieldVariable = RteFunctionsGenerator.GenerateSenderReceiverInterfaceArguments(field, portDefenition.PortType, componentDefenition.MultipleInstantiation);
 
@@ -383,6 +399,7 @@ namespace AutosarGuiEditor.Source.RteGenerator
                         String funcName = RteFunctionsGenerator.Generate_RteCall_FunctionName(portDefenition, operation);
                         String RteFuncName = RteFunctionsGenerator.Generate_RteCall_ConnectionGroup_FunctionName(componentDefenition, portDefenition, operation);
                         String funcArgument = RteFunctionsGenerator.GenerateClientServerInterfaceArguments(operation, componentDefenition.MultipleInstantiation);
+                        writer.WriteLine("#undef " + funcName);
                         writer.WriteLine(RteFunctionsGenerator.CreateDefine(funcName, RteFuncName, false));
                         externFunctions += Properties.Resources.STD_RETURN_TYPE + funcName + funcArgument + ";" + Environment.NewLine;
                     }
@@ -395,6 +412,7 @@ namespace AutosarGuiEditor.Source.RteGenerator
                         String funcName = RteFunctionsGenerator.Generate_RteCall_FunctionName(portDefenition, operation);
                         String RteFuncName = RteFunctionsGenerator.Generate_RteCall_ConnectionGroup_FunctionName(componentDefenition, portDefenition, operation);
                         String funcArgument = RteFunctionsGenerator.GenerateClientServerInterfaceArguments(operation, componentDefenition.MultipleInstantiation);
+                        writer.WriteLine("#undef " + funcName);
                         writer.WriteLine(RteFunctionsGenerator.CreateDefine(funcName, RteFuncName, false));
                     }
                 }

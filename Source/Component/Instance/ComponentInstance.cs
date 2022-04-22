@@ -36,7 +36,7 @@ namespace AutosarGuiEditor.Source.Painters
         public PimInstancesList PerInstanceMemories = new PimInstancesList();
         public CDataInstancesList CDataInstances = new CDataInstancesList();
 
-        public ComponentDefenition ComponentDefenition
+        public ApplicationSwComponentType ComponentDefenition
         {
             get
             {

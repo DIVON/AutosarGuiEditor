@@ -46,15 +46,15 @@ namespace System
 
 		}
 
-        public ComponentDefenition CreateComponentDefenition(string name)
+        public ApplicationSwComponentType CreateComponentDefenition(string name)
         {
-            ComponentDefenition compDef = new ComponentDefenition();
+            ApplicationSwComponentType compDef = new ApplicationSwComponentType();
             compDef.Name = name;
             compDef.Runnables.Add(CreateRunnableDefenition("Refresh"));
             return compDef;
         }
 
-        public ComponentInstance CreateComponent(ComponentDefenition componentDefenition, double X, double Y)
+        public ComponentInstance CreateComponent(ApplicationSwComponentType componentDefenition, double X, double Y)
         {
             int leftPortCount = 0;
             int rightPortCount = 0;
@@ -110,7 +110,7 @@ namespace System
             return componentInstance;
 		}
 
-        public String GetComponentName(ComponentDefenition componentDefenition)
+        public String GetComponentName(ApplicationSwComponentType componentDefenition)
         {
             return componentDefenition.Name;
             

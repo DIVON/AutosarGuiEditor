@@ -302,13 +302,13 @@ namespace AutosarGuiEditor.Source.Tester
             CheckSimilarNames(autosarApp.ComponentDefenitionsList.ConvertAll(x => x as IGUID), "Component Defenition");
 
             /* Check each enum */
-            foreach (ComponentDefenition elem in autosarApp.ComponentDefenitionsList)
+            foreach (ApplicationSwComponentType elem in autosarApp.ComponentDefenitionsList)
             {
                 TestComponentDefenition(elem);
             }
         }
 
-        protected void TestComponentDefenition(ComponentDefenition elem)
+        protected void TestComponentDefenition(ApplicationSwComponentType elem)
         {
             bool withoutErrors = true;
 

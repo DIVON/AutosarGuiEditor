@@ -17,8 +17,13 @@ namespace AutosarGuiEditor.Source.RteGenerator
             String guardDefine = RteFunctionsGenerator.OpenGuardDefine(writer);
 
             writer.WriteLine("/* Rte return codes */");
-            writer.WriteLine(RteFunctionsGenerator.CreateDefine(Properties.Resources.RTE_E_OK, "((uint32)0xFF)"));
-            writer.WriteLine(RteFunctionsGenerator.CreateDefine(Properties.Resources.RTE_E_UNCONNECTED, "((uint32)0xFE)"));
+            writer.WriteLine(RteFunctionsGenerator.CreateDefine("RTE_E_OK", "0u"));
+            writer.WriteLine(RteFunctionsGenerator.CreateDefine("RTE_E_INVALID", "1u"));
+            writer.WriteLine(RteFunctionsGenerator.CreateDefine("RTE_E_LOST_DATA", "64u"));
+            writer.WriteLine(RteFunctionsGenerator.CreateDefine("RTE_E_NO_DATA", "131u"));
+            writer.WriteLine(RteFunctionsGenerator.CreateDefine("RTE_E_UNCONNECTED", "134u"));
+            writer.WriteLine(RteFunctionsGenerator.CreateDefine("RTE_E_OUT_OF_RANGE", "137u"));
+
             writer.WriteLine();
 
             RteFunctionsGenerator.CloseGuardDefine(writer);

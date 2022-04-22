@@ -56,7 +56,7 @@ namespace AutosarGuiEditor.Source.RteGenerator
 
         void GenerateComponentsDataTypes(StreamWriter writer)
         {
-            foreach (ComponentDefenition compDef in AutosarApplication.GetInstance().ComponentDefenitionsList)
+            foreach (ApplicationSwComponentType compDef in AutosarApplication.GetInstance().ComponentDefenitionsList)
             {
                 writer.WriteLine("/* Datatype for " + compDef.Name  + " */");
                 writer.WriteLine("typedef struct");
@@ -99,17 +99,17 @@ namespace AutosarGuiEditor.Source.RteGenerator
             }
         }
 
-        public void GenerateDataTypeForPim(StreamWriter writer, ComponentDefenition componentDefenition, PimDefenition pimDefenition)       
+        public void GenerateDataTypeForPim(StreamWriter writer, ApplicationSwComponentType componentDefenition, PimDefenition pimDefenition)       
         {
             writer.WriteLine("    " + pimDefenition.DataTypeName + " " + RteFunctionsGenerator.GenerateRtePimFieldInComponentDefenitionStruct(componentDefenition, pimDefenition) + ";");            
         }
 
-        public void GenerateDataTypeForCData(StreamWriter writer, ComponentDefenition componentDefenition, CDataDefenition cdata)
+        public void GenerateDataTypeForCData(StreamWriter writer, ApplicationSwComponentType componentDefenition, CDataDefenition cdata)
         {
             writer.WriteLine("    " + cdata.DataTypeName + " " + RteFunctionsGenerator.GenerateRteCDataFieldInComponentDefenitionStruct(componentDefenition, cdata) + ";");     
         }
 
-        public void GenerateFieldsForSenderPorts(StreamWriter writer, ComponentDefenition componentDefenition, PortDefenition portDefenition, SenderReceiverInterfaceField srInterfaceField)
+        public void GenerateFieldsForSenderPorts(StreamWriter writer, ApplicationSwComponentType componentDefenition, PortDefenition portDefenition, SenderReceiverInterfaceField srInterfaceField)
         {
             writer.WriteLine("    " + srInterfaceField.DataTypeName + " " + RteFunctionsGenerator.GenerateRteWriteFieldInComponentDefenitionStruct(portDefenition, srInterfaceField) + ";");
         }

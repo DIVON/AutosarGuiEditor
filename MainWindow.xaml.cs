@@ -154,7 +154,7 @@ namespace AutosarGuiEditor
                 compDefenitionName = "ComponentDefenition" + index.ToString();
             }
 
-            ComponentDefenition compDefenition = ComponentFabric.GetInstance().CreateComponentDefenition(compDefenitionName);
+            ApplicationSwComponentType compDefenition = ComponentFabric.GetInstance().CreateComponentDefenition(compDefenitionName);
 
             autosarApp.ComponentDefenitionsList.Add(compDefenition);
 
@@ -494,9 +494,9 @@ namespace AutosarGuiEditor
                     EnumDataTypeTab.IsEnabled = true;
                     tabHideHelper.SelectTab(EnumDataTypeTab);
                 }  
-                if  (item.Tag is ComponentDefenition)
+                if  (item.Tag is ApplicationSwComponentType)
                 {
-                    componentDefenitionViewController.ComponentDefenition = (item.Tag as ComponentDefenition);
+                    componentDefenitionViewController.ComponentDefenition = (item.Tag as ApplicationSwComponentType);
                     ComponentDefenitionTab.IsEnabled = true;
                     CompositionTab.IsEnabled = true;
                     tabHideHelper.SelectTab(CompositionTab);
@@ -802,7 +802,11 @@ namespace AutosarGuiEditor
 
         private void SaveAsProject_Click(object sender, RoutedEventArgs e)
         {
-            openSaveController.SaveAs();
+            bool saved = openSaveController.SaveAs();
+            if (saved)
+            {
+                UpdateMainWindowTitle();
+            }
         }
 
         private void OpenProject_Click(object sender, RoutedEventArgs e)
@@ -835,6 +839,7 @@ namespace AutosarGuiEditor
             ProjectSettingsForm projectSettingsForm = new ProjectSettingsForm();
             projectSettingsForm.Owner = this;
             projectSettingsForm.RteGenerationPath = autosarApp.GenerateRtePath;
+            projectSettingsForm.TestRteGenerationPath = autosarApp.GenerateTestRtePath;
             projectSettingsForm.ComponentGenerationPath = autosarApp.GenerateComponentsPath;
             projectSettingsForm.Frequency = autosarApp.SystickFrequencyHz;
             projectSettingsForm.McuTypeComboBox.SelectedIndex = autosarApp.MCUType.ToInt();
@@ -842,6 +847,7 @@ namespace AutosarGuiEditor
             if (projectSettingsForm.DialogResult == true)
             {
                 autosarApp.SystickFrequencyHz = projectSettingsForm.Frequency;
+                autosarApp.GenerateTestRtePath = projectSettingsForm.TestRteGenerationPath;
                 autosarApp.GenerateRtePath = projectSettingsForm.RteGenerationPath;
                 autosarApp.GenerateComponentsPath = projectSettingsForm.ComponentGenerationPath;
                 autosarApp.MCUType.Type = (MCUTypeDef)projectSettingsForm.McuTypeComboBox.SelectedIndex;
@@ -1039,7 +1045,7 @@ namespace AutosarGuiEditor
             {
                 return true;
             }
-            else if (tag is ComponentDefenition)
+            else if (tag is ApplicationSwComponentType)
             {
                 return true;
             }
@@ -1100,9 +1106,9 @@ namespace AutosarGuiEditor
                                 autosarApp.Delete(selectedItem.Tag as  CompositionInstance);
                                 autosarApp.ActiveComposition = autosarApp.Compositions.GetMainComposition();
                             }
-                            else if (selectedItem.Tag is  ComponentDefenition)
+                            else if (selectedItem.Tag is  ApplicationSwComponentType)
                             {
-                                autosarApp.Delete(selectedItem.Tag as  ComponentDefenition);
+                                autosarApp.Delete(selectedItem.Tag as  ApplicationSwComponentType);
                             }
                             else if (selectedItem.Tag is ArrayDataType)
                             {
@@ -1191,34 +1197,16 @@ namespace AutosarGuiEditor
 
         private void GenerateTestEnvironment_Click(object sender, RoutedEventArgs e)
         {
-            ComponentDefenition compDef = null;
-            if (selectedAutosarTreeObject is ComponentDefenition)
+            TestRteEnvironmentGenerator generator = new TestRteEnvironmentGenerator();
+            foreach (ApplicationSwComponentType compDefenition in AutosarApplication.GetInstance().ComponentDefenitionsList)
             {
-                compDef = (ComponentDefenition)selectedAutosarTreeObject;
+                generator.GenerateRteEnvironment(compDefenition, autosarApp.GenerateTestRtePath);
+                        
             }
-            else if (selectedAutosarTreeObject is ComponentInstance)
-            {
-                compDef = ((ComponentInstance)selectedAutosarTreeObject).ComponentDefenition;
-            }
-
-            if (compDef != null)
-            {
-                
-                System.Windows.Forms.FolderBrowserDialog dialog = new System.Windows.Forms.FolderBrowserDialog();
-                if (lastTestEnvironmentDir != null)
-                {
-                    dialog.SelectedPath = lastTestEnvironmentDir;
-                }
-                System.Windows.Forms.DialogResult result = dialog.ShowDialog();
-                
-                if (result == System.Windows.Forms.DialogResult.OK)
-                {
-                    lastTestEnvironmentDir = dialog.SelectedPath;
-                    TestRteEnvironmentGenerator generator = new TestRteEnvironmentGenerator();
-                    generator.GenerateRteEnvironment(compDef, dialog.SelectedPath);
-                    MessageBox.Show("Test environment has been generated for " + compDef.Name);
-                }
-            }
+            generator.GenerateCommonFiles(autosarApp.GenerateTestRtePath);
+            RteSchedulerGenerator rteSchedulerGenerator = new RteSchedulerGenerator();
+            rteSchedulerGenerator.Generate_ExternalRunnables_File(autosarApp.GenerateTestRtePath);
+            MessageBox.Show("Test environment has been generated.");
         }
 
         private void NewProject_Click(object sender, RoutedEventArgs e)
@@ -1268,6 +1256,21 @@ namespace AutosarGuiEditor
                 (moveObjectsController.SelectedObject as PortConnection).Visible = true;
                 Render(null, null);
             }
+        }
+
+        private void Step1Px(object sender, RoutedEventArgs e)
+        {
+            AnchorsStep.Step = 1;
+        }
+
+        private void Step5Px(object sender, RoutedEventArgs e)
+        {
+            AnchorsStep.Step = 5;
+        }
+
+        private void Step10Px(object sender, RoutedEventArgs e)
+        {
+            AnchorsStep.Step = 10;
         }
     }
 

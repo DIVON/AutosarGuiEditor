@@ -158,7 +158,7 @@ namespace WpfTreeView
                     var image = Path.GetDirectoryName(System.Windows.Forms.Application.ExecutablePath) + "\\Images\\icons\\tree\\Bricks.png";
                     return new BitmapImage(new Uri(image));
                 }
-                if (value is ComponentDefenition)
+                if (value is ApplicationSwComponentType)
                 {
                     var image = Path.GetDirectoryName(System.Windows.Forms.Application.ExecutablePath) + "\\Images\\icons\\tree\\ComponentDefenition.png";
                     return new BitmapImage(new Uri(image));

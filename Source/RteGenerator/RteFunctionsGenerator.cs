@@ -83,14 +83,9 @@ namespace AutosarGuiEditor.Source.RteGenerator
         public static String GetComponentsFolder()
         {
             String resFolder = "";
-            if (Path.IsPathRooted(AutosarApplication.GetInstance().GenerateRtePath))
-            {
+
                 resFolder = AutosarApplication.GetInstance().GenerateComponentsPath + "\\" + Properties.Resources.COMPONENTS_FOLDER;
-            }
-            else
-            {
-                resFolder = Path.GetDirectoryName(AutosarApplication.GetInstance().FileName) + "\\" + AutosarApplication.GetInstance().GenerateComponentsPath + "\\" + Properties.Resources.COMPONENTS_FOLDER;
-            }
+         
 
             return resFolder;
         }
@@ -100,7 +95,7 @@ namespace AutosarGuiEditor.Source.RteGenerator
             return "Rte_Call_" + portDef.Name + "_" + operation.Name;
         }
 
-        public static String Generate_RteCall_ConnectionGroup_FunctionName(ComponentDefenition compDef, PortDefenition port, ClientServerOperation operation)
+        public static String Generate_RteCall_ConnectionGroup_FunctionName(ApplicationSwComponentType compDef, PortDefenition port, ClientServerOperation operation)
         {
             return "Rte_Call_" + compDef.Name + "_" + port.Name + "_" + operation.Name;
         }
@@ -199,12 +194,12 @@ namespace AutosarGuiEditor.Source.RteGenerator
             return "Rte_Pim_" + pim.Name;
         }
 
-        public static String GenerateFullPimFunctionName(ComponentDefenition compDefenition, PimDefenition pim)
+        public static String GenerateFullPimFunctionName(ApplicationSwComponentType compDefenition, PimDefenition pim)
         {
             return "Rte_Pim_" + compDefenition.Name + "_" + pim.Name;
         }
 
-        public static String GenerateRtePimFieldInComponentDefenitionStruct(ComponentDefenition compDefenition, PimDefenition pim)
+        public static String GenerateRtePimFieldInComponentDefenitionStruct(ApplicationSwComponentType compDefenition, PimDefenition pim)
         {
             return "Rte_PimField_" + compDefenition.Name + "_" + pim.Name;
         }
@@ -213,7 +208,7 @@ namespace AutosarGuiEditor.Source.RteGenerator
 
 #region CDATA
 
-        public static String GenerateCDataDataType(ComponentDefenition compDefenition, CDataDefenition cdata)
+        public static String GenerateCDataDataType(ApplicationSwComponentType compDefenition, CDataDefenition cdata)
         {
             return "Rte_CDataType_" + compDefenition.Name + "_" + cdata.Name;
         }
@@ -223,12 +218,12 @@ namespace AutosarGuiEditor.Source.RteGenerator
             return "Rte_CData_" + cdata.Name;
         }
 
-        public static String GenerateFullCDataFunctionName(ComponentDefenition compDefenition, CDataDefenition cdata)
+        public static String GenerateFullCDataFunctionName(ApplicationSwComponentType compDefenition, CDataDefenition cdata)
         {
             return "Rte_CData_" + compDefenition.Name + "_" + cdata.Name;
         }
 
-        public static String GenerateFullCDataFunctionDefenitionNameAndReturnType(ComponentDefenition compDefenition, CDataDefenition cdata)
+        public static String GenerateFullCDataFunctionDefenitionNameAndReturnType(ApplicationSwComponentType compDefenition, CDataDefenition cdata)
         {
             String returnDataType = GenerateCDataDataType(compDefenition, cdata);
             String FunctionArguments = "(";
@@ -241,7 +236,7 @@ namespace AutosarGuiEditor.Source.RteGenerator
             return result;
         }
 
-        public static String GenerateRteCDataFieldInComponentDefenitionStruct(ComponentDefenition compDefenition, CDataDefenition cdata)
+        public static String GenerateRteCDataFieldInComponentDefenitionStruct(ApplicationSwComponentType compDefenition, CDataDefenition cdata)
         {
             return "Rte_CDataField_" + compDefenition.Name + "_" + cdata.Name;
         }
@@ -315,12 +310,12 @@ namespace AutosarGuiEditor.Source.RteGenerator
             return ComponentName + "_" + PortName + "_" + field.Name + "_VALUE";
         }
 
-        public static String Generate_RunnableFunctionName(ComponentDefenition compDefenition, PeriodicRunnableDefenition runnable)
+        public static String Generate_RunnableFunctionName(ApplicationSwComponentType compDefenition, PeriodicRunnableDefenition runnable)
         {
             return compDefenition.Name + "_ru" + runnable.Name;
         }
 
-        public static String Generate_RunnableFunction(ComponentDefenition compDefenition, PeriodicRunnableDefenition runnable)
+        public static String Generate_RunnableFunction(ApplicationSwComponentType compDefenition, PeriodicRunnableDefenition runnable)
         {             
             if (compDefenition.MultipleInstantiation)
             {
@@ -496,7 +491,7 @@ namespace AutosarGuiEditor.Source.RteGenerator
                 res += "Read_";
             }
 
-            ComponentDefenition compDefenition = AutosarApplication.GetInstance().FindComponentDefenitionByPort(port);
+            ApplicationSwComponentType compDefenition = AutosarApplication.GetInstance().FindComponentDefenitionByPort(port);
             res += compDefenition.Name + "_" + port.Name + "_" + field.Name;
 
             return res;

@@ -59,16 +59,24 @@ namespace AutosarGuiEditor.Source.Autosar.OsTasks
         int findlcm(List<int> arr)
         {
             // Initialize result
-            int ans = arr[0];
- 
-            // ans contains LCM of arr[0], ..arr[i]
-            // after i'th iteration,
-            for (int i = 1; i < arr.Count; i++)
+            if (arr.Count > 0)
             {
-                ans = (((arr[i] * ans)) / (gcd(arr[i], ans)));
+                int ans = arr[0];
+
+                // ans contains LCM of arr[0], ..arr[i]
+                // after i'th iteration,
+                for (int i = 1; i < arr.Count; i++)
+                {
+                    ans = (((arr[i] * ans)) / (gcd(arr[i], ans)));
+                }
+
+                return ans;
             }
- 
-            return ans;
+            else
+            {
+                return 0;
+            }
+            
         }
 
         public int GetSchedulerNecessaryStepsCount(double schedulerPeriodUs)

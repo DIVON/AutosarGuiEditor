@@ -82,12 +82,12 @@ namespace AutosarGuiEditor.Source.RteGenerator
             {
                 case MCUTypeDef.STM32F1xx:
                 {
-                    RteFunctionsGenerator.AddInclude(writer, "<stm32f1xx.h>");
+                    //RteFunctionsGenerator.AddInclude(writer, "<stm32f1xx.h>");
                     break;
                 }
                 case MCUTypeDef.STM32F4xx:
                 {
-                    RteFunctionsGenerator.AddInclude(writer, "<stm32f4xx.h>");
+                    //RteFunctionsGenerator.AddInclude(writer, "<stm32f4xx.h>");
                     break;
                 }
             }
@@ -102,7 +102,7 @@ namespace AutosarGuiEditor.Source.RteGenerator
             GenerateAllComponentInstances(writer);
 
             /* Generate all rte write functions */
-            foreach(ComponentDefenition compDef in AutosarApplication.GetInstance().ComponentDefenitionsList)
+            foreach(ApplicationSwComponentType compDef in AutosarApplication.GetInstance().ComponentDefenitionsList)
             {
                 writer.WriteLine("/**************************************************");
                 writer.WriteLine("        " + compDef.Name);
@@ -133,7 +133,7 @@ namespace AutosarGuiEditor.Source.RteGenerator
         }        
         
 
-        void CreateRteWriteFunctions(StreamWriter writer, ComponentDefenition compDefenition)
+        void CreateRteWriteFunctions(StreamWriter writer, ApplicationSwComponentType compDefenition)
         {
             foreach (PortDefenition port in compDefenition.Ports)
             {
@@ -151,7 +151,7 @@ namespace AutosarGuiEditor.Source.RteGenerator
             }
         }
 
-        void CreateRteReadFunctions(StreamWriter writer, ComponentDefenition compDefenition)
+        void CreateRteReadFunctions(StreamWriter writer, ApplicationSwComponentType compDefenition)
         {
             foreach (PortDefenition port in compDefenition.Ports)
             {
@@ -170,7 +170,7 @@ namespace AutosarGuiEditor.Source.RteGenerator
         }
 
 
-        void CreateRteCallFunctions(StreamWriter writer, ComponentDefenition compDefenition)
+        void CreateRteCallFunctions(StreamWriter writer, ApplicationSwComponentType compDefenition)
         {
             foreach (PortDefenition port in compDefenition.Ports)
             {
@@ -185,7 +185,7 @@ namespace AutosarGuiEditor.Source.RteGenerator
             }
         }
 
-        void CreateRtePimFunctions(StreamWriter writer, ComponentDefenition compDefenition)
+        void CreateRtePimFunctions(StreamWriter writer, ApplicationSwComponentType compDefenition)
         {
             foreach (PimDefenition pim in compDefenition.PerInstanceMemoryList)
             {                
@@ -194,7 +194,7 @@ namespace AutosarGuiEditor.Source.RteGenerator
         }
 
 
-        void CreateRteCDataFunctions(StreamWriter writer, ComponentDefenition compDefenition)
+        void CreateRteCDataFunctions(StreamWriter writer, ApplicationSwComponentType compDefenition)
         {
             foreach (CDataDefenition cdataDef in compDefenition.CDataDefenitions)
             {
@@ -279,7 +279,7 @@ namespace AutosarGuiEditor.Source.RteGenerator
 
         void GenerateComponentInstance(StreamWriter writer, ComponentInstance component)
         {
-            ComponentDefenition compDefenition = component.ComponentDefenition;
+            ApplicationSwComponentType compDefenition = component.ComponentDefenition;
 
             int elementsCount = compDefenition.Ports.PortsWithSenderInterface().Count + compDefenition.CDataDefenitions.Count + compDefenition.PerInstanceMemoryList.Count;
 
@@ -500,7 +500,7 @@ namespace AutosarGuiEditor.Source.RteGenerator
 
         
 
-        void GenerateRteWritePortFieldFunction(StreamWriter writer, ComponentDefenition compDef, PortDefenition port, SenderReceiverInterfaceField field)
+        void GenerateRteWritePortFieldFunction(StreamWriter writer, ApplicationSwComponentType compDef, PortDefenition port, SenderReceiverInterfaceField field)
         {
             String returnValue = Properties.Resources.STD_RETURN_TYPE;
             String RteFuncName = RteFunctionsGenerator.GenerateReadWriteConnectionFunctionName(port, field);
@@ -534,7 +534,7 @@ namespace AutosarGuiEditor.Source.RteGenerator
         }
 
 
-        void GenerateRteReadPortFieldFunction(StreamWriter writer, ComponentDefenition compDef, PortDefenition port, SenderReceiverInterfaceField field)
+        void GenerateRteReadPortFieldFunction(StreamWriter writer, ApplicationSwComponentType compDef, PortDefenition port, SenderReceiverInterfaceField field)
         {
             String returnValue = Properties.Resources.STD_RETURN_TYPE;
             String RteFuncName = RteFunctionsGenerator.GenerateReadWriteConnectionFunctionName(port, field);
@@ -611,11 +611,13 @@ namespace AutosarGuiEditor.Source.RteGenerator
             writer.WriteLine("");
         }
 
-        void GenerateRteCallPortFieldFunction(StreamWriter writer, ComponentDefenition compDef, PortDefenition port, ClientServerOperation operation)
+        void GenerateRteCallPortFieldFunction(StreamWriter writer, ApplicationSwComponentType compDef, PortDefenition port, ClientServerOperation operation)
         {
             String returnValue = Properties.Resources.STD_RETURN_TYPE;
             String RteFuncName = RteFunctionsGenerator.Generate_RteCall_ConnectionGroup_FunctionName(compDef, port, operation);
             String fieldVariable = RteFunctionsGenerator.GenerateClientServerInterfaceArguments(operation, compDef.MultipleInstantiation);
+
+            writer.WriteLine("#ifndef TEST_RTE");
 
             writer.WriteLine(returnValue + RteFuncName + fieldVariable);
             writer.WriteLine("{");
@@ -681,11 +683,12 @@ namespace AutosarGuiEditor.Source.RteGenerator
                 writer.WriteLine("    return " + Properties.Resources.RTE_E_UNCONNECTED + ";");
             }
             writer.WriteLine("}");
+            writer.WriteLine("#endif /* TEST_RTE */");
             writer.WriteLine("");
         }
 
 
-        void GenerateRtePimFunction(StreamWriter writer, ComponentDefenition compDef, PimDefenition pimDef)
+        void GenerateRtePimFunction(StreamWriter writer, ApplicationSwComponentType compDef, PimDefenition pimDef)
         {
             String returnValue = pimDef.DataTypeName + " * const ";
             String RteFuncName = RteFunctionsGenerator.GenerateFullPimFunctionName(compDef, pimDef);
@@ -717,7 +720,7 @@ namespace AutosarGuiEditor.Source.RteGenerator
             writer.WriteLine("");
         }
 
-        void GenerateRteCDataFunction(StreamWriter writer, ComponentDefenition compDef, CDataDefenition cdataDef)
+        void GenerateRteCDataFunction(StreamWriter writer, ApplicationSwComponentType compDef, CDataDefenition cdataDef)
         {
             String returnValue = cdataDef.DataTypeName + " ";
             String RteFuncName = RteFunctionsGenerator.GenerateFullCDataFunctionName(compDef, cdataDef);

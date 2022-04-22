@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace AutosarGuiEditor.Source.Component
 {
-    public class ComponentDefenitionList : IGuidList<ComponentDefenition>
+    public class ComponentDefenitionList : IGuidList<ApplicationSwComponentType>
     {
         public override String GetName()
         {

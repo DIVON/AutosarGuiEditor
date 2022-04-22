@@ -23,16 +23,16 @@ namespace AutosarGuiEditor.Source.Controllers
 
         public Boolean IsPressed = false;
         
-        private ComponentDefenition compDef;
+        private ApplicationSwComponentType compDef;
 
         public void MouseDownOnTreeViewMenu()
         {
             if (treeView.SelectedItem is TreeViewItem)
             {
                 TreeViewItem selectedItem = treeView.SelectedItem as TreeViewItem;
-                if (selectedItem.Tag is ComponentDefenition)
+                if (selectedItem.Tag is ApplicationSwComponentType)
                 {
-                    compDef = (selectedItem.Tag as ComponentDefenition);
+                    compDef = (selectedItem.Tag as ApplicationSwComponentType);
                     DataObject dataObj = new DataObject(compDef);
                     DragDrop.DoDragDrop(selectedItem, dataObj, DragDropEffects.Copy);
                 }
@@ -47,10 +47,10 @@ namespace AutosarGuiEditor.Source.Controllers
 
         public void ViewPortImage_Drop(DragEventArgs e, double worldCoordX, double worldCoordY)
         {
-            object obj = e.Data.GetData(typeof(ComponentDefenition));
-            if (obj is ComponentDefenition)
+            object obj = e.Data.GetData(typeof(ApplicationSwComponentType));
+            if (obj is ApplicationSwComponentType)
             {
-                ComponentDefenition realDefenition = (ComponentDefenition)obj;
+                ApplicationSwComponentType realDefenition = (ApplicationSwComponentType)obj;
                 int count = AutosarApplication.GetInstance().GetComponentDefenitionCount(realDefenition);
                 if (realDefenition.MultipleInstantiation || ((count == 0) && (!realDefenition.MultipleInstantiation)))
                 {

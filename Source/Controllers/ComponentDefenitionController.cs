@@ -106,8 +106,8 @@ namespace AutosarGuiEditor.Source.Controllers
         }
 
 
-        ComponentDefenition _componentDefenition;
-        public ComponentDefenition ComponentDefenition
+        ApplicationSwComponentType _componentDefenition;
+        public ApplicationSwComponentType ComponentDefenition
         {
             set
             {

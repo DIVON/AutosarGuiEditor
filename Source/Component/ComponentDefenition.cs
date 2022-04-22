@@ -13,12 +13,25 @@ using System.Xml.Linq;
 
 namespace AutosarGuiEditor.Source.Component
 {
-    public class ComponentDefenition : IGUID
+    public class ApplicationSwComponentType : IGUID
     {
+        public String ShortName
+        {
+            set;
+            get;
+        }
+
+
+        public PortDefenitionsList Ports = new PortDefenitionsList();
+
+
+
+
+
         public Boolean MultipleInstantiation = false;
 
         public RunnableDefenitionsList Runnables = new RunnableDefenitionsList();
-        public PortDefenitionsList Ports = new PortDefenitionsList();
+        
         public PerInstanceMemoryDefenitionList PerInstanceMemoryList = new PerInstanceMemoryDefenitionList();
         public CDataDefenitionList CDataDefenitions = new CDataDefenitionList();
 

@@ -154,6 +154,7 @@ namespace System
 
         public uint SystickFrequencyHz = 1000;
         public String GenerateRtePath = "";
+        public String GenerateTestRtePath = "";
         public String GenerateComponentsPath = "";
         public String Signature = "";
 
@@ -202,6 +203,7 @@ namespace System
         const string ProjectPropertiesXmlField = "Properties";
         const string SystickFrequencyProperty = "SysTickFrequency";
         const string RteGeneratePathProperty = "RteGeneratedPath";
+        const string TestRteGeneratePathProperty = "TestRteGeneratedPath";
         const string RteGenerateComponentPathProperty = "RteComponentPathProperty";
         const string ProjectSignatureProperty = "ProjectSignature";
 
@@ -258,6 +260,11 @@ namespace System
                 GenerateComponentsPath = properties.Element(RteGenerateComponentPathProperty).Value;
             }
 
+            if (properties.Element(TestRteGeneratePathProperty) != null)
+            {
+                GenerateTestRtePath = properties.Element(TestRteGeneratePathProperty).Value;
+            }
+
             if (properties.Element(ProjectSignatureProperty) != null)
             {
                 Signature = properties.Element(ProjectSignatureProperty).Value;
@@ -284,6 +291,9 @@ namespace System
             XElement rtePath = new XElement(RteGeneratePathProperty);
             rtePath.Value = GenerateRtePath;
 
+            XElement testRtePath = new XElement(TestRteGeneratePathProperty);
+            testRtePath.Value = GenerateTestRtePath;
+
             XElement ComponentPath = new XElement(RteGenerateComponentPathProperty);
             ComponentPath.Value = GenerateComponentsPath;
 
@@ -293,6 +303,7 @@ namespace System
             properties.Add(frequencyProp);
             properties.Add(ComponentPath);
             properties.Add(rtePath);
+            properties.Add(testRtePath);
             properties.Add(SignatureElem);
 
             root.Add(properties);
@@ -325,6 +336,7 @@ namespace System
             Compositions.WriteToXML(root);
             MCUType.WriteToXML(root);
             xdoc.Save(filename);
+            FileName = filename;
             return true;
         }
 
@@ -498,7 +510,7 @@ namespace System
         }
 
         /* Delete component defenition and its instances */
-        public void Delete(ComponentDefenition componentDefenition)
+        public void Delete(ApplicationSwComponentType componentDefenition)
         {
             /* Find Object instances */
             foreach (CompositionInstance composition in Compositions)
@@ -523,7 +535,7 @@ namespace System
             {
                 foreach (ComponentInstance compInstance in composition.ComponentInstances)
                 {
-                    ComponentDefenition compDefenition = compInstance.ComponentDefenition;
+                    ApplicationSwComponentType compDefenition = compInstance.ComponentDefenition;
                     for (int i = compInstance.Ports.Count - 1; i >= 0; i--)
                     {
                         PortPainter portPainter = compInstance.Ports[i];
@@ -541,7 +553,7 @@ namespace System
             {
                 foreach (ComponentInstance compInstance in composition.ComponentInstances)
                 {
-                    ComponentDefenition compDefenition = compInstance.ComponentDefenition;
+                    ApplicationSwComponentType compDefenition = compInstance.ComponentDefenition;
                     foreach (PortDefenition portDef in compDefenition.Ports)
                     {
                         bool find = false;
@@ -860,7 +872,7 @@ namespace System
 
         public PortDefenition GetPortDefenition(Guid GUID)
         {
-            foreach (ComponentDefenition componentDef in ComponentDefenitionsList)
+            foreach (ApplicationSwComponentType componentDef in ComponentDefenitionsList)
             {
                 foreach (PortDefenition portDef in componentDef.Ports)
                 {
@@ -899,7 +911,7 @@ namespace System
             return null;
         }
 
-        public ComponentInstancesList GetComponentInstanceByDefenition(ComponentDefenition compDef)
+        public ComponentInstancesList GetComponentInstanceByDefenition(ApplicationSwComponentType compDef)
         {
             ComponentInstancesList list = new ComponentInstancesList();
             foreach (CompositionInstance composition in Compositions)
@@ -1068,7 +1080,7 @@ namespace System
         public PeriodicRunnableDefenition FindRunnableDefenition(Guid runnableDefGuid)
         {
             PeriodicRunnableDefenition runableDef = null;
-            foreach (ComponentDefenition compDef in this.ComponentDefenitionsList)
+            foreach (ApplicationSwComponentType compDef in this.ComponentDefenitionsList)
             {
                 runableDef = compDef.Runnables.FindObject(runnableDefGuid);
                 if (runableDef != null)
@@ -1127,7 +1139,7 @@ namespace System
         public PortDefenition FindPortDefenition(Guid portDefenitionGuid)
         {
             /* Check component's ports */
-            foreach (ComponentDefenition compDef in this.ComponentDefenitionsList)
+            foreach (ApplicationSwComponentType compDef in this.ComponentDefenitionsList)
             {
                 PortDefenition portDefenition = compDef.Ports.FindObject(portDefenitionGuid);
                 if (portDefenition != null)
@@ -1190,7 +1202,7 @@ namespace System
 
         public PimDefenition FindPimDefenition(Guid defGuid)
         {
-            foreach (ComponentDefenition compInstance in this.ComponentDefenitionsList)
+            foreach (ApplicationSwComponentType compInstance in this.ComponentDefenitionsList)
             {
                 PimDefenition pimDef = compInstance.PerInstanceMemoryList.FindObject(defGuid);
                 if (pimDef != null)
@@ -1203,7 +1215,7 @@ namespace System
 
         public CDataDefenition FindCDataDefenition(Guid defGuid)
         {
-            foreach (ComponentDefenition compInstance in this.ComponentDefenitionsList)
+            foreach (ApplicationSwComponentType compInstance in this.ComponentDefenitionsList)
             {
                 CDataDefenition def = compInstance.CDataDefenitions.FindObject(defGuid);
                 if (def != null)
@@ -1214,9 +1226,9 @@ namespace System
             return null;
         }
 
-        public ComponentDefenition FindComponentDefenitionByRunnnableGuid(Guid runnableDefenitionGuid)
+        public ApplicationSwComponentType FindComponentDefenitionByRunnnableGuid(Guid runnableDefenitionGuid)
         {
-            foreach (ComponentDefenition compDefenition in this.ComponentDefenitionsList)
+            foreach (ApplicationSwComponentType compDefenition in this.ComponentDefenitionsList)
             {
                 if (compDefenition.Runnables.FindObject(runnableDefenitionGuid) != null)
                 {
@@ -1226,14 +1238,14 @@ namespace System
             return null;
         }
 
-        public ComponentDefenition FindComponentDefenitionByGuid(Guid componentDefenitionGuid)
+        public ApplicationSwComponentType FindComponentDefenitionByGuid(Guid componentDefenitionGuid)
         {
             return ComponentDefenitionsList.FindObject(componentDefenitionGuid);            
         }
 
-        public ComponentDefenition FindComponentDefenitionByPortGuid(Guid portDefenitionGuid)
+        public ApplicationSwComponentType FindComponentDefenitionByPortGuid(Guid portDefenitionGuid)
         {
-            foreach (ComponentDefenition compDefenition in this.ComponentDefenitionsList)
+            foreach (ApplicationSwComponentType compDefenition in this.ComponentDefenitionsList)
             {
                 if (compDefenition.Ports.FindObject(portDefenitionGuid) != null)
                 {
@@ -1243,12 +1255,12 @@ namespace System
             return null;
         }
 
-        public ComponentDefenition FindComponentDefenitionByPort(PortDefenition portDefenition)
+        public ApplicationSwComponentType FindComponentDefenitionByPort(PortDefenition portDefenition)
         {
             return FindComponentDefenitionByPortGuid(portDefenition.GUID);
         }
 
-        public ComponentDefenition FindComponentDefenitionByRunnnable(PeriodicRunnableDefenition runnableDef)
+        public ApplicationSwComponentType FindComponentDefenitionByRunnnable(PeriodicRunnableDefenition runnableDef)
         {
             return FindComponentDefenitionByRunnnableGuid(runnableDef.GUID);
         }
@@ -1277,7 +1289,7 @@ namespace System
         }
         */
 
-        public int GetComponentDefenitionCount(ComponentDefenition componentDefenition)
+        public int GetComponentDefenitionCount(ApplicationSwComponentType componentDefenition)
         {
             int count = 0;
             foreach (CompositionInstance composition in Compositions)
@@ -1293,7 +1305,7 @@ namespace System
             return count;
         }
 
-        public void SyncronizePerInstanceMemory(ComponentDefenition compDef, bool useAllDefenition = false)
+        public void SyncronizePerInstanceMemory(ApplicationSwComponentType compDef, bool useAllDefenition = false)
         {
             foreach (CompositionInstance composition in Compositions)
             {
@@ -1307,7 +1319,7 @@ namespace System
             }
         }
 
-        public void SysncronizePimNames(ComponentDefenition compDef, bool useAllDefenition = false)
+        public void SysncronizePimNames(ApplicationSwComponentType compDef, bool useAllDefenition = false)
         {
             foreach (CompositionInstance composition in Compositions)
             {
@@ -1321,7 +1333,7 @@ namespace System
             }
         }
 
-        public void SysncronizeCDataNames(ComponentDefenition compDef, bool useAllDefenition = false)
+        public void SysncronizeCDataNames(ApplicationSwComponentType compDef, bool useAllDefenition = false)
         {
             foreach (CompositionInstance composition in Compositions)
             {
@@ -1335,7 +1347,7 @@ namespace System
             }
         }
 
-        public void SyncronizeCData(ComponentDefenition compDef, bool useAllDefenition = false)
+        public void SyncronizeCData(ApplicationSwComponentType compDef, bool useAllDefenition = false)
         {
             foreach (CompositionInstance composition in Compositions)
             {
@@ -1349,7 +1361,7 @@ namespace System
             }
         }
 
-        public void SyncronizeRunnables(ComponentDefenition compDef, bool useAllDefenition = false)
+        public void SyncronizeRunnables(ApplicationSwComponentType compDef, bool useAllDefenition = false)
         {
             foreach (CompositionInstance composition in Compositions)
             {

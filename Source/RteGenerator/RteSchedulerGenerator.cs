@@ -20,7 +20,7 @@ namespace AutosarGuiEditor.Source.RteGenerator
     {
         public void GenerateShedulerFiles()
         {
-            Generate_ExternalRunnables_File();
+            Generate_ExternalRunnables_File(RteFunctionsGenerator.GetRteFolder());
             Generate_RunTimeEnvironment_Header_File();
             Generate_RunTimeEnvironment_Source_File();
             Generate_RteTaskScheduler_Header_File();
@@ -400,18 +400,20 @@ namespace AutosarGuiEditor.Source.RteGenerator
             writer.Close();
         }
 
-        void Generate_ExternalRunnables_File()
+        public void Generate_ExternalRunnables_File(string folder)
         {
-            String FileName = RteFunctionsGenerator.GetRteFolder() + "\\" + Properties.Resources.RTE_EXTERNAL_RUNNABLES_H_FILENAME;
+            String FileName = folder + "\\" + Properties.Resources.RTE_EXTERNAL_RUNNABLES_H_FILENAME;
             StreamWriter writer = new StreamWriter(FileName);
 
             RteFunctionsGenerator.GenerateFileTitle(writer, FileName, Properties.Resources.RTE_EXTERNAL_RUNNABLES_FILE_DESCRIPTION);
             RteFunctionsGenerator.OpenGuardDefine(writer);
 
+            RteFunctionsGenerator.AddInclude(writer, Properties.Resources.RTE_DATATYPES_H_FILENAME);
+
             writer.WriteLine();
             writer.WriteLine("/* Declaration of all periodic runnables */");
             writer.WriteLine();
-            foreach (ComponentDefenition compDefinition in AutosarApplication.GetInstance().ComponentDefenitionsList)
+            foreach (ApplicationSwComponentType compDefinition in AutosarApplication.GetInstance().ComponentDefenitionsList)
             {
                 foreach (PeriodicRunnableDefenition runnable in compDefinition.Runnables)
                 {
@@ -422,7 +424,7 @@ namespace AutosarGuiEditor.Source.RteGenerator
             writer.WriteLine();
             writer.WriteLine("/* Declaration of all server call functions */");
             writer.WriteLine();
-            foreach (ComponentDefenition componentDefenition in AutosarApplication.GetInstance().ComponentDefenitionsList)
+            foreach (ApplicationSwComponentType componentDefenition in AutosarApplication.GetInstance().ComponentDefenitionsList)
             {
                 foreach (PortDefenition port in componentDefenition.Ports)
                 {
@@ -584,9 +586,6 @@ namespace AutosarGuiEditor.Source.RteGenerator
                 }
             }
 
-            writer.WriteLine("extern TIM_HandleTypeDef " + htim + ";");
-
-
             writer.WriteLine();
             writer.WriteLine("static const Rte_Scheduler_Sequence  taskScheduling =");
             writer.WriteLine("{");
@@ -656,23 +655,19 @@ namespace AutosarGuiEditor.Source.RteGenerator
             /* Writing DoScheduling function */
             writer.WriteLine("void DoScheduling(void)");
             writer.WriteLine("{");
-            writer.WriteLine("    if (__HAL_TIM_GET_FLAG(&" + htim + ", TIM_FLAG_UPDATE) != RESET)");
+            writer.WriteLine("    uint32 index = schedulingCounter % RTE_SCHEDULER_STEPS;");
+            writer.WriteLine("    for (uint32 i = 0; i < RTE_TASKS_COUNT; i++)");
             writer.WriteLine("    {");
-            writer.WriteLine("        __HAL_TIM_CLEAR_FLAG(&" + htim + ", TIM_FLAG_UPDATE);");
-            writer.WriteLine("        uint32 index = schedulingCounter % RTE_SCHEDULER_STEPS;");
-            writer.WriteLine("        for (uint32 i = 0; i < RTE_TASKS_COUNT; i++)");
+            writer.WriteLine("        if (NULL != taskScheduling[index][i])");
             writer.WriteLine("        {");
-            writer.WriteLine("            if (NULL != taskScheduling[index][i])");
-            writer.WriteLine("            {");
-            writer.WriteLine("                taskScheduling[index][i]();");
-            writer.WriteLine("            }");
-            writer.WriteLine("            else");
-            writer.WriteLine("            {");
-            writer.WriteLine("                break;");
-            writer.WriteLine("            }");
+            writer.WriteLine("            taskScheduling[index][i]();");
             writer.WriteLine("        }");
-            writer.WriteLine("        schedulingCounter++;");
+            writer.WriteLine("        else");
+            writer.WriteLine("        {");
+            writer.WriteLine("            break;");
+            writer.WriteLine("        }");
             writer.WriteLine("    }");
+            writer.WriteLine("    schedulingCounter++;");
             writer.WriteLine("}");
 
 

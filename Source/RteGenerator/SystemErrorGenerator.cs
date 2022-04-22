@@ -21,11 +21,6 @@ namespace AutosarGuiEditor.Source.RteGenerator
             RteFunctionsGenerator.GenerateFileTitle(writer, Properties.Resources.RTE_DATATYPES_H_FILENAME, Properties.Resources.DATATYPES_H_FILE_DESCRIPTION);
             String guardDefine = RteFunctionsGenerator.OpenGuardDefine(writer);
 
-            writer.WriteLine("/* Rte return codes */");
-            writer.WriteLine(RteFunctionsGenerator.CreateDefine(Properties.Resources.RTE_E_OK, "((uint32)0xFF)"));
-            writer.WriteLine(RteFunctionsGenerator.CreateDefine(Properties.Resources.RTE_E_UNCONNECTED, "((uint32)0xFE)"));
-            writer.WriteLine();
-
             writer.WriteLine("/*  System errors */");
             WriteErrorsCount(writer);
             WriteAllErrors(writer);

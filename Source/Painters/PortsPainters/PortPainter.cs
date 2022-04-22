@@ -19,6 +19,7 @@ using AutosarGuiEditor.Source.SystemInterfaces;
 using AutosarGuiEditor.Source.Component;
 using AutosarGuiEditor.Source.PortDefenitions;
 using AutosarGuiEditor.Source.Painters.Boundaries;
+using AutosarGuiEditor.Source.Render;
 
 namespace AutosarGuiEditor.Source.Painters.PortsPainters
 {
@@ -87,16 +88,41 @@ namespace AutosarGuiEditor.Source.Painters.PortsPainters
             get;
         }
 
+
+        Point cummulatedShift = new Point(0, 0);
+
         public void Translate(double x, double y)
         {
-            rectanglePainter.MoveX(x);
-            rectanglePainter.MoveY(y);
+
+            Point translate = new Point(0, 0);
+
+            cummulatedShift.X += x;
+            cummulatedShift.Y += y;
+
+            bool doMove = false;
+
+            if (Math.Abs(cummulatedShift.X) > AnchorsStep.Step)
+            {
+                double ceilPart = Math.Round(cummulatedShift.X / 5) * 5;
+                rectanglePainter.MoveX(ceilPart);
+                cummulatedShift.X -= ceilPart;
+                translate.X = ceilPart;
+                doMove = true;
+            }
+
+            if (Math.Abs(cummulatedShift.Y) > AnchorsStep.Step)
+            {
+                double ceilPart = Math.Round(cummulatedShift.Y / 5) * 5;
+                rectanglePainter.MoveY(ceilPart);
+                cummulatedShift.Y -= ceilPart;
+                translate.Y = ceilPart;
+                doMove = true;
+            }
         }
 
         public void Translate(Point translation)
         {
-            rectanglePainter.MoveX(translation.X);
-            rectanglePainter.MoveY(translation.Y);
+            Translate(translation.X, translation.Y);
         }
 
         protected virtual void RenderEntrails(RenderContext context)
