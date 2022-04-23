@@ -51,6 +51,16 @@ namespace AutosarGuiEditor.Source.DataTypes.BaseDataType
             {
                 this.Add(CreateBaseDataType("boolean", "unsigned char"));
             }
+
+            if (FindObject("uint64") == null)
+            {
+                this.Add(CreateBaseDataType("uint64", "unsigned long long"));
+            }
+
+            if (FindObject("int64") == null)
+            {
+                this.Add(CreateBaseDataType("int64", "signed long long"));
+            }
         }
 
         public BaseDataType uint8 { get { return this.FindObject("uint8"); } }

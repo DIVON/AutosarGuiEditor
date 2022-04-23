@@ -374,7 +374,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.TestGenerator
 
             writer.WriteLine(returnValue + RteFuncName + fieldVariable);
             writer.WriteLine("{");
-            writer.WriteLine("    if (" + TestArtefactsVariable(compDef) + "." + RteFuncName + "." + "redirection != NULL)");
+            writer.WriteLine("    if (" + TestArtefactsVariable(compDef) + "." + RteFuncName + "." + "redirection == NULL)");
             writer.WriteLine("    {");
             writer.WriteLine("        " + TestArtefactsVariable(compDef) + "." + RteFuncName + "." + CallCount + "++;");
             foreach (var csField in operation.Fields)
