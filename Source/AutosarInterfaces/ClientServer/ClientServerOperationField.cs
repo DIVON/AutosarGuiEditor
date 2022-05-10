@@ -11,14 +11,25 @@ namespace AutosarGuiEditor.Source.AutosarInterfaces.ClientServer
 {
     public enum ClientServerOperationDirection
     {
-        IN,
-        OUT,
-        INOUT
+        VALUE,
+        CONST_VALUE,
+        VAL_REF,
+        CONST_VAL_REF,
+        VAL_CONST_REF,
+        CONST_VAL_CONST_REF
     }
 
 
     public class ClientServerOperationField : IGUID
     {
+        public const string STR_VALUE = "value";
+        public const string STR_CONST_VALUE = "const value";
+        public const string STR_VAL_REF = "reference";
+        public const string STR_CONST_VAL_REF = "const dt * vn";
+        public const string STR_VAL_CONST_REF = "dt * const vn";
+        public const string STR_CONST_VAL_CONST_REF = "const dt * const vn";
+
+
         public ClientServerOperationDirection Direction
         {
             set;
@@ -36,7 +47,7 @@ namespace AutosarGuiEditor.Source.AutosarInterfaces.ClientServer
         {
             BaseDataTypeGUID = Guid.Empty;
             Name = "Field";
-            this.Direction = ClientServerOperationDirection.IN;
+            this.Direction = ClientServerOperationDirection.VALUE;
         }
 
         public override void WriteToXML(XElement root)
@@ -47,9 +58,12 @@ namespace AutosarGuiEditor.Source.AutosarInterfaces.ClientServer
             String dir = "";
             switch (this.Direction)
             {
-                case ClientServerOperationDirection.IN: dir = "in"; break;
-                case ClientServerOperationDirection.OUT: dir = "out"; break;
-                case ClientServerOperationDirection.INOUT: dir = "in-out"; break;
+                case ClientServerOperationDirection.VALUE:                  dir = STR_VALUE; break;
+                case ClientServerOperationDirection.CONST_VALUE:            dir = STR_CONST_VALUE; break;
+                case ClientServerOperationDirection.VAL_REF:                dir = STR_VAL_REF; break;
+                case ClientServerOperationDirection.CONST_VAL_REF:          dir = STR_CONST_VAL_REF; break;
+                case ClientServerOperationDirection.VAL_CONST_REF:          dir = STR_VAL_CONST_REF; break;
+                case ClientServerOperationDirection.CONST_VAL_CONST_REF:    dir = STR_CONST_VAL_CONST_REF; break;
             }
             xmldatatype.Add(new XElement("Direction", dir));
             root.Add(xmldatatype);
@@ -66,9 +80,12 @@ namespace AutosarGuiEditor.Source.AutosarInterfaces.ClientServer
             String dir = xml.Element("Direction").Value;
             switch (dir)
             {
-                case "in": Direction = ClientServerOperationDirection.IN; break;
-                case "out": Direction = ClientServerOperationDirection.OUT; break;
-                case "in-out": Direction = ClientServerOperationDirection.INOUT; break;
+                case STR_VALUE: Direction = ClientServerOperationDirection.VALUE; break;
+                case STR_CONST_VALUE: Direction = ClientServerOperationDirection.CONST_VALUE; break;
+                case STR_VAL_REF: Direction = ClientServerOperationDirection.VAL_REF; break;
+                case STR_CONST_VAL_REF: Direction = ClientServerOperationDirection.CONST_VAL_REF; break;
+                case STR_VAL_CONST_REF: Direction = ClientServerOperationDirection.VAL_CONST_REF; break;
+                case STR_CONST_VAL_CONST_REF: Direction = ClientServerOperationDirection.CONST_VAL_CONST_REF; break;
             }
         }
 

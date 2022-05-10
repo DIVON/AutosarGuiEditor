@@ -42,9 +42,12 @@ namespace AutosarGuiEditor.Source.AutosarInterfaces.ClientServer
             if (instance == null)
             {
                 instance = new ClientServerOperationDirectionComboBoxDataList();
-                instance.Add(new ClientServerOperationDirectionComboBoxData(0, "in"));
-                instance.Add(new ClientServerOperationDirectionComboBoxData(0, "out"));
-                instance.Add(new ClientServerOperationDirectionComboBoxData(0, "in-out"));
+                instance.Add(new ClientServerOperationDirectionComboBoxData(0, ClientServerOperationField.STR_CONST_VAL_CONST_REF));
+                instance.Add(new ClientServerOperationDirectionComboBoxData(0, ClientServerOperationField.STR_CONST_VAL_REF));
+                instance.Add(new ClientServerOperationDirectionComboBoxData(0, ClientServerOperationField.STR_CONST_VALUE));
+                instance.Add(new ClientServerOperationDirectionComboBoxData(0, ClientServerOperationField.STR_VAL_CONST_REF));
+                instance.Add(new ClientServerOperationDirectionComboBoxData(0, ClientServerOperationField.STR_VAL_REF));
+                instance.Add(new ClientServerOperationDirectionComboBoxData(0, ClientServerOperationField.STR_VALUE));
             }
             return instance;
         }

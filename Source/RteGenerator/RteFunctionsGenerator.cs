@@ -270,17 +270,30 @@ namespace AutosarGuiEditor.Source.RteGenerator
         {
             String result = "";
             String dataTypeName = AutosarApplication.GetInstance().GetDataTypeName(field.BaseDataTypeGUID);
-            if (field.Direction == ClientServerOperationDirection.IN)
+            
+            if (field.Direction == ClientServerOperationDirection.CONST_VAL_CONST_REF)
             {
                 result = "const " + dataTypeName + " * const " + field.Name;
             }
-            else if (field.Direction == ClientServerOperationDirection.OUT)
+            else if (field.Direction == ClientServerOperationDirection.CONST_VAL_REF)
+            {
+                result = "const " + dataTypeName + " * " + field.Name;
+            }
+            else if (field.Direction == ClientServerOperationDirection.CONST_VALUE)
+            {
+                result = "const " + dataTypeName + field.Name;
+            }
+            else if (field.Direction == ClientServerOperationDirection.VAL_CONST_REF)
             {
                 result = dataTypeName + " * const " + field.Name;
             }
-            else //IN-OUT
+            else if (field.Direction == ClientServerOperationDirection.VAL_REF)
             {
-                result = dataTypeName + "* " + field.Name;
+                result = dataTypeName + " * " + field.Name;
+            }
+            else if (field.Direction == ClientServerOperationDirection.VALUE)
+            {
+                result = dataTypeName + " " + field.Name;
             }
             return result;
         }

@@ -56,18 +56,29 @@ namespace AutosarGuiEditor.Source.Controllers
                 {
                     switch ((containObject as ClientServerOperationField).Direction)
                     {
-                        case ClientServerOperationDirection.IN:
+                        case ClientServerOperationDirection.CONST_VAL_CONST_REF:
                         {
-                            return "in";
+                            return ClientServerOperationField.STR_CONST_VAL_CONST_REF;
                         }
-
-                        case ClientServerOperationDirection.OUT:
+                        case ClientServerOperationDirection.CONST_VAL_REF:
                         {
-                            return "out";
+                            return ClientServerOperationField.STR_CONST_VAL_REF;
                         }
-                        case ClientServerOperationDirection.INOUT:
+                        case ClientServerOperationDirection.CONST_VALUE:
                         {
-                            return "in-out";
+                            return ClientServerOperationField.STR_CONST_VALUE;
+                        }
+                        case ClientServerOperationDirection.VAL_CONST_REF:
+                        {
+                            return ClientServerOperationField.STR_VAL_CONST_REF;
+                        }
+                        case ClientServerOperationDirection.VAL_REF:
+                        {
+                            return ClientServerOperationField.STR_VAL_REF;
+                        }
+                        case ClientServerOperationDirection.VALUE:
+                        {
+                            return ClientServerOperationField.STR_VALUE;
                         }
                     }
                 }
@@ -78,17 +89,29 @@ namespace AutosarGuiEditor.Source.Controllers
                 if (containObject is ClientServerOperationField)
                 {
                     ClientServerOperationField field = (containObject as ClientServerOperationField);
-                    if (value.Equals("in"))
+                    if (value.Equals(ClientServerOperationField.STR_CONST_VAL_CONST_REF))
                     {
-                        field.Direction = ClientServerOperationDirection.IN;
+                        field.Direction = ClientServerOperationDirection.CONST_VAL_CONST_REF;
                     }
-                    else if (value.Equals("out"))
+                    else if (value.Equals(ClientServerOperationField.STR_CONST_VAL_REF))
                     {
-                        field.Direction = ClientServerOperationDirection.OUT;
+                        field.Direction = ClientServerOperationDirection.CONST_VAL_REF;
                     }
-                    else if (value.Equals("in-out"))
+                    else if (value.Equals(ClientServerOperationField.STR_CONST_VALUE))
                     {
-                        field.Direction = ClientServerOperationDirection.INOUT;
+                        field.Direction = ClientServerOperationDirection.CONST_VALUE;
+                    }
+                    else if (value.Equals(ClientServerOperationField.STR_VAL_CONST_REF))
+                    {
+                        field.Direction = ClientServerOperationDirection.VAL_CONST_REF;
+                    }
+                    else if (value.Equals(ClientServerOperationField.STR_VAL_REF))
+                    {
+                        field.Direction = ClientServerOperationDirection.VAL_REF;
+                    }
+                    else if (value.Equals(ClientServerOperationField.STR_VALUE))
+                    {
+                        field.Direction = ClientServerOperationDirection.VALUE;
                     }
                 }
             }
@@ -182,9 +205,12 @@ namespace AutosarGuiEditor.Source.Controllers
     {
         public InOutDirectionList()
         {
-            this.Add("in");
-            this.Add("out");
-            this.Add("in-out");
+            this.Add(ClientServerOperationField.STR_CONST_VAL_CONST_REF);
+            this.Add(ClientServerOperationField.STR_CONST_VAL_REF);
+            this.Add(ClientServerOperationField.STR_CONST_VALUE);
+            this.Add(ClientServerOperationField.STR_VAL_CONST_REF);
+            this.Add(ClientServerOperationField.STR_VAL_REF);
+            this.Add(ClientServerOperationField.STR_VALUE);
         }
     }
 }

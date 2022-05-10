@@ -6,7 +6,7 @@
     xmlns:MyNamespace="clr-namespace:AutosarGuiEditor.Source.Forms.Controls"
     xmlns:local="clr-namespace:WpfTreeView"
     Title="AUTOSAR Gui Editor"
-    Width="1141.734"
+    Width="1372.734"
     Height="774.045"
     Closing="Window_Closing"
     Icon="AppIcon.ico"
