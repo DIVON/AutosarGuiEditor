@@ -37,6 +37,8 @@ namespace AutosarGuiEditor.Source.RteGenerator
             ComplexDataTypesList sortedComplexDataTypes = SortComplexDataTypeWithDependencies();
             WriteComplexDataTypes(sortedComplexDataTypes, writer);
 
+            GenerateQueuedSenderReceiverFieldsDataTypes(writer);
+
             GenerateComponentsDataTypes(writer);
 
             RteFunctionsGenerator.CloseGuardDefine(writer);
@@ -46,13 +48,38 @@ namespace AutosarGuiEditor.Source.RteGenerator
 
         void WriteStaticGlobal(StreamWriter writer)
         {
-            writer.WriteLine("#ifdef COMPONENT_TEST");
+            writer.WriteLine("#ifdef TEST_RTE");
             writer.WriteLine("#define STATIC_GLOBAL");
+            writer.WriteLine("#define CONST_VOLATILE");
             writer.WriteLine("#else");
             writer.WriteLine("#define STATIC_GLOBAL static");
+            writer.WriteLine("#define CONST_VOLATILE const volatile");
             writer.WriteLine("#endif");
             writer.WriteLine();
         }
+
+        void GenerateQueuedSenderReceiverFieldsDataTypes(StreamWriter writer)
+        {
+            foreach (SenderReceiverInterface srInterface in AutosarApplication.GetInstance().SenderReceiverInterfaces)
+            {
+                if (srInterface.IsQueued)
+                {
+                    writer.WriteLine("/* Datatypes for queued " + srInterface.Name + " fields */");
+                    foreach (SenderReceiverInterfaceField field in srInterface.Fields)
+                    {
+                        writer.WriteLine("typedef struct");
+                        writer.WriteLine("{");
+                        writer.WriteLine("    uint32 head;");
+                        writer.WriteLine("    uint32 tail;");
+                        writer.WriteLine("    " + field.DataTypeName + " elements[" + srInterface.QueueSize.ToString() + "];");
+                        writer.WriteLine("    Std_ReturnType overlayError;");
+                        writer.WriteLine("} " + field.QueuedInterfaceName(srInterface.Name) + ";");
+                        writer.WriteLine();
+                    }
+                }
+            }
+        }
+
 
         void GenerateComponentsDataTypes(StreamWriter writer)
         {
@@ -86,9 +113,26 @@ namespace AutosarGuiEditor.Source.RteGenerator
                         SenderReceiverInterface srInterface = AutosarApplication.GetInstance().SenderReceiverInterfaces.FindObject(portDef.InterfaceGUID);
                         if (srInterface != null)
                         {
-                            foreach (SenderReceiverInterfaceField field in srInterface.Fields)
+                            if (srInterface.IsQueued == false)
                             {
-                                GenerateFieldsForSenderPorts(writer, compDef, portDef, field);
+                                foreach (SenderReceiverInterfaceField field in srInterface.Fields)
+                                {
+                                    GenerateFieldsForSenderPorts(writer, compDef, portDef, field);
+                                }
+                            }
+                        }
+                    }
+                    if (portDef.PortType == PortType.Receiver)
+                    {
+                        SenderReceiverInterface srInterface = AutosarApplication.GetInstance().SenderReceiverInterfaces.FindObject(portDef.InterfaceGUID);
+                        if (srInterface != null)
+                        {
+                            if (srInterface.IsQueued == true)
+                            {
+                                foreach (SenderReceiverInterfaceField field in srInterface.Fields)
+                                {
+                                    GenerateFieldsForQueuedReceiverPort(writer, compDef, portDef, field);
+                                }
                             }
                         }
                     }
@@ -112,6 +156,12 @@ namespace AutosarGuiEditor.Source.RteGenerator
         public void GenerateFieldsForSenderPorts(StreamWriter writer, ApplicationSwComponentType componentDefenition, PortDefenition portDefenition, SenderReceiverInterfaceField srInterfaceField)
         {
             writer.WriteLine("    " + srInterfaceField.DataTypeName + " " + RteFunctionsGenerator.GenerateRteWriteFieldInComponentDefenitionStruct(portDefenition, srInterfaceField) + ";");
+        }
+
+        public void GenerateFieldsForQueuedReceiverPort(StreamWriter writer, ApplicationSwComponentType componentDefenition, PortDefenition portDefenition, SenderReceiverInterfaceField srInterfaceField)
+        {
+            SenderReceiverInterface srInterface = portDefenition.InterfaceDatatype as SenderReceiverInterface;
+            writer.WriteLine("    " + srInterfaceField.QueuedInterfaceName(srInterface.Name) + " " + RteFunctionsGenerator.GenerateRteWriteFieldInComponentDefenitionStruct(portDefenition, srInterfaceField) + ";");
         }
 
         static bool isComplexDataTypeWithoutDependenciesToOtherCDT(ComplexDataType cdt)

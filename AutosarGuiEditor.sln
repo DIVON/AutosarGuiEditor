@@ -13,15 +13,20 @@ EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
+		RegenRTE|Any CPU = RegenRTE|Any CPU
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{C87CB053-50A4-454E-9436-6B0A96AF2FA3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{C87CB053-50A4-454E-9436-6B0A96AF2FA3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C87CB053-50A4-454E-9436-6B0A96AF2FA3}.RegenRTE|Any CPU.ActiveCfg = RegenRTE|Any CPU
+		{C87CB053-50A4-454E-9436-6B0A96AF2FA3}.RegenRTE|Any CPU.Build.0 = RegenRTE|Any CPU
 		{C87CB053-50A4-454E-9436-6B0A96AF2FA3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C87CB053-50A4-454E-9436-6B0A96AF2FA3}.Release|Any CPU.Build.0 = Release|Any CPU
 		{B0AA6A94-6784-4221-81F0-244A68C374C0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{B0AA6A94-6784-4221-81F0-244A68C374C0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B0AA6A94-6784-4221-81F0-244A68C374C0}.RegenRTE|Any CPU.ActiveCfg = Debug|Any CPU
+		{B0AA6A94-6784-4221-81F0-244A68C374C0}.RegenRTE|Any CPU.Build.0 = Debug|Any CPU
 		{B0AA6A94-6784-4221-81F0-244A68C374C0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B0AA6A94-6784-4221-81F0-244A68C374C0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection

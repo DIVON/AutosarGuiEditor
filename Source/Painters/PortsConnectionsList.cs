@@ -17,6 +17,7 @@ using AutosarGuiEditor.Source.PortDefenitions;
 using AutosarGuiEditor.Source.Painters;
 using AutosarGuiEditor.Source.Interfaces;
 using AutosarGuiEditor.Source.Render;
+using AutosarGuiEditor.Source.AutosarInterfaces.SenderReceiver;
 
 
 
@@ -97,9 +98,35 @@ namespace System
             PortDefenition portDef1 = AutosarApplication.GetInstance().GetPortDefenition(newConnection.Port1.PortDefenitionGuid);
 
 
+
+
+            /* Check port at the start of connection line */
             if (!newConnection.Port1.IsDelegatePort) /* Port of component */
             {
-                if ((portDef1.PortType == PortType.Client) || (portDef1.PortType == PortType.Receiver))
+                /* Client port shall have only one connection  */
+                if (portDef1.PortType == PortType.Client)
+                {
+                    if (IsThisPointConnectionExists(newConnection.Component1, newConnection.Port1) == true)
+                    {
+                        return;
+                    }
+                }
+
+                /* Receiver without queue shall have only one connection */
+                if (portDef1.PortType == PortType.Receiver)
+                {
+                    SenderReceiverInterface srInterface = portDef1.InterfaceDatatype as SenderReceiverInterface;
+                    if (srInterface.IsQueued == false)
+                    {
+                        if (IsThisPointConnectionExists(newConnection.Component1, newConnection.Port1) == true)
+                        {
+                            return;
+                        }
+                    }
+                }
+
+                /* Sender shall have only one connection */
+                if (portDef1.PortType == PortType.Sender)
                 {
                     if (IsThisPointConnectionExists(newConnection.Component1, newConnection.Port1) == true)
                     {
@@ -118,10 +145,37 @@ namespace System
                 }
             }
 
+
+
+
+            /* Check port at the end of connection line */
             PortDefenition portDef2 = AutosarApplication.GetInstance().GetPortDefenition(newConnection.Port2.PortDefenitionGuid);
             if (!newConnection.Port2.IsDelegatePort) /* Port of component */
             {
-                if ((portDef2.PortType == PortType.Client) || (portDef2.PortType == PortType.Receiver))
+                /* Client port shall have only one connection  */
+                if (portDef2.PortType == PortType.Client)
+                {
+                    if (IsThisPointConnectionExists(newConnection.Component2, newConnection.Port2) == true)
+                    {
+                        return;
+                    }
+                }
+
+                /* Receiver without queue shall have only one connection */
+                if (portDef2.PortType == PortType.Receiver)
+                {
+                    SenderReceiverInterface srInterface = portDef2.InterfaceDatatype as SenderReceiverInterface;
+                    if (srInterface.IsQueued == false)
+                    {
+                        if (IsThisPointConnectionExists(newConnection.Component2, newConnection.Port2) == true)
+                        {
+                            return;
+                        }
+                    }
+                }
+
+                /* Sender shall have only one connection */
+                if (portDef2.PortType == PortType.Sender)
                 {
                     if (IsThisPointConnectionExists(newConnection.Component2, newConnection.Port2) == true)
                     {

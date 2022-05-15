@@ -21,5 +21,35 @@ namespace AutosarGuiEditor.Source.Utility
                 return defValue;
             }
         }
+
+        public static Boolean GetBooleanValue(XElement element, String fieldName, Boolean defValue)
+        {
+            String elem = GetFieldValue(element, fieldName, defValue.ToString());
+            Boolean retValue;
+            try
+            {
+                retValue = Convert.ToBoolean(elem);
+            } 
+            catch
+            {
+                retValue = defValue;
+            }
+            return retValue;
+        }
+
+        public static int GetIntegerValue(XElement element, String fieldName, int defValue)
+        {
+            String elem = GetFieldValue(element, fieldName, defValue.ToString());
+            int retValue;
+            try
+            {
+                retValue = Convert.ToInt32(elem);
+            }
+            catch
+            {
+                retValue = defValue;
+            }
+            return retValue;
+        }
     }
 }

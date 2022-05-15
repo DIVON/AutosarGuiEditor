@@ -23,6 +23,7 @@ namespace AutosarGuiEditor.Source.RteGenerator
             writer.WriteLine(RteFunctionsGenerator.CreateDefine("RTE_E_NO_DATA", "131u"));
             writer.WriteLine(RteFunctionsGenerator.CreateDefine("RTE_E_UNCONNECTED", "134u"));
             writer.WriteLine(RteFunctionsGenerator.CreateDefine("RTE_E_OUT_OF_RANGE", "137u"));
+            writer.WriteLine(RteFunctionsGenerator.CreateDefine("RTE_E_LIMIT", "138u"));
 
             writer.WriteLine();
 

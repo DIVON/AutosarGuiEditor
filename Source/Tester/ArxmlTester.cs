@@ -49,6 +49,7 @@ namespace AutosarGuiEditor.Source.Tester
             TestArrays();
             TestConnections();
             TestOsTasks();
+            TestQueuedSenderReceiverInterface();
         }
 
         const string ERROR = "ERROR: ";
@@ -440,6 +441,21 @@ namespace AutosarGuiEditor.Source.Tester
                     if (initTask != task)
                     {
                         AppendText("OsTask : " + task.Name + " has zero frequency", Error: true);
+                    }
+                }
+            }
+        }
+
+        protected void TestQueuedSenderReceiverInterface()
+        {
+            /* Queued Sender-Receiver interfaces shall have only one field  */
+            foreach (SenderReceiverInterface srInterface in autosarApp.SenderReceiverInterfaces)
+            {
+                if (srInterface.IsQueued)
+                {
+                    if (srInterface.Fields.Count > 1u)
+                    {
+                        AppendText("Queued Sender-Receiver interface shall have only one field : " + srInterface.Name, Error: true);
                     }
                 }
             }

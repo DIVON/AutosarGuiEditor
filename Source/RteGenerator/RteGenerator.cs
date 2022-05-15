@@ -142,9 +142,19 @@ namespace AutosarGuiEditor.Source.RteGenerator
                     SenderReceiverInterface srInterface = port.InterfaceDatatype as SenderReceiverInterface;
                     if (srInterface != null) // prevent for unselected interface for port
                     {
-                        foreach (SenderReceiverInterfaceField field in srInterface.Fields)
+                        if (srInterface.IsQueued == false)
                         {
-                            GenerateRteWritePortFieldFunction(writer, compDefenition, port, field);
+                            foreach (SenderReceiverInterfaceField field in srInterface.Fields)
+                            {
+                                GenerateRteWritePortFieldFunction(writer, compDefenition, port, field);
+                            }
+                        }
+                        else /* It is queued sender-receiver interface */
+                        {
+                            foreach (SenderReceiverInterfaceField field in srInterface.Fields)
+                            {
+                                GenerateQueuedRteWritePortFieldFunction(writer, compDefenition, port, field);
+                            }
                         }
                     }
                 }
@@ -162,7 +172,14 @@ namespace AutosarGuiEditor.Source.RteGenerator
                     {
                         foreach (SenderReceiverInterfaceField field in srInterface.Fields)
                         {
-                            GenerateRteReadPortFieldFunction(writer, compDefenition, port, field);
+                            if (srInterface.IsQueued == false)
+                            {
+                                GenerateRteReadPortFieldFunction(writer, compDefenition, port, field);
+                            }
+                            else
+                            {
+                                GenerateRteQueuedReadPortFieldFunction(writer, compDefenition, port, field);
+                            }
                         }
                     }
                 }
@@ -394,11 +411,14 @@ namespace AutosarGuiEditor.Source.RteGenerator
             for (int i = 0; i < senderPorts.Count; i++)
             {
                 SenderReceiverInterface srInterface = (SenderReceiverInterface)senderPorts[i].InterfaceDatatype;
-                WriteZeroDefaultValueForSenderPort(writer, senderPorts[i], srInterface);
-
-                if (i < senderPorts.Count - 1)
+                if (srInterface.IsQueued == false)
                 {
-                    writer.WriteLine(",");
+                    WriteZeroDefaultValueForSenderPort(writer, senderPorts[i], srInterface);
+
+                    if (i < senderPorts.Count - 1)
+                    {
+                        writer.WriteLine(",");
+                    }
                 }
             }
             writer.WriteLine();
@@ -517,13 +537,13 @@ namespace AutosarGuiEditor.Source.RteGenerator
                     ComponentInstance compInstance = components[0];
                     String compName = RteFunctionsGenerator.GenerateComponentName(compInstance.Name);
                     String fieldName = RteFunctionsGenerator.GenerateRteWriteFieldInComponentDefenitionStruct(port, field);
-                    writer.WriteLine("    " + compName + "." + fieldName + " = *" + field.Name + ";");
+                    writer.WriteLine("    " + compName + "." + fieldName + " = (*data);");
                 }
             }
             else //multiple instantiation component 
             {
                 String rteStructFieldName = RteFunctionsGenerator.GenerateRteWriteFieldInComponentDefenitionStruct(port, field);
-                String instanceLine = "((" + compDef.Name + "*)instance)->" + rteStructFieldName + " = *" + field.Name + ";";
+                String instanceLine = "((" + compDef.Name + "*)instance)->" + rteStructFieldName + " = (*data);";
                 writer.WriteLine("    " + instanceLine);
             }
 
@@ -533,6 +553,73 @@ namespace AutosarGuiEditor.Source.RteGenerator
             //}
         }
 
+
+        void GenerateQueuedRteWritePortFieldFunction(StreamWriter writer, ApplicationSwComponentType compDef, PortDefenition port, SenderReceiverInterfaceField field)
+        {
+            String returnValue = Properties.Resources.STD_RETURN_TYPE;
+            String RteFuncName = RteFunctionsGenerator.GenerateReadWriteConnectionFunctionName(port, field);
+            String fieldVariable = RteFunctionsGenerator.GenerateSenderReceiverInterfaceArguments(field, port.PortType, compDef.MultipleInstantiation);
+
+            writer.WriteLine(returnValue + RteFuncName + fieldVariable);
+            writer.WriteLine("{");
+
+            if (!compDef.MultipleInstantiation) //single instantiation component 
+            {
+                ComponentInstancesList components = AutosarApplication.GetInstance().GetComponentInstanceByDefenition(compDef);
+                if (components.Count > 0)
+                {
+                    /* At least one component exists at this step */
+                    ComponentInstance compInstance = components[0];
+
+                    PortPainter portPainter = compInstance.Ports.FindPortByItsDefenition(port);
+                    ComponentInstance oppositCompInstance;
+                    PortPainter oppositePort;
+                    AutosarApplication.GetInstance().GetOppositePortAndComponent(portPainter, out oppositCompInstance, out oppositePort);
+                    if (oppositCompInstance != null)
+                    {                        
+                        SenderReceiverInterface srInterface = port.InterfaceDatatype as SenderReceiverInterface;
+                        int queueSize = srInterface.QueueSize;
+
+                        String oppositeCompName = RteFunctionsGenerator.GenerateComponentName(oppositCompInstance.Name);
+                        String copyFromField = oppositeCompName + "." + RteFunctionsGenerator.GenerateRteWriteFieldInComponentDefenitionStruct(oppositePort.PortDefenition, field);
+
+                        writer.WriteLine("    Std_ReturnType _returnValue = RTE_E_OK;");
+                        writer.WriteLine("");
+                        writer.WriteLine("    uint32 head = " + copyFromField + ".head;");  
+                        writer.WriteLine("    uint32 tail = " + copyFromField + ".tail;");
+                        writer.WriteLine("");
+                        writer.WriteLine("    if ((head == tail) || ((head % " +queueSize.ToString() + "U) != (tail % "+queueSize.ToString()+"U)))");
+                        writer.WriteLine("    {");  
+                        writer.WriteLine("        " + copyFromField + ".elements[tail % " + queueSize.ToString() + "U] = (*data);");  
+                        writer.WriteLine("        " + copyFromField + ".tail = (tail + 1U) % " + (queueSize * 2).ToString() + "U;");  
+                        writer.WriteLine("    }");  
+                        writer.WriteLine("    else"); 
+                        writer.WriteLine("    {");  
+                        writer.WriteLine("        " + copyFromField + ".overlayError = RTE_E_LOST_DATA;");  
+                        writer.WriteLine("        _returnValue = RTE_E_LIMIT;");
+                        writer.WriteLine("    }");  
+                        writer.WriteLine("");
+                        writer.WriteLine("    return _returnValue;");  
+                    }
+                    else
+                    {
+                        writer.WriteLine("    memset(" + field.Name + ", " + "0, sizeof(" + field.DataTypeName + "));");
+                        writer.WriteLine("    return " + Properties.Resources.RTE_E_UNCONNECTED + ";");
+                    }
+                }
+            }
+            else //multiple instantiation component 
+            {
+                String rteStructFieldName = RteFunctionsGenerator.GenerateRteWriteFieldInComponentDefenitionStruct(port, field);
+                String instanceLine = "((" + compDef.Name + "*)instance)->" + rteStructFieldName + " = *" + field.Name + ";";
+                writer.WriteLine("    " + instanceLine);
+                writer.WriteLine("    return " + Properties.Resources.RTE_E_OK + ";");
+            }
+           
+            writer.WriteLine("}");
+            writer.WriteLine("");
+            //}
+        }
 
         void GenerateRteReadPortFieldFunction(StreamWriter writer, ApplicationSwComponentType compDef, PortDefenition port, SenderReceiverInterfaceField field)
         {
@@ -559,13 +646,96 @@ namespace AutosarGuiEditor.Source.RteGenerator
                     {
                         String copyFromField = RteFunctionsGenerator.GenerateRteWriteFieldInComponentDefenitionStruct(oppositePort.PortDefenition, field);
                         String oppositeCompName = RteFunctionsGenerator.GenerateComponentName(oppositCompInstance.Name);
-                        writer.WriteLine("    memcpy(" + field.Name + ", " + "&" + oppositeCompName + "." + copyFromField + ", sizeof(" + field.DataTypeName + "));");
+                        writer.WriteLine("    memcpy(data, " + "&" + oppositeCompName + "." + copyFromField + ", sizeof(" + field.DataTypeName + "));");
                         writer.WriteLine("    return " + Properties.Resources.RTE_E_OK + ";");
                     }
                     else 
                     {
-                        writer.WriteLine("    memset(" + field.Name + ", " + "0, sizeof(" + field.DataTypeName + "));");
+                        writer.WriteLine("    memset(data, " + "0, sizeof(" + field.DataTypeName + "));");
                         writer.WriteLine("    return " + Properties.Resources.RTE_E_UNCONNECTED + ";");
+                    }
+                }
+            }
+            else //multiple instantiation component 
+            {
+                ComponentInstancesList components = AutosarApplication.GetInstance().GetComponentInstanceByDefenition(compDef);
+                if (components.Count > 0)
+                {
+                    writer.WriteLine("    switch(((" + compDef.Name + "*)" + "instance)->index)");
+                    writer.WriteLine("    {");
+                    for (int i = 0; i < components.Count; i++)
+                    {
+                        ComponentInstance compInstance = components[i];
+                        PortPainter portPainter = compInstance.Ports.FindPortByItsDefenition(port);
+                        ComponentInstance oppositCompInstance;
+                        PortPainter oppositePort;
+                        AutosarApplication.GetInstance().GetOppositePortAndComponent(portPainter, out oppositCompInstance, out oppositePort);
+
+                        writer.WriteLine("        case " + i.ToString() + ": ");
+                        writer.WriteLine("        {");
+
+                        if (oppositCompInstance != null)
+                        {
+                            String copyFromField = RteFunctionsGenerator.GenerateRteWriteFieldInComponentDefenitionStruct(oppositePort.PortDefenition, field);
+                            String oppositeCompName = RteFunctionsGenerator.GenerateComponentName(oppositCompInstance.Name);
+                            writer.WriteLine("            memcpy(" + field.Name + ", " + "&" + oppositeCompName + "." + copyFromField + ", sizeof(" + field.DataTypeName + "));");
+                            writer.WriteLine("            return " + Properties.Resources.RTE_E_OK + ";");
+                        }
+                        else
+                        {
+                            writer.WriteLine("            memset(" + field.Name + ", " + "0, sizeof(" + field.DataTypeName + "));");
+                            writer.WriteLine("            return " + Properties.Resources.RTE_E_UNCONNECTED + ";");
+                        }
+
+                        writer.WriteLine("        }");
+                    }
+                     writer.WriteLine("    }");
+                }
+                writer.WriteLine("    return " + Properties.Resources.RTE_E_UNCONNECTED + ";");
+            }
+
+            writer.WriteLine("}");
+            writer.WriteLine("");
+        }
+
+
+        void GenerateRteQueuedReadPortFieldFunction(StreamWriter writer, ApplicationSwComponentType compDef, PortDefenition port, SenderReceiverInterfaceField field)
+        {
+            String returnValue = Properties.Resources.STD_RETURN_TYPE;
+            String RteFuncName = RteFunctionsGenerator.GenerateReadWriteConnectionFunctionName(port, field);
+            String fieldVariable = RteFunctionsGenerator.GenerateSenderReceiverInterfaceArguments(field, port.PortType, compDef.MultipleInstantiation);
+
+            writer.WriteLine(returnValue + RteFuncName + fieldVariable);
+            writer.WriteLine("{");
+
+            if (!compDef.MultipleInstantiation) //single instantiation component 
+            {
+                ComponentInstancesList components = AutosarApplication.GetInstance().GetComponentInstanceByDefenition(compDef);
+                if (components.Count > 0)
+                {
+                    /* At least one component exists at this step */
+                    ComponentInstance compInstance = components[0];
+
+                    PortPainter portPainter = compInstance.Ports.FindPortByItsDefenition(port);
+                    {
+                        String copyFromField = RteFunctionsGenerator.GenerateComponentName(compInstance.Name) +"." + RteFunctionsGenerator.GenerateRteWriteFieldInComponentDefenitionStruct(port, field);
+                        SenderReceiverInterface srInterface = port.InterfaceDatatype as SenderReceiverInterface;
+                        int queueSize = srInterface.QueueSize;
+
+                        writer.WriteLine("    Std_ReturnType _returnValue = RTE_E_NO_DATA;");
+                        writer.WriteLine("");
+                        writer.WriteLine("    uint32 head = " + copyFromField + ".head;");
+                        writer.WriteLine("    uint32 tail = " + copyFromField + ".tail;");
+                        writer.WriteLine("");
+                        writer.WriteLine("    if (head != tail)");
+                        writer.WriteLine("    {");
+                        writer.WriteLine("        (*data) = " + copyFromField + ".elements[head % " + queueSize.ToString() + "U];");
+                        writer.WriteLine("        " + copyFromField + ".head = (head + 1U) % " + (queueSize * 2).ToString() + "U;");
+                        writer.WriteLine("        _returnValue = RTE_E_OK | " + copyFromField + ".overlayError;");
+                        writer.WriteLine("        " + copyFromField + ".overlayError = RTE_E_OK;");
+                        writer.WriteLine("    }");
+                        writer.WriteLine("");
+                        writer.WriteLine("    return _returnValue;");  
                     }
                 }
             }

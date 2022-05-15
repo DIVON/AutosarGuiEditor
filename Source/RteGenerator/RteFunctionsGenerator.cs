@@ -116,22 +116,22 @@ namespace AutosarGuiEditor.Source.RteGenerator
                 
                 if (portType == PortType.Receiver)
                 {
-                    result += dataTypeName + " * const " + field.Name;
+                    result += dataTypeName + " * const data";
                 }
                 else
                 {
-                    result += "const " + dataTypeName + " * const " + field.Name;
+                    result += "const " + dataTypeName + " * const data";
                 }
             }
             else
             {
                 if (portType == PortType.Receiver)
                 {
-                    result += dataTypeName + " ** const " + field.Name;
+                    result += dataTypeName + " ** const data";
                 }
                 else
                 {
-                    result += "const " + dataTypeName + "** const " + field.Name;
+                    result += "const " + dataTypeName + "** const data";
                 }
             }
             return result + ")";
@@ -246,6 +246,7 @@ namespace AutosarGuiEditor.Source.RteGenerator
 #region SENDER_RECEIVER
         public static String GenerateRteWriteFieldInComponentDefenitionStruct(PortDefenition portDefenition, SenderReceiverInterfaceField field)
         {
+            SenderReceiverInterface srInterface = portDefenition.InterfaceDatatype as SenderReceiverInterface;
             return "Rte_WriteField_" + portDefenition.Name + "_" + field.Name;
         }
 #endregion

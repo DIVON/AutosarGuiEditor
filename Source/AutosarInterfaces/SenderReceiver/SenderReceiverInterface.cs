@@ -17,7 +17,8 @@ namespace AutosarGuiEditor.Source.AutosarInterfaces.SenderReceiver
 
         public SenderReceiverInterface()
         {
-            
+            QueueSize = 0;
+            IsQueued = false;
         }
 
         public override void WriteToXML(XElement xml)
@@ -25,6 +26,12 @@ namespace AutosarGuiEditor.Source.AutosarInterfaces.SenderReceiver
             XElement xmldatatype = new XElement("Interface");
             base.WriteToXML(xmldatatype);
             Fields.WriteToXML(xmldatatype);
+
+            if (IsQueued)
+            {
+                xmldatatype.Add(new XElement("IsQueued", IsQueued.ToString()));
+                xmldatatype.Add(new XElement("QueueSize", QueueSize.ToString()));
+            }
             xml.Add(xmldatatype);
         }
 
@@ -32,6 +39,8 @@ namespace AutosarGuiEditor.Source.AutosarInterfaces.SenderReceiver
         {
             base.LoadFromXML(xml);
             Fields.LoadFromXML(xml);
+            IsQueued = XmlUtilits.GetBooleanValue(xml, "IsQueued", false);
+            QueueSize = XmlUtilits.GetIntegerValue(xml, "QueueSize", 0);
         }
 
         public override List<IAutosarTreeList> GetLists()
@@ -40,5 +49,18 @@ namespace AutosarGuiEditor.Source.AutosarInterfaces.SenderReceiver
             list.Add(Fields);
             return list;
         }
+
+        public Boolean IsQueued
+        {
+            set;
+            get;
+        }
+
+        public int QueueSize
+        {
+            set;
+            get;
+        }
+       
     }  
 }

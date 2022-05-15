@@ -650,7 +650,7 @@
                         TextWrapping="Wrap" />
                     <DataGrid
                         x:Name="SenderReceiver_GridView"
-                        Margin="10,102,10,8"
+                        Margin="10,145,10,8"
                         AutoGenerateColumns="False"
                         BeginningEdit="ComplexDataType_GridView_BeginningEdit"
                         CanUserAddRows="False">
@@ -700,11 +700,32 @@
                     <Button
                         x:Name="SenderReceiver_AddField_Button"
                         Width="75"
-                        Margin="10,77,0,0"
+                        Margin="10,110,0,0"
                         HorizontalAlignment="Left"
                         VerticalAlignment="Top"
                         Click="SenderReceiver_AddField_Button_Click"
                         Content="Add field" />
+                    <CheckBox
+                        Name="SenderReceiver_IsQueuedCheckBox"
+                        Margin="14,69,0,0"
+                        HorizontalAlignment="Left"
+                        VerticalAlignment="Top"
+                        Content="Queued" />
+                    <TextBox
+                        Name="SenderReceiver_QueueSizeTB"
+                        Width="120"
+                        Height="23"
+                        Margin="200,66,0,0"
+                        HorizontalAlignment="Left"
+                        VerticalAlignment="Top"
+                        IsEnabled="False"
+                        Text=""
+                        TextWrapping="Wrap" />
+                    <Label
+                        Margin="124,63,0,0"
+                        HorizontalAlignment="Left"
+                        VerticalAlignment="Top"
+                        Content="Queue size:" />
 
                 </Grid>
             </TabItem>
@@ -754,7 +775,7 @@
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
 
-                            <DataGridTemplateColumn Width="70" Header="Direction">
+                            <DataGridTemplateColumn Width="150" Header="Direction">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
                                         <ComboBox

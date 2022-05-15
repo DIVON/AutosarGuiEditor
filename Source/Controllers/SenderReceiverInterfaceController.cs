@@ -19,13 +19,53 @@ namespace AutosarGuiEditor.Source.Controllers
         AutosarTreeViewControl tree;
         DataGrid grid;
         TextBox nameTextBox;
+        CheckBox isQueueCB;
+        TextBox queueSizeTB;
 
-        public SenderReceiverInterfaceController(AutosarTreeViewControl AutosarTree, DataGrid grid, TextBox nameTextBox)
+        public SenderReceiverInterfaceController(AutosarTreeViewControl AutosarTree, DataGrid grid, TextBox nameTextBox, CheckBox isQueueCB, TextBox queueSizeTB)
         {
             this.tree = AutosarTree;
             this.grid = grid;
             this.nameTextBox = nameTextBox;
             this.nameTextBox.TextChanged += nameTextBox_TextChanged;
+
+            this.isQueueCB = isQueueCB;
+            this.isQueueCB.Checked += isQueueCB_Checked;
+            this.isQueueCB.Unchecked += isQueueCB_Checked;
+
+            this.queueSizeTB = queueSizeTB;
+            this.queueSizeTB.TextChanged += queueSizeTB_TextChanged;
+            this.queueSizeTB.PreviewTextInput += queueSizeTB_PreviewTextInput;
+        }
+
+        void queueSizeTB_PreviewTextInput(object sender, System.Windows.Input.TextCompositionEventArgs e)
+        {
+            /* Allow only numeric chars */
+
+            var textBox = sender as TextBox;
+            // Use SelectionStart property to find the caret position.
+            // Insert the previewed text into the existing text in the textbox.
+            var fullText = textBox.Text.Insert(textBox.SelectionStart, e.Text);
+
+            int val;
+            // If parsing is successful, set Handled to false
+            e.Handled = !int.TryParse(fullText, out val);
+        }
+
+        void queueSizeTB_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            int val;
+            // If parsing is successful, set Handled to false
+            if (int.TryParse(queueSizeTB.Text, out val))
+            {
+                srInterface.QueueSize = val;
+            }
+        }
+
+        void isQueueCB_Checked(object sender, System.Windows.RoutedEventArgs e)
+        {
+            queueSizeTB.IsEnabled = isQueueCB.IsChecked.Value;
+            srInterface.IsQueued = isQueueCB.IsChecked.Value;
         }
 
         void nameTextBox_TextChanged(object sender, TextChangedEventArgs e)
@@ -73,6 +113,9 @@ namespace AutosarGuiEditor.Source.Controllers
                 _srInterface = value;
                 allowUpdater.StopUpdate();
                 nameTextBox.Text = _srInterface.Name;
+                isQueueCB.IsChecked = _srInterface.IsQueued;
+                queueSizeTB.Text = _srInterface.QueueSize.ToString();
+                queueSizeTB.IsEnabled = _srInterface.IsQueued;
                 RefreshGridView();
                 allowUpdater.AllowUpdate();
             }

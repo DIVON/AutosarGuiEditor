@@ -14,5 +14,10 @@ namespace AutosarGuiEditor.Source.AutosarInterfaces.ClientServer
         {
             return "Fields";
         }
+
+        public override void DoSort()
+        {
+            /* do not sort elements */
+        }
     }
 }

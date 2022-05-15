@@ -65,5 +65,10 @@ namespace AutosarGuiEditor.Source.AutosarInterfaces.SenderReceiver
                 return AutosarApplication.GetInstance().GetDataType(this.BaseDataTypeGUID);
             }
         }
+
+        public String QueuedInterfaceName(string parentInterfaceName)
+        {
+            return "dtRte_" + parentInterfaceName + "_" + Name + "_Handler";
+        }
     }
 }

@@ -85,7 +85,7 @@ namespace AutosarGuiEditor
 
             complexDataTypeMenu = new ComplexDataTypeMenu(AutosarTree, ComplexDataTypeGridView, ComplexDataType_NameTextBox);
             enumsMenu = new EnumsMenu(AutosarTree, Enums_GridView, EnumDataType_NameEdit);
-            senderReceiverInterfaceController = new SenderReceiverInterfaceController(AutosarTree, SenderReceiver_GridView, SenderReceiver_NameTextBox);
+            senderReceiverInterfaceController = new SenderReceiverInterfaceController(AutosarTree, SenderReceiver_GridView, SenderReceiver_NameTextBox, SenderReceiver_IsQueuedCheckBox, SenderReceiver_QueueSizeTB);
             clientServerInterfaceController = new ClientServerInterfaceController(AutosarTree, ClientServer_GridView, ClientServer_NameTextBox);
             componentDefenitionViewController = new ComponentDefenitionController(AutosarTree, ComponentDefenitionName_TextBox, ComponentPorts_GridView, ComponentRunnables_GridView, MultipleInstantiation_CheckBox, AddPerInstanceDefenition_Button, PerInstanceDefenition_Grid, CDataDescription_Grid, AddCDataDescription_Button);
             connectionLineController = new ConnectionLineController(AutosarTree);

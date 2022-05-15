@@ -165,7 +165,19 @@ namespace AutosarGuiEditor.Source.RteGenerator.TestGenerator
                         writer.WriteLine("        {");
                         foreach (var field in csOperation.Fields)
                         {
-                            writer.WriteLine("            " + field.DataTypeName + " " + field.Name + ";");
+                            string fieldDataType = "";
+
+                            switch (field.Direction)
+                            {
+                                case ClientServerOperationDirection.VALUE: fieldDataType = field.DataTypeName; break;
+                                case ClientServerOperationDirection.CONST_VALUE: fieldDataType = field.DataTypeName; break;
+                                case ClientServerOperationDirection.VAL_REF: fieldDataType = field.DataTypeName + " *"; break;
+                                case ClientServerOperationDirection.CONST_VAL_REF: fieldDataType = "const " + field.DataTypeName + " *"; break;
+                                case ClientServerOperationDirection.VAL_CONST_REF: fieldDataType = field.DataTypeName + " *"; break;
+                                case ClientServerOperationDirection.CONST_VAL_CONST_REF: fieldDataType = "const " + field.DataTypeName + " *"; break;
+                            }
+
+                            writer.WriteLine("            " + fieldDataType + " " + field.Name + ";");
                         }
                         writer.WriteLine("        } Arguments;");
                         writer.WriteLine("        Std_ReturnType (*redirection)" + RteFunctionsGenerator.GenerateClientServerInterfaceArguments(csOperation, compDef.MultipleInstantiation) + ";");
@@ -379,7 +391,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.TestGenerator
             writer.WriteLine("        " + TestArtefactsVariable(compDef) + "." + RteFuncName + "." + CallCount + "++;");
             foreach (var csField in operation.Fields)
             {
-                writer.WriteLine("        " + TestArtefactsVariable(compDef) + "." + RteFuncName + ".Arguments." + csField.Name + " = *" + csField.Name + ";");
+                writer.WriteLine("        " + TestArtefactsVariable(compDef) + "." + RteFuncName + ".Arguments." + csField.Name + " = " + csField.Name + ";");
             }
             writer.WriteLine("        return " + TestArtefactsVariable(compDef) + "." + RteFuncName + ".ReturnValue;");
             writer.WriteLine("    }");
