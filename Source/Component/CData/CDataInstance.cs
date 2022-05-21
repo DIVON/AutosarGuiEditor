@@ -4,6 +4,7 @@ using AutosarGuiEditor.Source.DataTypes.BaseDataType;
 using AutosarGuiEditor.Source.DataTypes.ComplexDataType;
 using AutosarGuiEditor.Source.DataTypes.Enum;
 using AutosarGuiEditor.Source.Fabrics;
+using AutosarGuiEditor.Source.RteGenerator;
 using AutosarGuiEditor.Source.SystemInterfaces;
 using AutosarGuiEditor.Source.Utility;
 using System;
@@ -41,6 +42,26 @@ namespace AutosarGuiEditor.Source.Painters.Components.CData
             xmlElement.Add(new XElement("DefenitionGuid", DefenitionGuid.ToString("B")));
 
             root.Add(xmlElement);
+        }
+
+        public String GetDefaultValue()
+        {
+            String defaultValue = DefaultValueForAllDatatypes();
+            return defaultValue;
+        }
+
+        String DefaultValueForAllDatatypes()
+        {
+            String defValue = "";
+
+            if (DefaultValues.Count >= 1)
+            {
+                if (DefaultValues[0].DefaultValue.Length > 0)
+                {
+                    defValue = DefaultValues[0].DefaultValue;
+                }
+            }
+            return defValue;
         }
 
         public void SyncronizeName()

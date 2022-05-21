@@ -9,6 +9,8 @@ using AutosarGuiEditor.Source.Tester;
 using AutosarGuiEditor.Source.RteGenerator;
 using System.Diagnostics;
 using System.IO;
+using AutosarGuiEditor.Source.RteGenerator.TestGenerator;
+using AutosarGuiEditor.Source.Component;
 
 namespace AutosarGuiEditor
 {
@@ -46,6 +48,36 @@ namespace AutosarGuiEditor
                         {
                             Console.WriteLine("There is a problem with RTE generation.");
                         }
+                    }
+                    else
+                    {
+                        Console.WriteLine("There are errors in the project. RTE generation is impossible. Check project for errors.");
+                    }
+
+                    Environment.Exit(0);
+                }
+
+                if (e.Args[0] == "-TestRteRegen")
+                {
+                    AutosarApplication autosarApp = AutosarApplication.GetInstance();
+                    String file = e.Args[1].Replace("\"", "");
+                    autosarApp.LoadFromFile(file);
+                    StringWriter writer = new StringWriter();
+
+                    ArxmlTester tester = new ArxmlTester(autosarApp, writer);
+                    tester.Test();
+                    String testResult = writer.ToString();
+                    if (!tester.IsErrorExist(testResult))
+                    {
+                        TestRteEnvironmentGenerator generator = new TestRteEnvironmentGenerator();
+                        foreach (ApplicationSwComponentType compDefenition in AutosarApplication.GetInstance().ComponentDefenitionsList)
+                        {
+                            generator.GenerateRteEnvironment(compDefenition, autosarApp.GenerateTestRtePath);
+
+                        }
+                        generator.GenerateCommonFiles(autosarApp.GenerateTestRtePath);
+                        RteSchedulerGenerator rteSchedulerGenerator = new RteSchedulerGenerator();
+                        rteSchedulerGenerator.Generate_ExternalRunnables_File(autosarApp.GenerateTestRtePath);
                     }
                     else
                     {

@@ -65,6 +65,42 @@ namespace AutosarGuiEditor.Source.RteGenerator
             return "cin" + compName;
         }
 
+        public static String GenerateComponentTypeHeaderFile(ApplicationSwComponentType compDef)
+        {
+            return "Rte_" + compDef.Name + "_Type.h";
+        }
+
+        public static String GenerateComponentHeaderFile(ApplicationSwComponentType compDef)
+        {
+            return "Rte_" + compDef.Name + ".h";
+        }
+
+        public static String ComponentDataStructureDefenitionName(ApplicationSwComponentType compDef)
+        {
+            return "Rte_CDS_" + compDef.Name;
+        }
+
+        public static String GeneratePortDataStructureDefenition(ApplicationSwComponentType compDef, SenderReceiverInterface srInterface, PortType PortType)
+        {
+            string baseStr = "Rte_PDS_"+ compDef.Name + "_" + srInterface.Name;
+            if (PortType == PortDefenitions.PortType.Sender)
+            {
+                baseStr += "_P";
+            }
+            else
+            {
+                baseStr += "_R";
+            }
+            return baseStr;
+        }
+
+        public static String GeneratePortDataStructureDefenition(ApplicationSwComponentType compDef, ClientServerInterface csInterface)
+        {
+            string baseStr = "Rte_PDS_" + compDef.Name + "_" + csInterface.Name + "_C";
+
+            return baseStr;
+        }
+
         public static String GetRteFolder()
         {
             String resFolder = "";
@@ -184,6 +220,51 @@ namespace AutosarGuiEditor.Source.RteGenerator
                 }
             }
             
+            return result + ")";
+        }
+
+        public static String GenerateClientServerInterfaceArgumentsForDefine(ClientServerOperation operation, Boolean MultipleInstantiation = false)
+        {
+            String result = "(";
+
+            if (MultipleInstantiation)
+            {
+                result += "instance";
+                if (operation.Fields.Count > 0)
+                {
+                    result += ", ";
+                }
+            }
+
+            for (int i = 0; i < operation.Fields.Count; i++)
+            {
+                ClientServerOperationField field = operation.Fields[i];
+
+                result += field.Name;
+                if (i != operation.Fields.Count - 1)
+                {
+                    result += ", ";
+                }
+            }
+
+            return result + ")";
+        }
+
+        public static String GenerateClientServerInterfaceArgumentsForDefineWithoutInstance(ClientServerOperation operation, Boolean MultipleInstantiation = false)
+        {
+            String result = "(";
+
+            for (int i = 0; i < operation.Fields.Count; i++)
+            {
+                ClientServerOperationField field = operation.Fields[i];
+
+                result += "(" + field.Name + ")";
+                if (i != operation.Fields.Count - 1)
+                {
+                    result += ", ";
+                }
+            }
+
             return result + ")";
         }
 
@@ -333,7 +414,8 @@ namespace AutosarGuiEditor.Source.RteGenerator
         {             
             if (compDefenition.MultipleInstantiation)
             {
-                return "void " + Generate_RunnableFunctionName(compDefenition, runnable) + "(" + ComponentInstancePointerDatatype + " instance)";
+                String CDSName = RteFunctionsGenerator.ComponentDataStructureDefenitionName(compDefenition);
+                return "void " + Generate_RunnableFunctionName(compDefenition, runnable) + "(const " + CDSName + " * const instance)";
             }
             else /* Single instantiation */
             {
@@ -424,7 +506,7 @@ namespace AutosarGuiEditor.Source.RteGenerator
             return "FREQUENCY_" + Math.Floor(frequency * 1000).ToString();
         }
 
-        public static String CreateDefine(String source, String destination, bool useBracers = true, int macroStart = 50)
+        public static String CreateDefine(String source, String destination, bool useBracers = true, int macroStart = 80)
         {
             if (useBracers)
             {
@@ -535,45 +617,10 @@ namespace AutosarGuiEditor.Source.RteGenerator
             return str;
         }
 
-        public static void WriteDefaultValueForPimDefenition(StreamWriter writer, ComponentInstance component, PimInstance pimInstance)
-        {
-            
-            if (pimInstance.DefaultValues.Count == 1)
-            {
-                if (pimInstance.DefaultValues[0].DefaultValue.Length > 0)
-                {                    
-                    writer.Write(pimInstance.DefaultValues[0].DefaultValue);
-                }
-                else
-                {
-                    writer.Write("0");
-                }
-            }
-            else
-            {
-                writer.Write("0");
-            }
-        }
+        
 
-        public static void WriteDefaultValueForCDataDefenition(StreamWriter writer, ComponentInstance component, CDataInstance cdataInstance)
-        {
 
-            if (cdataInstance.DefaultValues.Count == 1)
-            {
-                if (cdataInstance.DefaultValues[0].DefaultValue.Length > 0)
-                {
-                    writer.Write(cdataInstance.DefaultValues[0].DefaultValue);
-                }
-                else
-                {
-                    writer.Write("0");
-                }
-            }
-            else
-            {
-                writer.Write("0");
-            }
-        }
+        
 
         public static String GenerateRteOsTaskName(OsTask task)
         {

@@ -175,7 +175,7 @@ namespace AutosarGuiEditor.Source.RteGenerator
             writer.Close();
         }
 
-        private static void WriteAllFunctionWhichComponentCouldUse(ApplicationSwComponentType compDefenition, StreamWriter writer)
+        public static void WriteAllFunctionWhichComponentCouldUse(ApplicationSwComponentType compDefenition, StreamWriter writer)
         {
             List<String> lines = new List<string>();
 

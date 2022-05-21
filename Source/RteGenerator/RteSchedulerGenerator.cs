@@ -136,15 +136,17 @@ namespace AutosarGuiEditor.Source.RteGenerator
 #endif
         void WriteAllExternComponentInstances(StreamWriter writer)
         {
-            writer.WriteLine("/* Extern component instances  */");
-            foreach (CompositionInstance composition in AutosarApplication.GetInstance().Compositions)
-            {
-                foreach(ComponentInstance compInstance in composition.ComponentInstances)
-                {
-                    writer.WriteLine("extern " + compInstance.ComponentDefenition.Name + " cin" + compInstance.Name + ";");
-                }
-            }
-            writer.WriteLine();
+            return;
+
+            //writer.WriteLine("/* Extern component instances  */");
+            //foreach (CompositionInstance composition in AutosarApplication.GetInstance().Compositions)
+            //{
+            //    foreach(ComponentInstance compInstance in composition.ComponentInstances)
+            //    {
+            //        writer.WriteLine("extern " + compInstance.ComponentDefenition.Name + " cin" + compInstance.Name + ";");
+            //    }
+            //}
+            //writer.WriteLine();
         }
 
 #if false

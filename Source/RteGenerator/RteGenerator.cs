@@ -36,8 +36,11 @@ namespace AutosarGuiEditor.Source.RteGenerator
             Directory.CreateDirectory(RteFunctionsGenerator.GetRteFolder());
             GenerateDataTypesFile();
             GenerateComponentsFiles();
-            GenerateConnections();
+            //GenerateConnections();
             GenerateScheduler();
+
+            RteConnectionCGenerator connectionsGenerator = new RteConnectionCGenerator();
+            connectionsGenerator.GenerateConnections();
 
             ReturnCodesGenerator returnCodesGenerator = new ReturnCodesGenerator();
             returnCodesGenerator.GenerateReturnCodesFile(RteFunctionsGenerator.GetRteFolder());
@@ -100,6 +103,9 @@ namespace AutosarGuiEditor.Source.RteGenerator
          
             /* Create extern variables */
             GenerateAllComponentInstances(writer);
+
+            /* Generate buffers for all write ports and queued read ports */
+ 
 
             /* Generate all rte write functions */
             foreach(ApplicationSwComponentType compDef in AutosarApplication.GetInstance().ComponentDefenitionsList)
@@ -319,91 +325,6 @@ namespace AutosarGuiEditor.Source.RteGenerator
                ComponentInstancesList compInstances = AutosarApplication.GetInstance().GetComponentInstanceByDefenition(compDefenition);
                int compIndex = compInstances.IndexOf(component);
                writer.WriteLine("    .index = " + compIndex.ToString() + ", ");
-            }
-
-            /* Pim*/
-            int count = 0;
-            for (int i = 0; i < compDefenition.PerInstanceMemoryList.Count; i++)
-            {
-                PimDefenition pimDef = compDefenition.PerInstanceMemoryList[i];
-                count++;
-                
-                PimInstance pimInstance = component.PerInstanceMemories.GetPim(pimDef.GUID);
-
-                writer.Write("    ." + RteFunctionsGenerator.GenerateRtePimFieldInComponentDefenitionStruct(component.ComponentDefenition, pimDef) + " = ");
-                
-                IGUID datatype = pimDef.DataType;
-                if ((datatype is BaseDataType) || (datatype is SimpleDataType) || (datatype is EnumDataType))
-                {
-                    RteFunctionsGenerator.WriteDefaultValueForPimDefenition(writer, component, pimInstance);
-                }
-                else if (datatype is ArrayDataType)
-                {
-                    writer.Write(" {{ ");
-                    if (!((datatype as ArrayDataType).DataType is PlainDataType))
-                    {
-                        writer.Write("{ ");
-                    }
-                    writer.Write(" 0 ");
-
-                    if (!((datatype as ArrayDataType).DataType is PlainDataType))
-                    {
-                        writer.Write("} ");
-                    }
-
-                    writer.Write(" }}");                 
-                }
-                else if (datatype is ComplexDataType)
-                {
-                    writer.Write("{ 0 }");
-                }
-                if ((i != compDefenition.PerInstanceMemoryList.Count - 1) || ((compDefenition.CDataDefenitions.Count > 0) || (compDefenition.Ports.PortsWithSenderInterface().Count > 0)))
-                {
-                    writer.WriteLine(",");
-                }
-            }
-
-            /* CData */
-            for (int i = 0; i < compDefenition.CDataDefenitions.Count; i++)
-            {
-
-                count++;
-                CDataDefenition cdataDef = compDefenition.CDataDefenitions[i];
-
-                CDataInstance cdataInstance = component.CDataInstances.GetCData(cdataDef.GUID);
-
-                writer.Write("    ." + RteFunctionsGenerator.GenerateRteCDataFieldInComponentDefenitionStruct(component.ComponentDefenition, cdataDef) + " = ");
-                
-                IGUID datatype = cdataDef.DataType;
-                if ((datatype is BaseDataType) || (datatype is SimpleDataType) || (datatype is EnumDataType))
-                {
-                    RteFunctionsGenerator.WriteDefaultValueForCDataDefenition(writer, component, cdataInstance);
-                }
-                else if (datatype is ArrayDataType)
-                {
-                    writer.Write(" {{ ");
-                    if(!((datatype as ArrayDataType).DataType is PlainDataType))
-                    {
-                        writer.Write("{ ");
-                    }
-                    writer.Write(" 0 ");
-
-                    if (!((datatype as ArrayDataType).DataType is PlainDataType))
-                    {
-                        writer.Write("} ");
-                    }
-
-                    writer.Write(" }}");                    
-                }
-                else if (datatype is ComplexDataType)
-                {
-                    writer.WriteLine(" { 0 }");
-                }
-
-                if ((i !=  compDefenition.CDataDefenitions.Count - 1) || (compDefenition.Ports.PortsWithSenderInterface().Count > 0))
-                {
-                    writer.WriteLine(",");
-                }
             }
 
             /* Port */

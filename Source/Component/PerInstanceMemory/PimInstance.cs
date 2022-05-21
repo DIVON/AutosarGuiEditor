@@ -198,6 +198,19 @@ namespace AutosarGuiEditor.Source.Painters.Components.PerInstance
                     AddComplexDataTypeFieldDefaultValue(newDefValuesList, baseName, cmplfield);
                 }
             }
-        }        
+        }
+
+        public String GetDefaultValue()
+        {
+            String defValue = "";
+            if (DefaultValues.Count >= 1)
+            {
+                if (DefaultValues[0].DefaultValue.Length > 0)
+                {                    
+                    defValue = DefaultValues[0].DefaultValue;
+                }
+            }
+            return defValue;
+        }
     }
 }

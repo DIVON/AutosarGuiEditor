@@ -53,6 +53,16 @@
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'RegenTestRte|AnyCPU'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\RegenTestRte\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <DebugType>full</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="Ookii.Dialogs.Wpf, Version=1.0.0.0, Culture=neutral, PublicKeyToken=0c15020868fd6249, processorArchitecture=MSIL">
       <HintPath>packages\Ookii.Dialogs.1.0\lib\net35\Ookii.Dialogs.Wpf.dll</HintPath>
@@ -238,8 +248,10 @@
     <Compile Include="Source\Render\Painter.cs" />
     <Compile Include="Source\Render\ResizableRectangleElement.cs" />
     <Compile Include="Source\Render\Scene.cs" />
+    <Compile Include="Source\RteGenerator\ComponentRteHeaderGenerator.cs" />
     <Compile Include="Source\RteGenerator\ReturnCodesGenerator.cs" />
     <Compile Include="Source\RteGenerator\RteComponentGenerator.cs" />
+    <Compile Include="Source\RteGenerator\RteConnectionCGenerator.cs" />
     <Compile Include="Source\RteGenerator\RteDataTypesGenerator.cs" />
     <Compile Include="Source\RteGenerator\RteGenerator.cs" />
     <Compile Include="Source\RteGenerator\RteFunctionsGenerator.cs" />
@@ -248,7 +260,6 @@
     <Compile Include="Source\RteGenerator\RteSchedulerGenerator.cs" />
     <Compile Include="Source\RteGenerator\SystemErrorGenerator.cs" />
     <Compile Include="Source\Interfaces\IGuid.cs" />
-    <Compile Include="Source\RteGenerator\TestEnvironmentGenerator.cs" />
     <Compile Include="Source\RteGenerator\TestGenerator\TestRteEnvironmentGenerator.cs" />
     <Compile Include="Source\Tester\ArxmlTester.cs" />
     <Compile Include="Source\Utility\AllowUpdater.cs" />
