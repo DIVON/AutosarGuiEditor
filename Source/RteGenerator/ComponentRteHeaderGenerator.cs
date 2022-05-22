@@ -219,10 +219,6 @@ namespace AutosarGuiEditor.Source.RteGenerator
                 writer.WriteLine(define);
             }
 
-            
-
-            String externFunctions = "";
-
             /* Add defines for all ports */
             foreach (PortDefenition portDefenition in compDef.Ports)
             {

@@ -954,6 +954,53 @@ namespace System
             return portConnection;
         }
 
+        public void GetOppositeComponentPorts(PortPainter portPainter, List<PortPainter> oppositePorts)
+        {
+            PortPainter oppositePort;
+
+            PortsConnectionsList portConnections = GetPortConnections(portPainter);
+            if (portConnections.Count != 0)
+            {
+                oppositePort = portConnections[0].GetOppositePort(portPainter);
+                if (oppositePort != null)
+                {
+                    IElementWithPorts elem = FindComponentInstanceByPort(oppositePort);
+
+                    if (elem is ComponentInstance)
+                    {
+                        oppositePorts.Add(oppositePort);
+                    }
+                    /* the port belongs to the composition */
+                    else if (elem is CompositionInstance)
+                    {
+                        CompositionInstance composition = elem as CompositionInstance;
+                        PortPainter middlePort;
+                        /* Is it composition's external port?*/
+                        int externalPortIndex = composition.Ports.IndexOf(oppositePort);
+                        if (externalPortIndex >= 0)
+                        {
+                            /* get internal index */
+                            middlePort = composition.InternalPortsInstances[externalPortIndex];
+                        }
+                        else /* It was internal port */
+                        {
+                            /* get external port */
+                            int internalPortIndex = composition.InternalPortsInstances.IndexOf(oppositePort);
+                            middlePort = composition.Ports[internalPortIndex];
+                        }
+
+                        /* Get middle port connections */
+                        PortsConnectionsList compositionPortConnections = GetPortConnections(middlePort);
+                        foreach(PortConnection compositeConnection in compositionPortConnections)
+                        {
+                            GetOppositeComponentPorts(middlePort, oppositePorts);
+                        }                        
+                    }
+                }
+            }
+        }
+
+
         public void GetOppositePortAndComponent(PortPainter portPainter, out ComponentInstance oppositeComponent, out PortPainter oppositePort)
         {
             oppositeComponent = null;

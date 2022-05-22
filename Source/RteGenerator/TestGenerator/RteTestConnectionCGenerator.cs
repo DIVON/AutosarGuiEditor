@@ -167,19 +167,20 @@ namespace AutosarGuiEditor.Source.RteGenerator
 
                                 int queueSize = srInterface.QueueSize;
 
-                                String copyFromField = "Rte_ReceiveBuffer_" + component.Name + "_" + portDef.Name + "_" + field.Name;
+                                String fieldName = RteFunctionsGenerator.GenerateReadWriteFunctionName(portDef, field);
+                                String copyFromField = "TEST_STUB_RECORD." + component.Name + "." + fieldName;
 
                                 writer.WriteLine("    Std_ReturnType _returnValue = RTE_E_NO_DATA;");
                                 writer.WriteLine("");
-                                writer.WriteLine("    uint32 head = " + copyFromField + ".head;");
-                                writer.WriteLine("    uint32 tail = " + copyFromField + ".tail;");
+                                writer.WriteLine("    uint32 head = " + copyFromField + ".Arguments.data.head;");
+                                writer.WriteLine("    uint32 tail = " + copyFromField + ".Arguments.data.tail;");
                                 writer.WriteLine("");
                                 writer.WriteLine("    if (head != tail)");
                                 writer.WriteLine("    {");
-                                writer.WriteLine("        (*data) = " + copyFromField + ".elements[head % " + queueSize.ToString() + "U];");
-                                writer.WriteLine("        " + copyFromField + ".head = (head + 1U) % " + (queueSize * 2).ToString() + "U;");
-                                writer.WriteLine("        _returnValue = RTE_E_OK | " + copyFromField + ".overlayError;");
-                                writer.WriteLine("        " + copyFromField + ".overlayError = RTE_E_OK;");
+                                writer.WriteLine("        (*data) = " + copyFromField + ".Arguments.data.elements[head % " + queueSize.ToString() + "U];");
+                                writer.WriteLine("        " + copyFromField + ".Arguments.data.head = (head + 1U) % " + (queueSize * 2).ToString() + "U;");
+                                writer.WriteLine("        _returnValue = RTE_E_OK | " + copyFromField + ".Arguments.data.overlayError;");
+                                writer.WriteLine("        " + copyFromField + ".Arguments.data.overlayError = RTE_E_OK;");
                                 writer.WriteLine("    }");
                                 writer.WriteLine("");
                                 writer.WriteLine("    return _returnValue;");  
@@ -237,21 +238,21 @@ namespace AutosarGuiEditor.Source.RteGenerator
                                     {
                                         int queueSize = srInterface.QueueSize;
 
-                                        String copyFromField = "TEST_STUB_RECORD." + oppositCompInstance.Name + "." + RteFunctionsGenerator.GenerateReadWriteFunctionName(oppositePort.PortDefenition, field) + ".data";
+                                        String copyFromField = "TEST_STUB_RECORD." + oppositCompInstance.Name + "." + RteFunctionsGenerator.GenerateReadWriteFunctionName(oppositePort.PortDefenition, field);
 
-                                        writer.WriteLine("        uint32 head = " + copyFromField + ".head;");
-                                        writer.WriteLine("        uint32 tail = " + copyFromField + ".tail;");
+                                        writer.WriteLine("        uint32 head = " + copyFromField + ".Arguments.data.head;");
+                                        writer.WriteLine("        uint32 tail = " + copyFromField + ".Arguments.data.tail;");
                                         writer.WriteLine("");
                                         writer.WriteLine("        if ((head == tail) || ((head % " + queueSize.ToString() + "U) != (tail % " + queueSize.ToString() + "U)))");
                                         writer.WriteLine("        {");
-                                        writer.WriteLine("            " + copyFromField + ".elements[tail % " + queueSize.ToString() + "U] = (*data);");
-                                        writer.WriteLine("            " + copyFromField + ".tail = (tail + 1U) % " + (queueSize * 2).ToString() + "U;");
+                                        writer.WriteLine("            " + copyFromField + ".Arguments.data.elements[tail % " + queueSize.ToString() + "U] = (*data);");
+                                        writer.WriteLine("            " + copyFromField + ".Arguments.data.tail = (tail + 1U) % " + (queueSize * 2).ToString() + "U;");
                                         writer.WriteLine("            return " + testRecordField + ".ReturnValue;");
                                         writer.WriteLine("        }");
                                         writer.WriteLine("        else");
                                         writer.WriteLine("        {");
-                                        writer.WriteLine("            " + copyFromField + ".overlayError = RTE_E_LOST_DATA;");
-                                        writer.WriteLine("            _returnValue = RTE_E_LIMIT;");
+                                        writer.WriteLine("            " + copyFromField + ".Arguments.data.overlayError = RTE_E_LOST_DATA;");
+                                        writer.WriteLine("            return RTE_E_LIMIT;");
                                         writer.WriteLine("        }");
                                     }
                                     else
@@ -310,7 +311,24 @@ namespace AutosarGuiEditor.Source.RteGenerator
 
                                 writer.WriteLine("    if (" + testRecordField + ".redirection == NULL)");
                                 writer.WriteLine("    {");
+
+                                /* Write data to the output port field of the current component */
                                 writer.WriteLine("        " + testRecordField + ".Arguments.data = *data;");
+                                
+                                /* Write data to all opposite receiver ports */
+                                PortPainter portPainter = component.GetPort(portDef);
+                                List<PortPainter> oppositePorts = new List<PortPainter>();
+                                AutosarApplication.GetInstance().GetOppositeComponentPorts(portPainter, oppositePorts);
+
+                                foreach(PortPainter oppositePort in oppositePorts)
+                                {
+                                    ComponentInstance oppositeComponent = AutosarApplication.GetInstance().FindComponentInstanceByPort(oppositePort) as ComponentInstance;
+                                    String oppositefieldName = RteFunctionsGenerator.GenerateReadWriteFunctionName(oppositePort.PortDefenition, field);
+                                    String oppositeTestRecordField = "TEST_STUB_RECORD." + oppositeComponent.Name + "." + oppositefieldName;
+                                    writer.WriteLine("        " + oppositeTestRecordField + ".Arguments.data = *data;");
+                                }
+
+
                                 writer.WriteLine("        return " + testRecordField + ".ReturnValue;");
                                 writer.WriteLine("    }");
                                 writer.WriteLine("    else");
@@ -355,6 +373,7 @@ namespace AutosarGuiEditor.Source.RteGenerator
                                 PortPainter portPainter = component.Ports.FindPortByItsDefenition(portDef);
                                 ComponentInstance oppositCompInstance;
                                 PortPainter oppositePort;
+
                                 AutosarApplication.GetInstance().GetOppositePortAndComponent(portPainter, out oppositCompInstance, out oppositePort);
                                
                                 writer.WriteLine("    " + testRecordField + ".CallCount++;");
@@ -369,8 +388,8 @@ namespace AutosarGuiEditor.Source.RteGenerator
 
                                 if (oppositCompInstance != null)
                                 {
-                                    String oppositeFieldName = RteFunctionsGenerator.GenerateReadWriteFunctionName(oppositePort.PortDefenition, field);
-                                    String copyFromField = "TEST_STUB_RECORD." + oppositCompInstance.Name + "." + oppositeFieldName;
+                                    String myField = RteFunctionsGenerator.GenerateReadWriteFunctionName(portDef, field);
+                                    String copyFromField = "TEST_STUB_RECORD." + component.Name + "." + myField;
 
                                     writer.WriteLine("        *data = " + copyFromField + ".Arguments.data;");
                                     writer.WriteLine("        return " + testRecordField + ".ReturnValue;");
