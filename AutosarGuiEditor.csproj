@@ -45,7 +45,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'RegenRTE|AnyCPU'">
     <DebugSymbols>true</DebugSymbols>
-    <OutputPath>bin\RegenRTE\</OutputPath>
+    <OutputPath>bin\Debug\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <DebugType>full</DebugType>
@@ -55,7 +55,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'RegenTestRte|AnyCPU'">
     <DebugSymbols>true</DebugSymbols>
-    <OutputPath>bin\RegenTestRte\</OutputPath>
+    <OutputPath>bin\Debug\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <DebugType>full</DebugType>
@@ -251,6 +251,7 @@
     <Compile Include="Source\RteGenerator\ComponentRteHeaderGenerator.cs" />
     <Compile Include="Source\RteGenerator\ReturnCodesGenerator.cs" />
     <Compile Include="Source\RteGenerator\RteComponentGenerator.cs" />
+    <Compile Include="Source\RteGenerator\TestGenerator\RteTestConnectionCGenerator.cs" />
     <Compile Include="Source\RteGenerator\RteConnectionCGenerator.cs" />
     <Compile Include="Source\RteGenerator\RteDataTypesGenerator.cs" />
     <Compile Include="Source\RteGenerator\RteGenerator.cs" />
@@ -260,6 +261,7 @@
     <Compile Include="Source\RteGenerator\RteSchedulerGenerator.cs" />
     <Compile Include="Source\RteGenerator\SystemErrorGenerator.cs" />
     <Compile Include="Source\Interfaces\IGuid.cs" />
+    <Compile Include="Source\RteGenerator\TestGenerator\TestRteCommonHGegenerator.cs" />
     <Compile Include="Source\RteGenerator\TestGenerator\TestRteEnvironmentGenerator.cs" />
     <Compile Include="Source\Tester\ArxmlTester.cs" />
     <Compile Include="Source\Utility\AllowUpdater.cs" />

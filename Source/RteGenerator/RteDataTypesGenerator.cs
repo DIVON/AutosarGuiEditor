@@ -23,7 +23,7 @@ namespace AutosarGuiEditor.Source.RteGenerator
             String FileName = folder + "\\" + Properties.Resources.RTE_DATATYPES_H_FILENAME;
             StreamWriter writer = new StreamWriter(FileName);
             RteFunctionsGenerator.GenerateFileTitle(writer, Properties.Resources.RTE_DATATYPES_H_FILENAME, Properties.Resources.DATATYPES_H_FILE_DESCRIPTION);
-            String guardDefine = RteFunctionsGenerator.OpenGuardDefine(writer);
+            RteFunctionsGenerator.OpenGuardDefine(writer);
 
             writer.WriteLine();
             RteFunctionsGenerator.AddInclude(writer, Properties.Resources.RTE_RETURN_CODES_FILENAME);

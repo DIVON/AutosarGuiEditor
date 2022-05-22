@@ -19,7 +19,7 @@ namespace AutosarGuiEditor.Source.RteGenerator
             String FileName = folder + "\\" + Properties.Resources.SYSTEM_ERRORS_H_FILENAME;
             StreamWriter writer = new StreamWriter(FileName);
             RteFunctionsGenerator.GenerateFileTitle(writer, Properties.Resources.RTE_DATATYPES_H_FILENAME, Properties.Resources.DATATYPES_H_FILE_DESCRIPTION);
-            String guardDefine = RteFunctionsGenerator.OpenGuardDefine(writer);
+            RteFunctionsGenerator.OpenGuardDefine(writer);
 
             writer.WriteLine("/*  System errors */");
             WriteErrorsCount(writer);

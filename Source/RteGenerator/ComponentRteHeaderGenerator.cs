@@ -22,7 +22,7 @@ namespace AutosarGuiEditor.Source.RteGenerator
 
             StreamWriter writer = new StreamWriter(filename);
             RteFunctionsGenerator.GenerateFileTitle(writer, filename, "Implementation for " + compDef.Name + " header file");
-            string guardDefine = RteFunctionsGenerator.OpenGuardDefine(writer);
+            RteFunctionsGenerator.OpenGuardDefine(writer);
 
             writer.WriteLine(@"
 #include <Rte_DataTypes.h>
@@ -59,7 +59,7 @@ namespace AutosarGuiEditor.Source.RteGenerator
                         data += fieldVariable + ";";
                         writer.WriteLine(data);
                     }
-                    writer.WriteLine("}" + portDataStructureName + ";");
+                    writer.WriteLine("} " + portDataStructureName + ";");
                     writer.WriteLine();
                 }
             }
