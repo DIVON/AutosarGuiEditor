@@ -65,11 +65,6 @@ namespace AutosarGuiEditor.Source.RteGenerator
             return "cin" + compName;
         }
 
-        public static String GenerateComponentTypeHeaderFile(ApplicationSwComponentType compDef)
-        {
-            return "Rte_" + compDef.Name + "_Type.h";
-        }
-
         public static String GenerateComponentHeaderFile(ApplicationSwComponentType compDef)
         {
             return "Rte_" + compDef.Name + ".h";
@@ -126,7 +121,12 @@ namespace AutosarGuiEditor.Source.RteGenerator
             return resFolder;
         }
 
-        public static String Generate_RteCall_FunctionName(PortDefenition portDef, ClientServerOperation operation)
+        public static String Generate_RteCall_FunctionName(ApplicationSwComponentType compDef, PortDefenition portDef, ClientServerOperation operation)
+        {
+            return compDef.Name + "_" + portDef.Name + "_ru" + operation.Name;
+        }
+
+        public static String Generate_InternalRteCall_FunctionName(PortDefenition portDef, ClientServerOperation operation)
         {
             return "Rte_Call_" + portDef.Name + "_" + operation.Name;
         }
@@ -589,6 +589,61 @@ namespace AutosarGuiEditor.Source.RteGenerator
 
             ApplicationSwComponentType compDefenition = AutosarApplication.GetInstance().FindComponentDefenitionByPort(port);
             res += compDefenition.Name + "_" + port.Name + "_" + field.Name;
+
+            return res;
+        }
+
+
+        public static String GenerateInternalReadWriteConnectionFunctionName(String componentName, PortDefenition port, SenderReceiverInterfaceField field)
+        {
+            String res = "Rte_Internal";
+
+            if (port.PortType == PortType.Sender)
+            {
+                res += "Write_";
+            }
+            else
+            {
+                res += "Read_";
+            }
+
+            res += componentName + "_" + port.Name + "_" + field.Name;
+
+            return res;
+        }
+
+        public static String GenerateInternalCallConnectionFunctionName(String componentName, PortDefenition port, ClientServerOperation operation)
+        {
+            String res = "Rte_InternalCall_";
+
+            res += componentName + "_" + port.Name + "_" + operation.Name;
+
+            return res;
+        }
+
+        public static String GenerateInternalCDataFunctionName(String componentName, CDataDefenition cdata)
+        {
+            String res = "Rte_InternalCData_";
+
+            res += componentName + "_" + cdata.Name;
+
+            return res;
+        }
+
+        public static String GenerateInternalSendReceiveConnectionFunctionName(String componentName, PortDefenition port, SenderReceiverInterfaceField field)
+        {
+            String res = "Rte_Internal";
+
+            if (port.PortType == PortType.Sender)
+            {
+                res += "Send_";
+            }
+            else
+            {
+                res += "Receive_";
+            }
+
+            res += componentName + "_" + port.Name + "_" + field.Name;
 
             return res;
         }

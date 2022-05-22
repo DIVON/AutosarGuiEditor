@@ -24,13 +24,13 @@ namespace AutosarGuiEditor.Source.RteGenerator.TestGenerator
 {
     class TestRteEnvironmentGenerator
     {
-        public String TestRte_c_filename;
+        public String TestRte_c_filename = "";
 
         public void GenerateRteEnvironment(ApplicationSwComponentType compDef, String outputDir)
         {
             /* Generate Rte_<ComponentName>.h file */
             RteComponentGenerator compGenerator = new RteComponentGenerator();
-            compGenerator.CreateRteIncludes(outputDir, compDef);
+            //compGenerator.CreateRteIncludes(outputDir, compDef);
 
             //GenerateTestRteHFile(compDef, outputDir);
             ComponentRteHeaderGenerator.GenerateHeader(outputDir, compDef);
@@ -201,7 +201,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.TestGenerator
                         }
                         writer.WriteLine("        } Arguments;");
                         writer.WriteLine("        Std_ReturnType (*redirection)" + RteFunctionsGenerator.GenerateClientServerInterfaceArguments(csOperation, compDef.MultipleInstantiation) + ";");
-                        String operationName = RteFunctionsGenerator.Generate_RteCall_FunctionName(portDef, csOperation);
+                        String operationName = RteFunctionsGenerator.Generate_RteCall_FunctionName(compDef, portDef, csOperation);
                         writer.WriteLine("    } " + operationName + ";");
                         writer.WriteLine();
                     }
@@ -339,7 +339,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.TestGenerator
                     foreach (ClientServerOperation operation in csInterface.Operations)
                     {
                         String returnValue = Properties.Resources.STD_RETURN_TYPE;
-                        String RteFuncName = RteFunctionsGenerator.Generate_RteCall_FunctionName(port, operation);
+                        String RteFuncName = RteFunctionsGenerator.Generate_RteCall_FunctionName(compDefenition, port, operation);
                         String fieldVariable = RteFunctionsGenerator.GenerateClientServerInterfaceArguments(operation, compDefenition.MultipleInstantiation);
                         String writeValue = returnValue + RteFuncName + fieldVariable + ";";
                         writer.WriteLine(writeValue);

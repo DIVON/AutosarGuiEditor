@@ -455,7 +455,7 @@ namespace AutosarGuiEditor.Source.Tester
                 {
                     if (srInterface.Fields.Count > 1u)
                     {
-                        AppendText("Queued Sender-Receiver interface shall have only one field : " + srInterface.Name, Error: true);
+                        //AppendText("Queued Sender-Receiver interface shall have only one field : " + srInterface.Name, Error: true);
                     }
                 }
             }

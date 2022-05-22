@@ -68,7 +68,7 @@ namespace AutosarGuiEditor.Source.AutosarInterfaces.SenderReceiver
 
         public String QueuedInterfaceName(string parentInterfaceName)
         {
-            return "dtRte_" + parentInterfaceName + "_" + Name + "_Handler";
+            return "Rte_ReceiveBufferType_" + parentInterfaceName + "_" + Name;
         }
     }
 }

@@ -437,7 +437,7 @@ namespace AutosarGuiEditor.Source.RteGenerator
                         {
                             foreach (ClientServerOperation operation in csInterface.Operations)
                             {
-                                String funcName = RteFunctionsGenerator.Generate_RteCall_ConnectionGroup_FunctionName(componentDefenition, port, operation);
+                                String funcName = RteFunctionsGenerator.Generate_RteCall_FunctionName(componentDefenition, port, operation);
                                 String funcArguments = RteFunctionsGenerator.GenerateClientServerInterfaceArguments(operation, componentDefenition.MultipleInstantiation);
                                 writer.WriteLine(Properties.Resources.STD_RETURN_TYPE + funcName + funcArguments + ";");
                             }

@@ -60,7 +60,7 @@ namespace AutosarGuiEditor.Source.RteGenerator
             }
 
             /* Generate funcitons for Sender-Receiver ports and call operations from client ports */
-            CreateRteIncludes(rteDir, component);
+            ComponentRteHeaderGenerator.GenerateHeader(rteDir, component);
 
             CreateComponentIncludes(incDir, component);
         }
@@ -221,7 +221,7 @@ namespace AutosarGuiEditor.Source.RteGenerator
                     ClientServerInterface csInterface = AutosarApplication.GetInstance().ClientServerInterfaces.FindObject(port.InterfaceGUID);
                     foreach (ClientServerOperation operation in csInterface.Operations)
                     {
-                        lines.Add(" *  " + RteFunctionsGenerator.Generate_RteCall_FunctionName(port, operation));
+                        lines.Add(" *  " + RteFunctionsGenerator.Generate_RteCall_FunctionName(compDefenition, port, operation));
                     }
                 }
             }
@@ -293,7 +293,7 @@ namespace AutosarGuiEditor.Source.RteGenerator
                     /* Fill all function names which component could use*/
                     WriteAllFunctionWhichComponentCouldUse(compDefenition, writer);
 
-                    String funcName = RteFunctionsGenerator.Generate_RteCall_FunctionName(portDefenition, operation);
+                    String funcName = RteFunctionsGenerator.Generate_RteCall_FunctionName(compDefenition, portDefenition, operation);
                     String funcArgument = RteFunctionsGenerator.GenerateClientServerInterfaceArguments(operation, compDefenition.MultipleInstantiation);
                     writer.WriteLine(Properties.Resources.STD_RETURN_TYPE + funcName + funcArgument);
                     writer.WriteLine("{");
@@ -312,157 +312,6 @@ namespace AutosarGuiEditor.Source.RteGenerator
             {
                 System.Windows.MessageBox.Show(portDefenition.GUID.ToString("B") + " not found in interfaces!");
             }
-        }
-
-        /* Generate funcitons for Sender-Receiver ports and call operations from client ports */
-        public void CreateRteIncludes(String dir, ApplicationSwComponentType componentDefenition)
-        {
-            String filename = dir + "\\" +"Rte_" + componentDefenition.Name + ".h";
-            StreamWriter writer = new StreamWriter(filename);
-            RteFunctionsGenerator.GenerateFileTitle(writer, filename, "Implementation for " + componentDefenition.Name + " header file");
-            string guardDefine = RteFunctionsGenerator.OpenGuardDefine(writer);
-
-            writer.WriteLine("");
-
-            writer.WriteLine("#ifdef RTE_DEFINED");
-            writer.WriteLine("#ifndef TEST_RTE");
-            writer.WriteLine("#error \"Multiple RTE files included\"");
-            writer.WriteLine("#endif");
-            writer.WriteLine("#endif");
-
-            writer.WriteLine("#define RTE_DEFINED");
-            writer.WriteLine("");
-
-            writer.WriteLine(RteFunctionsGenerator.IncludesLine);
-            RteFunctionsGenerator.AddInclude(writer, Properties.Resources.SYSTEM_ERRORS_H_FILENAME);
-            RteFunctionsGenerator.AddInclude(writer, Properties.Resources.RTE_DATATYPES_H_FILENAME);
-            writer.WriteLine("");
-            writer.WriteLine(RteFunctionsGenerator.EndOfIncludesLine);
-            writer.WriteLine("");
-
-            /* MACROS */
-            writer.WriteLine("");
-            writer.WriteLine(RteFunctionsGenerator.MacrosLine);
-            
-            /* Write all runnables frequences */
-            writer.WriteLine("/* Runnables frequences */");
-            
-            foreach (PeriodicRunnableDefenition runnable in componentDefenition.Runnables)
-            {
-                String runnableFreqMacroName = "Rte_Period_" + componentDefenition.Name + "_ru" + runnable.Name;
-
-                writer.WriteLine("#undef " + runnableFreqMacroName);
-                String define = RteFunctionsGenerator.CreateDefine(runnableFreqMacroName, (runnable.PeriodMs * 1000).ToString() + "UL");
-                writer.WriteLine(define);
-            }
-
-            /* Write all pims */
-            foreach (PimDefenition pim in componentDefenition.PerInstanceMemoryList)
-            {
-                writer.WriteLine("#undef " + RteFunctionsGenerator.GenerateShortPimFunctionName(pim));
-                String define = RteFunctionsGenerator.CreateDefine(RteFunctionsGenerator.GenerateShortPimFunctionName(pim), RteFunctionsGenerator.GenerateFullPimFunctionName(componentDefenition, pim), false);
-                writer.WriteLine(define);
-            }
-
-            /* Write all cdata */
-            foreach (CDataDefenition cdata in componentDefenition.CDataDefenitions)
-            {
-                writer.WriteLine("#undef " + RteFunctionsGenerator.GenerateShortCDataFunctionName(cdata));
-                String define = RteFunctionsGenerator.CreateDefine(RteFunctionsGenerator.GenerateShortCDataFunctionName(cdata), RteFunctionsGenerator.GenerateFullCDataFunctionName(componentDefenition, cdata), false);
-                writer.WriteLine(define);
-            }
-
-            String externFunctions = "";
-
-            /* Add defines for all ports */
-            foreach (PortDefenition portDefenition in componentDefenition.Ports)
-            {
-                if ((portDefenition.PortType == PortType.Sender) || (portDefenition.PortType == PortType.Receiver))
-                {
-                    SenderReceiverInterface srInterface = AutosarApplication.GetInstance().SenderReceiverInterfaces.FindObject(portDefenition.InterfaceGUID);
-                    foreach (SenderReceiverInterfaceField field in srInterface.Fields)
-                    {
-                        String funcName = RteFunctionsGenerator.GenerateReadWriteFunctionName(portDefenition, field);
-                        String RteFuncName = RteFunctionsGenerator.GenerateReadWriteConnectionFunctionName(portDefenition, field);
-                        writer.WriteLine("#undef " + funcName);
-                        writer.WriteLine(RteFunctionsGenerator.CreateDefine(funcName, RteFuncName, false));
-                        String fieldVariable = RteFunctionsGenerator.GenerateSenderReceiverInterfaceArguments(field, portDefenition.PortType, componentDefenition.MultipleInstantiation);
-
-                        externFunctions += Properties.Resources.STD_RETURN_TYPE + funcName + fieldVariable +";" +Environment.NewLine;
-                    }
-                }
-                else if (portDefenition.PortType == PortType.Client)
-                {
-                    ClientServerInterface csInterface = AutosarApplication.GetInstance().ClientServerInterfaces.FindObject(portDefenition.InterfaceGUID);
-                    foreach (ClientServerOperation operation in csInterface.Operations)
-                    {
-                        String funcName = RteFunctionsGenerator.Generate_RteCall_FunctionName(portDefenition, operation);
-                        String RteFuncName = RteFunctionsGenerator.Generate_RteCall_ConnectionGroup_FunctionName(componentDefenition, portDefenition, operation);
-                        String funcArgument = RteFunctionsGenerator.GenerateClientServerInterfaceArguments(operation, componentDefenition.MultipleInstantiation);
-                        writer.WriteLine("#undef " + funcName);
-                        writer.WriteLine(RteFunctionsGenerator.CreateDefine(funcName, RteFuncName, false));
-                        externFunctions += Properties.Resources.STD_RETURN_TYPE + funcName + funcArgument + ";" + Environment.NewLine;
-                    }
-                }
-                else if (portDefenition.PortType == PortType.Server)
-                {
-                    ClientServerInterface csInterface = AutosarApplication.GetInstance().ClientServerInterfaces.FindObject(portDefenition.InterfaceGUID);
-                    foreach (ClientServerOperation operation in csInterface.Operations)
-                    {
-                        String funcName = RteFunctionsGenerator.Generate_RteCall_FunctionName(portDefenition, operation);
-                        String RteFuncName = RteFunctionsGenerator.Generate_RteCall_ConnectionGroup_FunctionName(componentDefenition, portDefenition, operation);
-                        String funcArgument = RteFunctionsGenerator.GenerateClientServerInterfaceArguments(operation, componentDefenition.MultipleInstantiation);
-                        writer.WriteLine("#undef " + funcName);
-                        writer.WriteLine(RteFunctionsGenerator.CreateDefine(funcName, RteFuncName, false));
-                    }
-                }
-            }
-
-            writer.WriteLine("");
-            writer.WriteLine(RteFunctionsGenerator.EndOfMacrosLine);
-            writer.WriteLine("");
-
-            writer.WriteLine("");
-            writer.WriteLine(RteFunctionsGenerator.RteFunctionsDefenitionsLine);
-            writer.WriteLine("");
-            
-            /* Add function */
-            writer.Write(externFunctions);
-
-            /* Add Pim's functions */
-            foreach(PimDefenition pimDefenition in componentDefenition.PerInstanceMemoryList)
-            {
-                String datatype = pimDefenition.DataTypeName;
-                String pimFuncName = RteFunctionsGenerator.GenerateShortPimFunctionName(pimDefenition);
-                String arguments = "(";
-                if (componentDefenition.MultipleInstantiation)
-                {
-                    arguments += RteFunctionsGenerator.ComponentInstancePointerDatatype + " instance";
-                }
-                arguments += ");";
-                writer.WriteLine(datatype + " * const " + pimFuncName + arguments);
-            }
-
-            /* Add CData functions */
-            foreach (CDataDefenition cdataDefenition in componentDefenition.CDataDefenitions)
-            {
-                String datatype = cdataDefenition.DataTypeName;
-                String cdataFuncName = RteFunctionsGenerator.GenerateShortCDataFunctionName(cdataDefenition);
-                String arguments = "(";
-                if (componentDefenition.MultipleInstantiation)
-                {
-                    arguments += RteFunctionsGenerator.ComponentInstancePointerDatatype + " instance";
-                }
-                arguments += ");";
-                writer.WriteLine(datatype + " " + cdataFuncName + arguments);
-            }
-
-            writer.WriteLine(RteFunctionsGenerator.EndOfRteFunctionsDefenitionsLine);
-            writer.WriteLine("");
-
-            writer.WriteLine("");
-            RteFunctionsGenerator.CloseGuardDefine(writer);
-            writer.Close();
         }
     }
 }
