@@ -337,11 +337,25 @@ namespace AutosarGuiEditor.Source.RteGenerator
             String res = "Rte_";
             if (port.PortType == PortType.Sender)
             {
-                res += "Write_";
+                if ((port.InterfaceDatatype as SenderReceiverInterface).IsQueued == false)
+                {
+                    res += "Write_";
+                }
+                else
+                {
+                    res += "Send_";
+                }
             }
             else
             {
-                res += "Read_";
+                if ((port.InterfaceDatatype as SenderReceiverInterface).IsQueued == false)
+                {
+                    res += "Read_";
+                }
+                else
+                {
+                    res += "Receive_";
+                }
             }
 
             res += port.Name + "_" + field.Name;

@@ -24,7 +24,16 @@ namespace AutosarGuiEditor.Source.RteGenerator
             RteFunctionsGenerator.GenerateFileTitle(writer, filename, "Implementation for " + compDef.Name + " header file");
             RteFunctionsGenerator.OpenGuardDefine(writer);
 
+
             writer.WriteLine(@"
+#ifndef RTE_C
+    #ifdef RTE_APP_HEADER_FILE
+        #error Multiple application header files included.
+    #else
+        #define RTE_APP_HEADER_FILE
+    #endif
+#endif
+
 #include <Rte_DataTypes.h>
 #include <" + RteFunctionsGenerator.GenerateComponentHeaderFile(compDef) + @">
 
@@ -49,7 +58,7 @@ namespace AutosarGuiEditor.Source.RteGenerator
                 {
                     createdInterfaces.Add(portDataStructureName);
 
-                    writer.WriteLine("typedef struct " + portDataStructureName + "{");
+                    writer.WriteLine("typedef struct " + portDataStructureName + " {");
                     foreach (SenderReceiverInterfaceField field in srInterface.Fields)
                     {
                         string data = "    Std_ReturnType (*";
@@ -174,15 +183,20 @@ namespace AutosarGuiEditor.Source.RteGenerator
             {
                 writer.WriteLine(RteFunctionsGenerator.Generate_RunnableFunction(compDef, runnable) + ";");
             }
+            writer.WriteLine();
+            writer.WriteLine("/* Server calls */");
+            CreateRteCallFunctionDeclarations(writer, compDef);
 
             writer.WriteLine(
-@"/*************************************************************
+@"
+/*************************************************************
  * END Runnable Entity
  *************************************************************/
 
 /*************************************************************
  * BEGIN RTE API DEFINITIONS 
  *************************************************************/
+#ifndef RTE_C
 ");
 
             /* Write all cdata */
@@ -282,14 +296,37 @@ namespace AutosarGuiEditor.Source.RteGenerator
                     }
                 }
             }
+
             writer.WriteLine(
 @"
+#endif /* RTE_C */
+
 /*************************************************************
  * END RTE API DEFINITIONS 
  *************************************************************/
 ");
             RteFunctionsGenerator.CloseGuardDefine(writer);
             writer.Close();
+        }
+
+
+        static void CreateRteCallFunctionDeclarations(StreamWriter writer, ApplicationSwComponentType compDefenition)
+        {
+            foreach (PortDefenition port in compDefenition.Ports)
+            {
+                if (port.PortType == PortType.Server)
+                {
+                    ClientServerInterface csInterface = port.InterfaceDatatype as ClientServerInterface;
+                    foreach (ClientServerOperation operation in csInterface.Operations)
+                    {
+                        String returnValue = Properties.Resources.STD_RETURN_TYPE;
+                        String RteFuncName = RteFunctionsGenerator.Generate_RteCall_FunctionName(compDefenition, port, operation);
+                        String fieldVariable = RteFunctionsGenerator.GenerateClientServerInterfaceArguments(operation, compDefenition.MultipleInstantiation);
+                        String writeValue = returnValue + RteFuncName + fieldVariable + ";";
+                        writer.WriteLine(writeValue);
+                    }
+                }
+            }
         }
     }
 

@@ -28,6 +28,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.TestGenerator
 
 
             GenerateTestStubRecordType(writer);
+            GenerateExternComponentInstances(writer);
 
             RteFunctionsGenerator.CloseGuardDefine(writer);
             writer.Close();
@@ -58,6 +59,20 @@ namespace AutosarGuiEditor.Source.RteGenerator.TestGenerator
             writer.WriteLine("} TEST_STUB_RECORD_TYPE;");
             writer.WriteLine("");
             writer.WriteLine("extern TEST_STUB_RECORD_TYPE TEST_STUB_RECORD;");
+            writer.WriteLine("");
+        }
+
+        void GenerateExternComponentInstances(StreamWriter writer)
+        {
+            foreach (CompositionInstance composition in AutosarApplication.GetInstance().Compositions)
+            {
+                foreach (ComponentInstance component in composition.ComponentInstances)
+                {
+                    ApplicationSwComponentType compDef = component.ComponentDefenition;
+                    String CDSname = RteFunctionsGenerator.ComponentDataStructureDefenitionName(compDef);
+                    writer.WriteLine("extern const " + CDSname + " Rte_Instance_" + component.Name + ";");                    
+                }
+            }
             writer.WriteLine("");
         }
     }

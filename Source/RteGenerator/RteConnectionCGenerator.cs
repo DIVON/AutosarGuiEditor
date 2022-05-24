@@ -31,7 +31,6 @@ namespace AutosarGuiEditor.Source.RteGenerator
             RteFunctionsGenerator.AddInclude(writer, "<string.h>");
             RteFunctionsGenerator.AddInclude(writer, Properties.Resources.RTE_DATATYPES_H_FILENAME);
             RteFunctionsGenerator.AddInclude(writer, Properties.Resources.SYSTEM_ERRORS_H_FILENAME);
-            RteFunctionsGenerator.AddInclude(writer, Properties.Resources.RTE_EXTERNAL_RUNNABLES_H_FILENAME);
             AddComponentIncludes(writer);
 
             /* Include */
@@ -55,10 +54,12 @@ namespace AutosarGuiEditor.Source.RteGenerator
 
         void AddComponentIncludes(StreamWriter writer)
         {
+            writer.WriteLine("#define RTE_C");
             foreach(ApplicationSwComponentType compDef in AutosarApplication.GetInstance().ComponentDefenitionsList)
             {
                 RteFunctionsGenerator.AddInclude(writer, "<Rte_" + compDef.Name + ".h>");
             }
+            writer.WriteLine("#undef RTE_C");
         }
 
         void GenerateCDataFunctions(StreamWriter writer)

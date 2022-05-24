@@ -32,10 +32,7 @@ namespace AutosarGuiEditor.Source.RteGenerator
             RteFunctionsGenerator.AddInclude(writer, "<string.h>");
             RteFunctionsGenerator.AddInclude(writer, Properties.Resources.RTE_DATATYPES_H_FILENAME);
             RteFunctionsGenerator.AddInclude(writer, Properties.Resources.SYSTEM_ERRORS_H_FILENAME);
-            RteFunctionsGenerator.AddInclude(writer, Properties.Resources.RTE_EXTERNAL_RUNNABLES_H_FILENAME);
             RteFunctionsGenerator.AddInclude(writer, "<Rte_TestCommon.h>");
-
-            AddComponentIncludes(writer);
 
             /* Include */
             writer.WriteLine("");

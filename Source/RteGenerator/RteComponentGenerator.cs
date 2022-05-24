@@ -74,6 +74,7 @@ namespace AutosarGuiEditor.Source.RteGenerator
 
             writer.WriteLine("");
             writer.WriteLine(RteFunctionsGenerator.IncludesLine);
+            writer.WriteLine("");
             RteFunctionsGenerator.AddInclude(writer, "Rte_" + componentDefenition.Name + ".h");
             writer.WriteLine("");
             writer.WriteLine(RteFunctionsGenerator.EndOfIncludesLine);
@@ -104,7 +105,6 @@ namespace AutosarGuiEditor.Source.RteGenerator
             writer.WriteLine("");
 
             RteFunctionsGenerator.CloseGuardDefine(writer);
-            RteFunctionsGenerator.WriteEndOfFile(writer);
             writer.Close();
         }
 
@@ -117,6 +117,7 @@ namespace AutosarGuiEditor.Source.RteGenerator
 
             writer.WriteLine("");
             writer.WriteLine(RteFunctionsGenerator.IncludesLine);
+            writer.WriteLine("");
             RteFunctionsGenerator.AddInclude(writer, compDefenition.Name + ".h");
             writer.WriteLine("");
             writer.WriteLine(RteFunctionsGenerator.EndOfIncludesLine);
@@ -221,7 +222,7 @@ namespace AutosarGuiEditor.Source.RteGenerator
                     ClientServerInterface csInterface = AutosarApplication.GetInstance().ClientServerInterfaces.FindObject(port.InterfaceGUID);
                     foreach (ClientServerOperation operation in csInterface.Operations)
                     {
-                        lines.Add(" *  " + RteFunctionsGenerator.Generate_RteCall_FunctionName(compDefenition, port, operation));
+                        lines.Add(" *  " + RteFunctionsGenerator.Generate_InternalRteCall_FunctionName(port, operation));
                     }
                 }
             }
@@ -246,6 +247,7 @@ namespace AutosarGuiEditor.Source.RteGenerator
 
             writer.WriteLine("");
             writer.WriteLine(RteFunctionsGenerator.IncludesLine);
+            writer.WriteLine("");
             RteFunctionsGenerator.AddInclude(writer, compDefenition.Name + ".h");
             writer.WriteLine("");
             writer.WriteLine(RteFunctionsGenerator.EndOfIncludesLine);

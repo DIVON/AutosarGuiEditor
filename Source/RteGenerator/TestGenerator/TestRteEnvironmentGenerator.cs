@@ -70,7 +70,9 @@ namespace AutosarGuiEditor.Source.RteGenerator.TestGenerator
 
             /* Add includes */
             RteFunctionsGenerator.AddInclude(writer, Properties.Resources.RTE_DATATYPES_H_FILENAME);
+            writer.WriteLine("#define RTE_C");
             RteFunctionsGenerator.AddInclude(writer, "Rte_" + compDef.Name + ".h");
+            writer.WriteLine("#undef  RTE_C");
             //RteFunctionsGenerator.AddInclude(writer, Properties.Resources.TEST_FRAMEWORK_H_FILENAME);
             RteFunctionsGenerator.AddInclude(writer, "<string.h>");
 
@@ -78,16 +80,6 @@ namespace AutosarGuiEditor.Source.RteGenerator.TestGenerator
 
             /* Create structure */
             CreateTestArtefactStructure(writer, compDef);
-
-            writer.WriteLine("/* All periodical runnables */");
-            foreach (PeriodicRunnableDefenition runnable in compDef.Runnables)
-            {
-                writer.WriteLine(RteFunctionsGenerator.Generate_RunnableFunction(compDef, runnable) + ";");
-            }
-            writer.WriteLine();
-
-            writer.WriteLine("/* All server calls */");
-            CreateRteCallFunctionDeclarations(writer, compDef);
 
             writer.WriteLine();
 
@@ -332,26 +324,6 @@ namespace AutosarGuiEditor.Source.RteGenerator.TestGenerator
                     foreach (ClientServerOperation operation in csInterface.Operations)
                     {
                         GenerateRteCallPortFieldFunction(writer, compDefenition, port, operation);
-                    }
-                }
-            }
-        }
-
-
-        void CreateRteCallFunctionDeclarations(StreamWriter writer, ApplicationSwComponentType compDefenition)
-        {
-            foreach (PortDefenition port in compDefenition.Ports)
-            {
-                if (port.PortType == PortType.Server)
-                {
-                    ClientServerInterface csInterface = port.InterfaceDatatype as ClientServerInterface;
-                    foreach (ClientServerOperation operation in csInterface.Operations)
-                    {
-                        String returnValue = Properties.Resources.STD_RETURN_TYPE;
-                        String RteFuncName = RteFunctionsGenerator.Generate_RteCall_FunctionName(compDefenition, port, operation);
-                        String fieldVariable = RteFunctionsGenerator.GenerateClientServerInterfaceArguments(operation, compDefenition.MultipleInstantiation);
-                        String writeValue = returnValue + RteFuncName + fieldVariable + ";";
-                        writer.WriteLine(writeValue);
                     }
                 }
             }

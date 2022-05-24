@@ -20,7 +20,7 @@ namespace AutosarGuiEditor.Source.RteGenerator
     {
         public void GenerateShedulerFiles()
         {
-            Generate_ExternalRunnables_File(RteFunctionsGenerator.GetRteFolder());
+            //Generate_ExternalRunnables_File(RteFunctionsGenerator.GetRteFolder());
             Generate_RunTimeEnvironment_Header_File();
             Generate_RunTimeEnvironment_Source_File();
             Generate_RteTaskScheduler_Header_File();

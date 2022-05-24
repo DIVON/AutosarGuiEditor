@@ -125,8 +125,8 @@ namespace System
                     }
                 }
 
-                /* Sender shall have only one connection */
-                if (portDef1.PortType == PortType.Sender)
+                /* Queued Sender shall have only one connection */
+                if ((portDef1.PortType == PortType.Sender) && ((portDef1.InterfaceDatatype as SenderReceiverInterface).IsQueued == true))
                 {
                     if (IsThisPointConnectionExists(newConnection.Component1, newConnection.Port1) == true)
                     {

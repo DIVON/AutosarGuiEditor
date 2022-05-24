@@ -34,12 +34,7 @@ namespace AutosarGuiEditor.Source.RteGenerator
                     writer.WriteLine(RteFunctionsGenerator.CreateDefine(arraySizeNameMacro, arrayDT.Size.ToString() + "U", false));
 
                     writer.WriteLine();
-                    /* Write a structure with array */
-
-                    writer.WriteLine("typedef struct");
-                    writer.WriteLine("{");
-                    writer.WriteLine("    " + datatype.Name + " Values[" + arrayDT.Size + "];");
-                    writer.WriteLine("} " + arrayDT.Name + ";");
+                    writer.WriteLine("typedef " + datatype.Name + " " + arrayDT.Name + "[" + arrayDT.Size + "];");
                     writer.WriteLine();
                 }
             }
