@@ -24,19 +24,29 @@ using System.Windows.Controls;
 
 namespace AutosarGuiEditor.Source.Tester
 {
+    enum MessageType
+    {
+        OK,
+        WARNING,
+        ERROR
+    };
+
     public class ArxmlTester
     {
         private AutosarApplication autosarApp;
+        private StringWriter outputWriter;
         private StringWriter writer;
 
         public ArxmlTester(AutosarApplication autosarApp, StringWriter writer)
         {
             this.autosarApp = autosarApp;
-            this.writer = writer;
+            this.outputWriter = writer;
         }
 
         public void Test()
         {
+            writer = new StringWriter();
+
             TestEnums();
             TestComplexDataTypes();
             TestClientServer();
@@ -50,10 +60,40 @@ namespace AutosarGuiEditor.Source.Tester
             TestConnections();
             TestOsTasks();
             TestQueuedSenderReceiverInterface();
+            TestWetherComponentDefenitionUsed();
+
+            SortText();
         }
 
-        const string ERROR = "ERROR: ";
-        const string OK = "OK: ";
+        void SortText()
+        {
+            String[] lines = writer.ToString().Split('\n');
+            foreach(String str in lines)
+            {
+                if (str.Contains(ERROR_STR))
+                {
+                    outputWriter.Write(str);
+                }
+            }
+            foreach (String str in lines)
+            {
+                if (str.Contains(WARNING_STR))
+                {
+                    outputWriter.Write(str);
+                }
+            }
+            foreach (String str in lines)
+            {
+                if ((!str.Contains(ERROR_STR)) && (!str.Contains(WARNING_STR)))
+                {
+                    outputWriter.Write(str);
+                }
+            }
+        }
+
+        const string WARNING_STR = "WARNING: ";
+        const string ERROR_STR = "ERROR: ";
+        const string OK_STR = "OK: ";
 
         void TestConnections()
         {
@@ -64,8 +104,8 @@ namespace AutosarGuiEditor.Source.Tester
                     if (!connection.Port1.PortDefenition.InterfaceGUID.Equals(connection.Port2.PortDefenition.InterfaceGUID))
                     {
                         
-                        //AppendText("Different datatypes in connection: " + connection.Component1.Name + "(" + connection.Port1.Name + ")        " + connection.Component2.Name + "(" + connection.Port2.Name + ")", Error: true);
-                        AppendText("Different datatypes in " + composition.Name + " connection: " + connection.Name, Error: true);
+                        //AppendText("Different datatypes in connection: " + connection.Component1.Name + "(" + connection.Port1.Name + ")        " + connection.Component2.Name + "(" + connection.Port2.Name + ")", MessageType.ERROR);
+                        AppendText("Different datatypes in " + composition.Name + " connection: " + connection.Name, MessageType.ERROR);
                     }
                 }                
             }
@@ -80,7 +120,7 @@ namespace AutosarGuiEditor.Source.Tester
                 {
                     if (arrDt.DataTypeGUID.Equals(autosarApp.ArrayDataTypes[i].GUID))
                     {
-                        AppendText("Arrays couldn't have other array datatype: " + arrDt.Name, Error: true); 
+                        AppendText("Arrays couldn't have other array datatype: " + arrDt.Name, MessageType.ERROR); 
                     }
                 }
             }
@@ -89,7 +129,7 @@ namespace AutosarGuiEditor.Source.Tester
             {
                 if (arrDt.DataTypeName.Equals("ERROR"))
                 {
-                    AppendText("Array " + arrDt.Name + " haven't datatype", Error: true);
+                    AppendText("Array " + arrDt.Name + " haven't datatype", MessageType.ERROR);
                 }
             }
 
@@ -97,7 +137,7 @@ namespace AutosarGuiEditor.Source.Tester
             {
                 if (arrDt.Size <= 0)
                 {
-                    AppendText("Array " + arrDt.Name + " have zero size!", Error: true);
+                    AppendText("Array " + arrDt.Name + " have zero size!", MessageType.ERROR);
                 }
             }
         }
@@ -116,7 +156,7 @@ namespace AutosarGuiEditor.Source.Tester
                 {
                     strRes += cdt.Name + Environment.NewLine;
                 }
-                AppendText(strRes, Error:true);                
+                AppendText(strRes, MessageType.ERROR);                
             }
         }
 
@@ -144,12 +184,12 @@ namespace AutosarGuiEditor.Source.Tester
                     if (enumDt.Fields[i].Value == enumDt.Fields[j].Value)
                     {
                         withoutErrors = false;
-                        AppendText(enumDt.Name + " field value " + enumDt.Fields[i].Name + "equals to " + enumDt.Fields[j].Name + " (" + enumDt.Fields[i].Value + ")", Error: true);
+                        AppendText(enumDt.Name + " field value " + enumDt.Fields[i].Name + "equals to " + enumDt.Fields[j].Name + " (" + enumDt.Fields[i].Value + ")", MessageType.ERROR);
                     }
                     if (enumDt.Fields[i].Name == enumDt.Fields[j].Name)
                     {
                         withoutErrors = false;
-                        AppendText(enumDt.Name + " has similar names (" + enumDt.Fields[i].Name + ") of fields for " + i.ToString() + " and " + j.ToString() + " indexes", Error: true);
+                        AppendText(enumDt.Name + " has similar names (" + enumDt.Fields[i].Name + ") of fields for " + i.ToString() + " and " + j.ToString() + " indexes", MessageType.ERROR);
                     }
                 }
             }
@@ -183,7 +223,7 @@ namespace AutosarGuiEditor.Source.Tester
                     if (elem.Fields[i].Name == elem.Fields[j].Name)
                     {
                         withoutErrors = false;
-                        AppendText(elem.Name + " has similar field names (" + elem.Fields[i].Name + ") of fields for " + i.ToString() + " and " + j.ToString() + " indexes", Error: true);
+                        AppendText(elem.Name + " has similar field names (" + elem.Fields[i].Name + ") of fields for " + i.ToString() + " and " + j.ToString() + " indexes", MessageType.ERROR);
                     }
                 }
             }
@@ -193,7 +233,7 @@ namespace AutosarGuiEditor.Source.Tester
             {
                 if (field.DataTypeName.Equals(AutosarApplication.ErrorDataType))
                 {
-                    AppendText(elem.Name + " : " + field.Name + " doesn't have specified datatype ", Error: true);
+                    AppendText(elem.Name + " : " + field.Name + " doesn't have specified datatype ", MessageType.ERROR);
                     withoutErrors = false;
                 }
             }
@@ -222,7 +262,19 @@ namespace AutosarGuiEditor.Source.Tester
 
             if (elem.Operations.Count == 0)
             {
-                AppendText(elem.Name + " :  does not have any operations!", Error: true);
+                AppendText(elem.Name + " :  does not have any operations!", MessageType.ERROR);
+            }
+
+            /* Check Asyncronous */
+            if (elem.IsAsync == true)
+            {
+                foreach (ClientServerOperation operation in elem.Operations)
+                {
+                    if (operation.Fields.Count > 0)
+                    {
+                        AppendText(elem.Name + " : " + operation.Name + " : Async calls shall have no arguments ", MessageType.ERROR);
+                    }
+                }
             }
 
             /* Check if there is an operation with similar names */
@@ -241,12 +293,13 @@ namespace AutosarGuiEditor.Source.Tester
                 {
                     if (field.DataTypeName.Equals(AutosarApplication.ErrorDataType))
                     {
-                        AppendText(elem.Name + " : " + operation.Name + " : " + field.Name + " doesn't have specified datatype ", Error: true);
+                        AppendText(elem.Name + " : " + operation.Name + " : " + field.Name + " doesn't have specified datatype ", MessageType.ERROR);
                          withoutErrors = false;
                     }
                 }                
             }
 
+            
             if (withoutErrors)
             {
                 AppendText(elem.Name);
@@ -272,7 +325,7 @@ namespace AutosarGuiEditor.Source.Tester
 
             if (elem.Fields.Count == 0)
             {
-                AppendText(elem.Name + " :  does not have any fields!", Error: true);
+                AppendText(elem.Name + " :  does not have any fields!", MessageType.ERROR);
             }
 
             
@@ -285,7 +338,7 @@ namespace AutosarGuiEditor.Source.Tester
             {
                 if (field.DataTypeName.Equals(AutosarApplication.ErrorDataType))
                 {
-                    AppendText(elem.Name + " : " + field.Name + " doesn't have specified datatype ", Error: true);
+                    AppendText(elem.Name + " : " + field.Name + " doesn't have specified datatype ", MessageType.ERROR);
                     withoutErrors = false;
                 }
             }
@@ -331,7 +384,7 @@ namespace AutosarGuiEditor.Source.Tester
             {
                 if (cdata.DataTypeName.Equals(AutosarApplication.ErrorDataType))
                 {
-                    AppendText("Component: " + elem.Name + ", Cdata : " + cdata.Name + " doesn't have specified datatype ", Error: true);
+                    AppendText("Component: " + elem.Name + ", Cdata : " + cdata.Name + " doesn't have specified datatype ", MessageType.ERROR);
                     withoutErrors = false;
                 }
             }
@@ -341,7 +394,7 @@ namespace AutosarGuiEditor.Source.Tester
             {
                 if (pim.DataTypeName.Equals(AutosarApplication.ErrorDataType))
                 {
-                    AppendText("Component: " + elem.Name + ", PIM : " + pim.Name + " doesn't have specified datatype ", Error: true);
+                    AppendText("Component: " + elem.Name + ", PIM : " + pim.Name + " doesn't have specified datatype ", MessageType.ERROR);
                     withoutErrors = false;
                 }
             }
@@ -351,7 +404,7 @@ namespace AutosarGuiEditor.Source.Tester
             {
                 if (port.InterfaceName.Equals(AutosarApplication.ErrorDataType))
                 {
-                    AppendText("Component: " + elem.Name + ", Port : " + port.Name + " doesn't have specified datatype ", Error: true);
+                    AppendText("Component: " + elem.Name + ", Port : " + port.Name + " doesn't have specified datatype ", MessageType.ERROR);
                     withoutErrors = false;
                 }
             }
@@ -386,7 +439,7 @@ namespace AutosarGuiEditor.Source.Tester
             {
                 if (port.InterfaceName.Equals(AutosarApplication.ErrorDataType))
                 {
-                    AppendText("Composition: " + elem.Name + ", Port : " + port.Name + " doesn't have specified datatype ", Error: true);
+                    AppendText("Composition: " + elem.Name + ", Port : " + port.Name + " doesn't have specified datatype ", MessageType.ERROR);
                     withoutErrors = false;
                 }
             }
@@ -412,6 +465,33 @@ namespace AutosarGuiEditor.Source.Tester
             CheckSimilarNames(list, "component");
         }
 
+        protected void TestWetherComponentDefenitionUsed()
+        {
+            foreach (ApplicationSwComponentType compDef in autosarApp.ComponentDefenitionsList)
+            {
+                Boolean used = false;
+                foreach (CompositionInstance composition in autosarApp.Compositions)
+                {
+                    foreach (ComponentInstance compInstance in composition.ComponentInstances)
+                    {
+                        if (compInstance.ComponentDefenition == compDef)
+                        {
+                            used = true;
+                            break;                            
+                        }
+                    }
+                    if (used)
+                    {
+                        break;
+                    }
+                }
+                if (!used)
+                {
+                    AppendText("Component defenition : " + compDef.Name + " is not used", MessageType.WARNING);
+                }
+            }
+        }
+
         protected void TestErrorNames()
         {
             /* Check if there is errors with similar names */
@@ -424,7 +504,7 @@ namespace AutosarGuiEditor.Source.Tester
                 {
                     //if (autosarApp.SystemErrors[i].Value == autosarApp.SystemErrors[j].Value)
                     //{
-                    //    AppendText("There is errors with similar ID. " + autosarApp.SystemErrors[i].Name + " and " +  autosarApp.SystemErrors[j].Name + " value: " + autosarApp.SystemErrors[i].Value.ToString(), Error: true);
+                    //    AppendText("There is errors with similar ID. " + autosarApp.SystemErrors[i].Name + " and " +  autosarApp.SystemErrors[j].Name + " value: " + autosarApp.SystemErrors[i].Value.ToString(), MessageType.ERROR);
                     //}                    
                 }
             }
@@ -440,7 +520,7 @@ namespace AutosarGuiEditor.Source.Tester
                 {
                     if (initTask != task)
                     {
-                        AppendText("OsTask : " + task.Name + " has zero frequency", Error: true);
+                        AppendText("OsTask : " + task.Name + " has zero frequency", MessageType.ERROR);
                     }
                 }
             }
@@ -455,22 +535,38 @@ namespace AutosarGuiEditor.Source.Tester
                 {
                     if (srInterface.Fields.Count > 1u)
                     {
-                        //AppendText("Queued Sender-Receiver interface shall have only one field : " + srInterface.Name, Error: true);
+                        //AppendText("Queued Sender-Receiver interface shall have only one field : " + srInterface.Name, MessageType.ERROR);
                     }
                 }
             }
         }
 
-        void AppendText(string text, bool Error = false)
+        void AppendText(string text)
         {
-            if (Error)
+            AppendText(text, MessageType.OK);
+        }
+
+        void AppendText(string text, MessageType messageType)
+        {
+            switch (messageType)
             {
-                writer.Write(ERROR);
+                case MessageType.OK:
+                {
+                    writer.Write(OK_STR);
+                    break;
+                }
+                case MessageType.WARNING:
+                {
+                    writer.Write(WARNING_STR);
+                    break;
+                }
+                case MessageType.ERROR:
+                {
+                    writer.Write(ERROR_STR);
+                    break;
+                }
             }
-            else
-            {
-                writer.Write(OK);
-            }
+
             writer.Write(text);
 
             writer.Write(Environment.NewLine);            
@@ -485,7 +581,7 @@ namespace AutosarGuiEditor.Source.Tester
                 {
                     if (list[i].Name == list[j].Name)
                     {
-                        AppendText("There is similar " + datatypeName + " names (" + list[i].Name + ") ", Error: true);
+                        AppendText("There is similar " + datatypeName + " names (" + list[i].Name + ") ", MessageType.ERROR);
                         result = false;
                     }
                 }
@@ -495,7 +591,7 @@ namespace AutosarGuiEditor.Source.Tester
 
         public Boolean IsErrorExist(String result)
         {
-            if (result.Contains(ERROR))
+            if (result.Contains(ERROR_STR))
             {
                 return true;
             }

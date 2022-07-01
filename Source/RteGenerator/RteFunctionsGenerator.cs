@@ -147,29 +147,30 @@ namespace AutosarGuiEditor.Source.RteGenerator
             }
 
             String dataTypeName = AutosarApplication.GetInstance().GetDataTypeName(field.BaseDataTypeGUID);
-            if (!field.IsPointer)
-            {
                 
-                if (portType == PortType.Receiver)
+            if (portType == PortType.Receiver)
+            {
+                if (field.IsPointer == false)
                 {
                     result += dataTypeName + " * const data";
                 }
                 else
                 {
-                    result += "const " + dataTypeName + " * const data";
+                    result += dataTypeName + " ** const data";
                 }
             }
             else
             {
-                if (portType == PortType.Receiver)
+                if (field.IsPointer == false)
                 {
-                    result += dataTypeName + " ** const data";
+                    result += "const " + dataTypeName + " * const data";
                 }
                 else
                 {
-                    result += "const " + dataTypeName + "** const data";
+                    result += dataTypeName + " * const data";
                 }
             }
+
             return result + ")";
         }
 
@@ -518,6 +519,11 @@ namespace AutosarGuiEditor.Source.RteGenerator
         public static String CreateFrequencyDefineName(double frequency)
         {
             return "FREQUENCY_" + Math.Floor(frequency * 1000).ToString();
+        }
+
+        public static String CreateTaskCounter(String taskName)
+        {
+            return "Rte_TaskCounter_" + taskName;
         }
 
         public static String CreateDefine(String source, String destination, bool useBracers = true, int macroStart = 80)

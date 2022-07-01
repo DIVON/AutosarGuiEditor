@@ -1,4 +1,5 @@
-﻿using AutosarGuiEditor.Source.AutosarInterfaces;
+﻿using AutosarGuiEditor.Source.Autosar.OsTasks;
+using AutosarGuiEditor.Source.AutosarInterfaces;
 using AutosarGuiEditor.Source.AutosarInterfaces.ClientServer;
 using AutosarGuiEditor.Source.AutosarInterfaces.SenderReceiver;
 using AutosarGuiEditor.Source.Component;
@@ -42,6 +43,9 @@ namespace AutosarGuiEditor.Source.RteGenerator.TestGenerator
 
             TestRteCommonHGegenerator commonHgenerator = new TestRteCommonHGegenerator();
             commonHgenerator.GenerateRteTestCommonHFile(outputDir);
+
+            RteSchedulerGenerator schedulerGenerator = new RteSchedulerGenerator();
+            schedulerGenerator.GenerateShedulerFiles(outputDir);
         }
 
         public void GenerateCommonFiles(String outputDir)
@@ -55,7 +59,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.TestGenerator
             systemErrorGenerator.GenerateSystemErrorsFile(outputDir);
 
             /* Generate TestInitialization.h */
-            GenerateTestInitializationFile(AutosarApplication.GetInstance().ComponentDefenitionsList, outputDir);
+            //GenerateTestInitializationFile(AutosarApplication.GetInstance().ComponentDefenitionsList, outputDir);
 
             ReturnCodesGenerator returnCodesGenerator = new ReturnCodesGenerator();
             returnCodesGenerator.GenerateReturnCodesFile(outputDir);
@@ -84,8 +88,6 @@ namespace AutosarGuiEditor.Source.RteGenerator.TestGenerator
             writer.WriteLine();
 
             RteFunctionsGenerator.CloseGuardDefine(writer);
-            RteFunctionsGenerator.WriteEndOfFile(writer);
-
             writer.Close();
         }
 
@@ -143,7 +145,14 @@ namespace AutosarGuiEditor.Source.RteGenerator.TestGenerator
                         writer.WriteLine("        {");
                         if (srInterface.IsQueued == false)
                         {
-                            writer.WriteLine("            " + field.DataTypeName + " data;");
+                            if (field.IsPointer == false)
+                            {
+                                writer.WriteLine("            " + field.DataTypeName + " data;");
+                            }
+                            else
+                            {
+                                writer.WriteLine("            " + field.DataTypeName + " * data;");
+                            }
                         }
                         else
                         {
@@ -626,6 +635,12 @@ namespace AutosarGuiEditor.Source.RteGenerator.TestGenerator
             writer.WriteLine("{");
 
             writer.WriteLine("    memset(&TEST_STUB_RECORD, 0u, sizeof(TEST_STUB_RECORD));");
+            foreach (OsTask task in AutosarApplication.GetInstance().OsTasks)
+            {
+                String taskCounter = RteFunctionsGenerator.CreateTaskCounter(task.Name);
+                writer.WriteLine("    extern uint32 " + taskCounter + ";");
+                writer.WriteLine("    " + taskCounter + " = 0U;");
+            }
             /* Clear test structure */
             //foreach (ApplicationSwComponentType swCompType in compDefs)
             //{

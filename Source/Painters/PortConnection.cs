@@ -187,28 +187,37 @@ namespace System
 
         public bool IsClicked(Point point, out Object clickedObject)
         {
+            return IsClicked(point, out clickedObject, false);
+        }
+
+        public bool IsClicked(Point point, out Object clickedObject, Boolean checkAnchors)
+        {
             
             Point startPoint = Port1.GetConnectionPoint();
             Point endPoint = Port2.GetConnectionPoint();
 
             clickedObject = null;
-   
-            foreach (AnchorPoint anchor in anchors)
+
+            if (checkAnchors)
             {
-                if (anchor.IsClicked(point, out clickedObject))
+                foreach (AnchorPoint anchor in anchors)
                 {
+                    if (anchor.IsClicked(point, out clickedObject))
+                    {
+                        Select();
+                        return true;
+                    }
+                }
+            }
+            else
+            {
+                if (lines.IsClicked(point, out clickedObject))
+                {
+                    clickedObject = this;
                     Select();
                     return true;
                 }
             }
-
-            if (lines.IsClicked(point, out clickedObject))
-            {
-                clickedObject = this;
-                Select();
-                return true;
-            }
- 
             return false;
         }
 

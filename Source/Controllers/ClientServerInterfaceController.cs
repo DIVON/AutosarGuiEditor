@@ -19,15 +19,28 @@ namespace AutosarGuiEditor.Source.Controllers
         AutosarTreeViewControl tree;
         DataGrid grid;
         TextBox nameTextBox;
+        CheckBox asyncCheckBox;
 
         List<ClientServerInterfaceGridViewField> gridElements = new List<ClientServerInterfaceGridViewField>();
 
-        public ClientServerInterfaceController(AutosarTreeViewControl AutosarTree, DataGrid grid, TextBox nameTextBox)
+        public ClientServerInterfaceController(AutosarTreeViewControl AutosarTree, DataGrid grid, TextBox nameTextBox, CheckBox asyncCheckBox)
         {
             this.tree = AutosarTree;
             this.grid = grid;
             this.nameTextBox = nameTextBox;
             this.nameTextBox.TextChanged += nameTextBox_TextChanged;
+            
+            this.asyncCheckBox = asyncCheckBox;
+            this.asyncCheckBox.Checked += asyncCheckBox_Checked;
+            this.asyncCheckBox.Unchecked += asyncCheckBox_Checked;
+        }
+
+        void asyncCheckBox_Checked(object sender, System.Windows.RoutedEventArgs e)
+        {
+            if (allowUpdater.IsUpdateAllowed)
+            {
+                _csInterface.IsAsync = asyncCheckBox.IsChecked.Value;
+            }
         }
 
         void nameTextBox_TextChanged(object sender, TextChangedEventArgs e)
@@ -49,6 +62,7 @@ namespace AutosarGuiEditor.Source.Controllers
             }   
         }
 
+        
         public ClientServerInterface CreateClientServerInterface()
         {
             string templateName = "iClientServer";
@@ -76,7 +90,8 @@ namespace AutosarGuiEditor.Source.Controllers
                 _csInterface = value;
 
                 nameTextBox.Text = _csInterface.Name;
-                
+                asyncCheckBox.IsChecked = _csInterface.IsAsync;
+
                 RefreshGridView();
 
                 allowUpdater.AllowUpdate();

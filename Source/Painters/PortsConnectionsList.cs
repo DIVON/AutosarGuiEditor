@@ -18,6 +18,7 @@ using AutosarGuiEditor.Source.Painters;
 using AutosarGuiEditor.Source.Interfaces;
 using AutosarGuiEditor.Source.Render;
 using AutosarGuiEditor.Source.AutosarInterfaces.SenderReceiver;
+using AutosarGuiEditor.Source.AutosarInterfaces;
 
 
 
@@ -39,12 +40,12 @@ namespace System
             }
         }
 
-        public bool IsClicked(Point point, out Object clickedObject)
+        public bool IsClicked(Point point, out Object clickedObject, Boolean checkAnchors)
         {
             clickedObject = null;
             foreach (PortConnection connectionPainter in this)
             {
-                bool clicked = connectionPainter.IsClicked(point, out clickedObject);
+                bool clicked = connectionPainter.IsClicked(point, out clickedObject, checkAnchors);
                 if (clicked == true)
                 {
                     return true;
@@ -94,21 +95,27 @@ namespace System
                 return;
             }
 
+
+
+
+
             /* Client and Receiver connections can't have more than one connection */  
             PortDefenition portDef1 = AutosarApplication.GetInstance().GetPortDefenition(newConnection.Port1.PortDefenitionGuid);
-
-
-
 
             /* Check port at the start of connection line */
             if (!newConnection.Port1.IsDelegatePort) /* Port of component */
             {
-                /* Client port shall have only one connection  */
+                /* Client port shall have only one connection for sync operation */
                 if (portDef1.PortType == PortType.Client)
                 {
-                    if (IsThisPointConnectionExists(newConnection.Component1, newConnection.Port1) == true)
+                    ClientServerInterface csInterface = portDef1.InterfaceDatatype as ClientServerInterface;
+
+                    if (csInterface.IsAsync == false)
                     {
-                        return;
+                        if (IsThisPointConnectionExists(newConnection.Component1, newConnection.Port1) == true)
+                        {
+                            return;
+                        }
                     }
                 }
 
@@ -150,14 +157,20 @@ namespace System
 
             /* Check port at the end of connection line */
             PortDefenition portDef2 = AutosarApplication.GetInstance().GetPortDefenition(newConnection.Port2.PortDefenitionGuid);
+
             if (!newConnection.Port2.IsDelegatePort) /* Port of component */
             {
-                /* Client port shall have only one connection  */
-                if (portDef2.PortType == PortType.Client)
+                ClientServerInterface csInterface = portDef2.InterfaceDatatype as ClientServerInterface;
+
+                if (csInterface.IsAsync == false)
                 {
-                    if (IsThisPointConnectionExists(newConnection.Component2, newConnection.Port2) == true)
+                    /* Client port shall have only one connection for sync operation */
+                    if (portDef2.PortType == PortType.Client)
                     {
-                        return;
+                        if (IsThisPointConnectionExists(newConnection.Component2, newConnection.Port2) == true)
+                        {
+                            return;
+                        }
                     }
                 }
 
@@ -185,7 +198,18 @@ namespace System
             }
             else /* Port of composition */
             {
-                if ((portDef2.PortType == PortType.Sender) || (portDef2.PortType == PortType.Server))
+                if (portDef2.PortType == PortType.Sender)
+                {
+                    if ((portDef1.InterfaceDatatype as SenderReceiverInterface).IsQueued == false)
+                    {
+                        if (IsThisPointConnectionExists(newConnection.Component2, newConnection.Port2) == true)
+                        {
+                            return;
+                        }
+                    }
+                }
+                
+                if (portDef2.PortType == PortType.Server)
                 {
                     if (IsThisPointConnectionExists(newConnection.Component2, newConnection.Port2) == true)
                     {

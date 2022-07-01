@@ -7,33 +7,35 @@ using AutosarGuiEditor.Source.Painters;
 using AutosarGuiEditor.Source.Painters.Components.Runables;
 using AutosarGuiEditor.Source.PortDefenitions;
 using AutosarGuiEditor.Source.RteGenerator.RteOs;
+using AutosarGuiEditor.Source.Utility;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace AutosarGuiEditor.Source.RteGenerator
 {
     public class RteSchedulerGenerator
     {
-        public void GenerateShedulerFiles()
+        public void GenerateShedulerFiles(String dir)
         {
             //Generate_ExternalRunnables_File(RteFunctionsGenerator.GetRteFolder());
-            Generate_RunTimeEnvironment_Header_File();
-            Generate_RunTimeEnvironment_Source_File();
-            Generate_RteTaskScheduler_Header_File();
-            Generate_RteTaskScheduler_Source_File();
+            Generate_RunTimeEnvironment_Header_File(dir);
+            Generate_RunTimeEnvironment_Source_File(dir);
+            Generate_RteTaskScheduler_Header_File(dir);
+            Generate_RteTaskScheduler_Source_File(dir);
         }
 
         public RteSchedulerGenerator()
         {
         }
 
-        void Generate_RunTimeEnvironment_Source_File()
+        void Generate_RunTimeEnvironment_Source_File(String dir)
         {
-            String FileName = RteFunctionsGenerator.GetRteFolder() + "\\" + Properties.Resources.RTE_RUNTIME_ENVIRONMENT_C_FILENAME;
+            String FileName = dir + "\\" + Properties.Resources.RTE_RUNTIME_ENVIRONMENT_C_FILENAME;
             StreamWriter writer = new StreamWriter(FileName);
 
             RteFunctionsGenerator.GenerateFileTitle(writer, FileName, Properties.Resources.RTE_RUNTIME_ENVIRONMENT_FILE_DESCRIPTION);
@@ -47,18 +49,14 @@ namespace AutosarGuiEditor.Source.RteGenerator
 
             foreach (OsTask osTask in AutosarApplication.GetInstance().OsTasks)
             {
-                List<double> frequences = PeriodChangeTimes(osTask);
-                List<String> freqVariableNames = new List<string>();
-
-                for (int i = 0; i < frequences.Count; i++)
+                if (osTask.PeriodMs > 0)
                 {
-                    String freqName = osTask.Name + "_" + RteFunctionsGenerator.CreateFrequencyDefineName(frequences[i]) + "_" + i.ToString();
-                    freqVariableNames.Add(freqName);
-                    String variableDeclaration = RteFunctionsGenerator.GenerateVariable(freqName, "uint32", true, 0, "0");
-                    writer.WriteLine(variableDeclaration);
+                    String taskCounter = RteFunctionsGenerator.CreateTaskCounter(osTask.Name);
+                    String defString = "STATIC uint32 " + taskCounter + ";";
+                    writer.WriteLine(defString);
                 }
-                writer.WriteLine();
             }
+            writer.WriteLine();
 
             WriteAllExternComponentInstances(writer);
             /* End declare variables */
@@ -230,24 +228,61 @@ namespace AutosarGuiEditor.Source.RteGenerator
             writer.WriteLine("void " + osTaskName + "(void)");
             writer.WriteLine("{");
             WriteCallOfOsRunnables(writer, osTask);
+            if (osTask.PeriodMs > 0)
+            {
+                int maxPeriod = LowestCommonPeriodOfTaskssRunnables(osTask);
+                if (maxPeriod != 0)
+                {
+                    String taskCounter = RteFunctionsGenerator.CreateTaskCounter(osTask.Name);
+                    writer.WriteLine("    " + taskCounter + " = (" + taskCounter + " + 1U) % (" + maxPeriod.ToString() + " / " + Convert.ToInt32(osTask.PeriodMs * 1000) + ");");
+                }
+            }
             writer.WriteLine("}");
             writer.WriteLine("");
+        }
+
+        int LowestCommonPeriodOfTaskssRunnables(OsTask task)
+        {
+            if (task.Runnables.Count > 0)
+            {
+                int naimensheeObheeKratnoe = Convert.ToInt32(task.Runnables[0].Defenition.PeriodMs * 1000);
+                for (int i = 1; i < task.Runnables.Count; i++)
+                {
+                    naimensheeObheeKratnoe = MathUtility.NaimensheeObsheeKratnoe(naimensheeObheeKratnoe, Convert.ToInt32(task.Runnables[i].Defenition.PeriodMs * 1000));
+                    if (naimensheeObheeKratnoe == 0)
+                    {
+                        MessageBox.Show("There is no common frequency for runnables");
+                        break;                        
+                    }
+                }
+                return naimensheeObheeKratnoe;
+            }
+            else
+            {
+                return 0;
+            }
         }
 
         void WriteCallOfOsRunnables(StreamWriter writer, OsTask osTask)
         {
             if (osTask.Runnables.Count > 0)
             {
+                String taskCounter = RteFunctionsGenerator.CreateTaskCounter(osTask.Name);
+
                 double lastPeriod = -1;
-                int changeIndex = 0;
                 bool wasBracersOpen = false;
                 for (int runnableIndex = 0; runnableIndex < osTask.Runnables.Count; runnableIndex++)
-                {                
+                {            
+                   
                     PeriodicRunnableDefenition runnableDefenition = AutosarApplication.GetInstance().FindRunnableDefenition(osTask.Runnables[runnableIndex].DefenitionGuid);
+
+                    int runnablePeriod = Convert.ToInt32(runnableDefenition.PeriodMs * 1000);
+                    int taskPeriod = Convert.ToInt32(osTask.PeriodMs * 1000);
+                    
                     if ((runnableDefenition != null) && (osTask.PeriodMs != runnableDefenition.PeriodMs))
                     {
                         /* Close previous period */
-                        if ((lastPeriod != runnableDefenition.PeriodMs) && wasBracersOpen)
+                        if ((lastPeriod != runnableDefenition.PeriodMs * 1000) && wasBracersOpen)
                         {
                             writer.WriteLine("    }");
                         }
@@ -256,12 +291,9 @@ namespace AutosarGuiEditor.Source.RteGenerator
                         if  (lastPeriod != runnableDefenition.PeriodMs)
                         {
                             lastPeriod = runnableDefenition.PeriodMs;
-                            String periodVariableName = osTask.Name + "_" + RteFunctionsGenerator.CreateFrequencyDefineName(runnableDefenition.PeriodMs) + "_" + changeIndex.ToString();
-                            int ostatok = (int)(runnableDefenition.PeriodMs / osTask.PeriodMs);
-                            changeIndex++;
-                            writer.WriteLine("    if (++" + periodVariableName + " >= " + ostatok + ")");
+
+                            writer.WriteLine("    if (" + taskCounter + " % (" + runnablePeriod.ToString() + "U / " + taskPeriod.ToString() + "U) == (0U / " + taskPeriod.ToString() + "))");
                             writer.WriteLine("    {");
-                            writer.WriteLine("        " + periodVariableName + " = 0u;" );
                         }
                        
                         wasBracersOpen = true;                       
@@ -339,30 +371,22 @@ namespace AutosarGuiEditor.Source.RteGenerator
             writer.Close();
         }
 #endif
-        void Generate_RunTimeEnvironment_Header_File()
+        void Generate_RunTimeEnvironment_Header_File(String dir)
         {
-            String FileName = RteFunctionsGenerator.GetRteFolder() + "\\" + Properties.Resources.RTE_RUNTIME_ENVIRONMENT_H_FILENAME;
+            String FileName = dir + "\\" + Properties.Resources.RTE_RUNTIME_ENVIRONMENT_H_FILENAME;
             StreamWriter writer = new StreamWriter(FileName);
 
             RteFunctionsGenerator.GenerateFileTitle(writer, FileName, Properties.Resources.RTE_RUNTIME_ENVIRONMENT_FILE_DESCRIPTION);
             RteFunctionsGenerator.OpenGuardDefine(writer);
 
             writer.WriteLine();
-            RteFunctionsGenerator.AddInclude(writer, Properties.Resources.RTE_DATATYPES_H_FILENAME);
-            RteFunctionsGenerator.AddInclude(writer, Properties.Resources.RTE_EXTERNAL_RUNNABLES_H_FILENAME);
-            switch (AutosarApplication.GetInstance().MCUType.Type)
+            writer.WriteLine("#define RTE_C");
+            foreach (ApplicationSwComponentType compDef in AutosarApplication.GetInstance().ComponentDefenitionsList)
             {
-                case MCUTypeDef.STM32F1xx:
-                {
-                    RteFunctionsGenerator.AddInclude(writer, "<stm32f1xx.h>");
-                    break;
-                }
-                case MCUTypeDef.STM32F4xx:
-                {
-                    RteFunctionsGenerator.AddInclude(writer, "<stm32f4xx.h>");
-                    break;
-                }
+                RteFunctionsGenerator.AddInclude(writer, "Rte_" + compDef.Name + ".h");
             }
+            writer.WriteLine("#undef RTE_C");
+
             writer.WriteLine();
 
             writer.WriteLine("/* Time periods */");
@@ -378,9 +402,12 @@ namespace AutosarGuiEditor.Source.RteGenerator
 
                 String freqValue = "";
 
-                int freq = (int)Math.Floor((double)AutosarApplication.GetInstance().SystickFrequencyHz / frequency);
-                freqValue = freq.ToString();
-                writer.WriteLine(RteFunctionsGenerator.CreateDefine(freqName, freqValue.ToString()));
+                if (frequency != 0u)
+                {
+                    int freq = (int)Math.Floor((double)AutosarApplication.GetInstance().SystickFrequencyHz / frequency);
+                    freqValue = freq.ToString();
+                    writer.WriteLine(RteFunctionsGenerator.CreateDefine(freqName, freqValue.ToString()));
+                }
             }
             writer.WriteLine();
 
@@ -498,9 +525,9 @@ namespace AutosarGuiEditor.Source.RteGenerator
             return frequences;
         }
 
-        void Generate_RteTaskScheduler_Header_File()
+        void Generate_RteTaskScheduler_Header_File(String dir)
         {
-            String FileName = RteFunctionsGenerator.GetRteFolder() + "\\" + Properties.Resources.RTE_TASK_SCHEDULER_H_FILENAME;
+            String FileName = dir + "\\" + Properties.Resources.RTE_TASK_SCHEDULER_H_FILENAME;
             StreamWriter writer = new StreamWriter(FileName);
 
             RteFunctionsGenerator.GenerateFileTitle(writer, FileName, Properties.Resources.RTE_TASK_SCHEDULER_FILE_DESCRIPTION);
@@ -524,12 +551,12 @@ namespace AutosarGuiEditor.Source.RteGenerator
             writer.Close();
         }
 
-        void Generate_RteTaskScheduler_Source_File()
+        void Generate_RteTaskScheduler_Source_File(String dir)
         {
             double systickfreq = AutosarApplication.GetInstance().SystickFrequencyHz;
             int schedulerStepMicrosec = (int)((1000.0d / systickfreq) * 1000.0);
 
-            String FileName = RteFunctionsGenerator.GetRteFolder() + "\\" + Properties.Resources.RTE_TASK_SCHEDULER_C_FILENAME;
+            String FileName = dir + "\\" + Properties.Resources.RTE_TASK_SCHEDULER_C_FILENAME;
             StreamWriter writer = new StreamWriter(FileName);
 
             RteFunctionsGenerator.GenerateFileTitle(writer, FileName, Properties.Resources.RTE_RUNTIME_ENVIRONMENT_FILE_DESCRIPTION);
@@ -660,7 +687,7 @@ namespace AutosarGuiEditor.Source.RteGenerator
             writer.WriteLine("    uint32 index = schedulingCounter % RTE_SCHEDULER_STEPS;");
             writer.WriteLine("    for (uint32 i = 0; i < RTE_TASKS_COUNT; i++)");
             writer.WriteLine("    {");
-            writer.WriteLine("        if (NULL != taskScheduling[index][i])");
+            writer.WriteLine("        if (((void *)0) != taskScheduling[index][i])");
             writer.WriteLine("        {");
             writer.WriteLine("            taskScheduling[index][i]();");
             writer.WriteLine("        }");

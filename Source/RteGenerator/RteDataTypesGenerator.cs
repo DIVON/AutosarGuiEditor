@@ -42,18 +42,21 @@ namespace AutosarGuiEditor.Source.RteGenerator
             //GenerateComponentsDataTypes(writer);
 
             RteFunctionsGenerator.CloseGuardDefine(writer);
-            RteFunctionsGenerator.WriteEndOfFile(writer);
             writer.Close();
         }
 
         void WriteStaticGlobal(StreamWriter writer)
         {
             writer.WriteLine("#ifdef TEST_RTE");
-            writer.WriteLine("#define STATIC_GLOBAL");
-            writer.WriteLine("#define CONST_VOLATILE");
+            writer.WriteLine("#define STATIC");
+            writer.WriteLine("#define STATIC_CONST const");
+            writer.WriteLine("#define CONST_VOLATILE volatile");
+            writer.WriteLine("#define ALWAYS_INLINE");
             writer.WriteLine("#else");
-            writer.WriteLine("#define STATIC_GLOBAL static");
+            writer.WriteLine("#define STATIC static");
+            writer.WriteLine("#define STATIC_CONST static const");
             writer.WriteLine("#define CONST_VOLATILE const volatile");
+            writer.WriteLine("#define ALWAYS_INLINE  inline __attribute__((always_inline))");
             writer.WriteLine("#endif");
             writer.WriteLine();
         }
@@ -318,6 +321,10 @@ namespace AutosarGuiEditor.Source.RteGenerator
             writer.WriteLine("/* Base datatypes */");
             writer.WriteLine("#define TRUE	1");
             writer.WriteLine("#define FALSE	0");
+            writer.WriteLine("");
+            writer.WriteLine("#ifndef NULL");
+            writer.WriteLine("#define NULL 0U");
+            writer.WriteLine("#endif");
             writer.WriteLine("");
 
             BaseDataTypesCodeGenerator.GenerateCode(writer, AutosarApplication.GetInstance().BaseDataTypes);

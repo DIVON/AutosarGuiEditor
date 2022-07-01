@@ -959,9 +959,9 @@ namespace System
             PortPainter oppositePort;
 
             PortsConnectionsList portConnections = GetPortConnections(portPainter);
-            if (portConnections.Count != 0)
+            foreach (PortConnection portConnection in portConnections)
             {
-                oppositePort = portConnections[0].GetOppositePort(portPainter);
+                oppositePort = portConnection.GetOppositePort(portPainter);
                 if (oppositePort != null)
                 {
                     IElementWithPorts elem = FindComponentInstanceByPort(oppositePort);

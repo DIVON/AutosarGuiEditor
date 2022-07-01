@@ -79,6 +79,7 @@ namespace AutosarGuiEditor.Source.Render
             {
                 double ceilPart = Math.Round(cummulatedShift.X / 5) * 5;
                 this.Position.X += ceilPart;
+                this.Position.X = Math.Round(this.Position.X / 5) * 5;
                 cummulatedShift.X -= ceilPart;
                 translate.X = ceilPart;
                 doMove = true;
@@ -88,6 +89,7 @@ namespace AutosarGuiEditor.Source.Render
             {
                 double ceilPart = Math.Round(cummulatedShift.Y / 5) * 5;
                 this.Position.Y += ceilPart;
+                this.Position.Y = Math.Round(this.Position.Y / 5) * 5;
                 cummulatedShift.Y -= ceilPart;
                 translate.Y = ceilPart;
                 doMove = true;

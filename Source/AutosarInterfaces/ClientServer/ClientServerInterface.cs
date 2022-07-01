@@ -1,6 +1,7 @@
 ﻿using AutosarGuiEditor.Source.AutosarInterfaces.ClientServer;
 using AutosarGuiEditor.Source.Interfaces;
 using AutosarGuiEditor.Source.SystemInterfaces;
+using AutosarGuiEditor.Source.Utility;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,6 +20,9 @@ namespace AutosarGuiEditor.Source.AutosarInterfaces
             XElement xmldatatype = new XElement("Interface");
             base.WriteToXML(xmldatatype);
             Operations.WriteToXML(xmldatatype);
+            xmldatatype.Add(new XElement("IsAsync", IsAsync));
+
+
             xml.Add(xmldatatype);
         }
 
@@ -26,6 +30,15 @@ namespace AutosarGuiEditor.Source.AutosarInterfaces
         {
             base.LoadFromXML(xml);
             Operations.LoadFromXML(xml);
+
+            String isAsync = XmlUtilits.GetFieldValue(xml, "IsAsync", "false");
+            IsAsync = Convert.ToBoolean(isAsync);
+        }
+
+        public Boolean IsAsync
+        {
+            set;
+            get;
         }
 
         public override List<IAutosarTreeList> GetLists()

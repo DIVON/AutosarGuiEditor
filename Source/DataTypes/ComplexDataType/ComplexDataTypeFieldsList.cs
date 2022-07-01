@@ -18,5 +18,10 @@ namespace AutosarGuiEditor.Source.DataTypes.ComplexDataType
         {
             return false;
         }
+
+        public override void DoSort()
+        {
+            /* Do not sort fields */ 
+        }
     }
 }

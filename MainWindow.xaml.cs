@@ -86,7 +86,7 @@ namespace AutosarGuiEditor
             complexDataTypeMenu = new ComplexDataTypeMenu(AutosarTree, ComplexDataTypeGridView, ComplexDataType_NameTextBox);
             enumsMenu = new EnumsMenu(AutosarTree, Enums_GridView, EnumDataType_NameEdit);
             senderReceiverInterfaceController = new SenderReceiverInterfaceController(AutosarTree, SenderReceiver_GridView, SenderReceiver_NameTextBox, SenderReceiver_IsQueuedCheckBox, SenderReceiver_QueueSizeTB);
-            clientServerInterfaceController = new ClientServerInterfaceController(AutosarTree, ClientServer_GridView, ClientServer_NameTextBox);
+            clientServerInterfaceController = new ClientServerInterfaceController(AutosarTree, ClientServer_GridView, ClientServer_NameTextBox, AsyncCallCheckBox);
             componentDefenitionViewController = new ComponentDefenitionController(AutosarTree, ComponentDefenitionName_TextBox, ComponentPorts_GridView, ComponentRunnables_GridView, MultipleInstantiation_CheckBox, AddPerInstanceDefenition_Button, PerInstanceDefenition_Grid, CDataDescription_Grid, AddCDataDescription_Button);
             connectionLineController = new ConnectionLineController(AutosarTree);
             changeViewportScaleController = new ChangeViewportScaleController(scene, ViewPortImage);
@@ -1271,6 +1271,26 @@ namespace AutosarGuiEditor
         private void Step10Px(object sender, RoutedEventArgs e)
         {
             AnchorsStep.Step = 10;
+        }
+
+        private void GenerateComponentSkeleton_Click(object sender, RoutedEventArgs e)
+        {
+            StringWriter writer = new StringWriter();
+
+            ArxmlTester tester = new ArxmlTester(autosarApp, writer);
+            tester.Test();
+            String testResult = writer.ToString();
+            if (!tester.IsErrorExist(testResult))
+            {
+                RteGenerator rteGenerator = new RteGenerator();
+                rteGenerator.GenerateComponentsFiles();
+
+                MessageBox.Show("Skeletons has been generated");
+            }
+            else
+            {
+                MessageBox.Show("There are errors in the project. RTE generation is impossible. Check project for errors.");
+            }
         }
     }
 

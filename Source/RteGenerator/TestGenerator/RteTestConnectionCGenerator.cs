@@ -310,19 +310,38 @@ namespace AutosarGuiEditor.Source.RteGenerator
                                 writer.WriteLine("    {");
 
                                 /* Write data to the output port field of the current component */
-                                writer.WriteLine("        " + testRecordField + ".Arguments.data = *data;");
+                                if (field.IsPointer == false)
+                                {
+                                    writer.WriteLine("        " + testRecordField + ".Arguments.data = *data;");
+                                }
+                                else
+                                {
+                                    writer.WriteLine("        " + testRecordField + ".Arguments.data = data;");
+                                }
                                 
                                 /* Write data to all opposite receiver ports */
                                 PortPainter portPainter = component.GetPort(portDef);
                                 List<PortPainter> oppositePorts = new List<PortPainter>();
                                 AutosarApplication.GetInstance().GetOppositeComponentPorts(portPainter, oppositePorts);
 
+                                if (component.Name == "McuInfoProvider")
+                                {
+
+                                }
                                 foreach(PortPainter oppositePort in oppositePorts)
                                 {
                                     ComponentInstance oppositeComponent = AutosarApplication.GetInstance().FindComponentInstanceByPort(oppositePort) as ComponentInstance;
                                     String oppositefieldName = RteFunctionsGenerator.GenerateReadWriteFunctionName(oppositePort.PortDefenition, field);
                                     String oppositeTestRecordField = "TEST_STUB_RECORD." + oppositeComponent.Name + "." + oppositefieldName;
-                                    writer.WriteLine("        " + oppositeTestRecordField + ".Arguments.data = *data;");
+
+                                    if (field.IsPointer == false)
+                                    {
+                                        writer.WriteLine("        " + oppositeTestRecordField + ".Arguments.data = *data;");
+                                    }
+                                    else
+                                    {
+                                        writer.WriteLine("        " + oppositeTestRecordField + ".Arguments.data = data;");
+                                    }
                                 }
 
 

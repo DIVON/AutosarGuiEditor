@@ -99,6 +99,7 @@ namespace AutosarGuiEditor.Source.RteGenerator
                             writer.WriteLine(data);
                         }
                         writer.WriteLine("} " + portDataStructureName + ";");
+                        writer.WriteLine();
                     }
                 }
             }

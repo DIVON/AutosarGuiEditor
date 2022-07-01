@@ -32,14 +32,12 @@ namespace AutosarGuiEditor.Source.RteGenerator
         public bool Generate()
         {
             /* Create base folders */
-            Directory.CreateDirectory(RteFunctionsGenerator.GetComponentsFolder());
             Directory.CreateDirectory(RteFunctionsGenerator.GetRteFolder());
-            GenerateDataTypesFile();
-            GenerateComponentsFiles();
+            GenerateDataTypesFile(RteFunctionsGenerator.GetRteFolder());
             GenerateScheduler();
 
             RteConnectionCGenerator connectionsGenerator = new RteConnectionCGenerator();
-            connectionsGenerator.GenerateConnections();
+            connectionsGenerator.GenerateConnections(RteFunctionsGenerator.GetRteFolder());
 
             ReturnCodesGenerator returnCodesGenerator = new ReturnCodesGenerator();
             returnCodesGenerator.GenerateReturnCodesFile(RteFunctionsGenerator.GetRteFolder());
@@ -52,15 +50,17 @@ namespace AutosarGuiEditor.Source.RteGenerator
         }
 
        
-        void GenerateDataTypesFile()
+        void GenerateDataTypesFile(String folder)
         {
             RteDataTypesGenerator dataTypesGenerator = new RteDataTypesGenerator();
-            dataTypesGenerator.GenerateDataTypesFile(RteFunctionsGenerator.GetRteFolder());
+            dataTypesGenerator.GenerateDataTypesFile(folder);
         }
 
         
-        void GenerateComponentsFiles()
+        public void GenerateComponentsFiles()
         {
+            Directory.CreateDirectory(RteFunctionsGenerator.GetComponentsFolder());
+
             RteComponentGenerator componentGenerator = new RteComponentGenerator();
             componentGenerator.GenerateComponentsFiles();
         }
@@ -69,7 +69,7 @@ namespace AutosarGuiEditor.Source.RteGenerator
         void GenerateScheduler()
         {
             RteSchedulerGenerator schedulerGenerator = new RteSchedulerGenerator();
-            schedulerGenerator.GenerateShedulerFiles();
+            schedulerGenerator.GenerateShedulerFiles(RteFunctionsGenerator.GetRteFolder());
         }
     }
 }

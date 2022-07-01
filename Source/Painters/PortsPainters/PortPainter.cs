@@ -105,6 +105,7 @@ namespace AutosarGuiEditor.Source.Painters.PortsPainters
             {
                 double ceilPart = Math.Round(cummulatedShift.X / 5) * 5;
                 rectanglePainter.MoveX(ceilPart);
+                rectanglePainter.Left = Math.Round(cummulatedShift.X / 5) * 5;
                 cummulatedShift.X -= ceilPart;
                 translate.X = ceilPart;
                 doMove = true;

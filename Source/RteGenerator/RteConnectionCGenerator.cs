@@ -21,9 +21,9 @@ namespace AutosarGuiEditor.Source.RteGenerator
 {
     public class RteConnectionCGenerator
     {
-        public void GenerateConnections()
+        public void GenerateConnections(String folder)
         {
-            String filename = RteFunctionsGenerator.GetRteFolder() + "\\" + Properties.Resources.RTE_CONNECTIONS_C_FILENAME;
+            String filename = folder + "\\" + Properties.Resources.RTE_CONNECTIONS_C_FILENAME;
             StreamWriter writer = new StreamWriter(filename);
             RteFunctionsGenerator.GenerateFileTitle(writer, filename, "Implementation for RTE connections source file");
 
@@ -39,6 +39,8 @@ namespace AutosarGuiEditor.Source.RteGenerator
             GenerateAllPimBuffers(writer);
             GenerateAllCDataBuffers(writer);
             GenerateAllWriteDataBuffers(writer);
+            GenerateAllAsyncServerNotificators(writer);
+
             GenerateQueuedDataBuffers(writer);
             GenerateWriteFunctions(writer);
             GenerateReadFunctions(writer);
@@ -99,32 +101,74 @@ namespace AutosarGuiEditor.Source.RteGenerator
                         if (portDef.PortType == PortType.Client) 
                         {
                             ClientServerInterface csInterface = (portDef.InterfaceDatatype as ClientServerInterface);
-                            foreach (ClientServerOperation operation in csInterface.Operations)
+
+                            /* Syncronous operation */
+                            if (csInterface.IsAsync == false)
                             {
-                                String returnValue = Properties.Resources.STD_RETURN_TYPE;
-
-                                String RteFuncName = RteFunctionsGenerator.GenerateInternalCallConnectionFunctionName(component.Name, portDef, operation);
-                                String fieldVariable = RteFunctionsGenerator.GenerateClientServerInterfaceArguments(operation, false);
-
-                                writer.WriteLine(returnValue + RteFuncName + fieldVariable);
-                                writer.WriteLine("{");
-                                PortPainter portPainter = component.Ports.FindPortByItsDefenition(portDef);
-                                ComponentInstance oppositCompInstance;
-                                PortPainter oppositePort;
-                                AutosarApplication.GetInstance().GetOppositePortAndComponent(portPainter, out oppositCompInstance, out oppositePort);
-                                if (oppositCompInstance != null)
+                                foreach (ClientServerOperation operation in csInterface.Operations)
                                 {
-                                    String functionName = RteFunctionsGenerator.Generate_RteCall_FunctionName(oppositCompInstance.ComponentDefenition, oppositePort.PortDefenition, operation);
-                                    String arguments = RteFunctionsGenerator.Generate_ClientServerPort_Arguments(oppositCompInstance, operation, oppositCompInstance.ComponentDefenition.MultipleInstantiation);
-                                    writer.WriteLine("    return " + functionName + arguments + ";");
-                                }
-                                else
-                                {
-                                    writer.WriteLine("    return " + Properties.Resources.RTE_E_UNCONNECTED + ";");
-                                }
+                                    String returnValue = Properties.Resources.STD_RETURN_TYPE;
 
-                                writer.WriteLine("}");
-                                writer.WriteLine("");
+                                    String RteFuncName = RteFunctionsGenerator.GenerateInternalCallConnectionFunctionName(component.Name, portDef, operation);
+                                    String fieldVariable = RteFunctionsGenerator.GenerateClientServerInterfaceArguments(operation, false);
+
+                                    writer.WriteLine(returnValue + RteFuncName + fieldVariable);
+                                    writer.WriteLine("{");
+                                    PortPainter portPainter = component.Ports.FindPortByItsDefenition(portDef);
+                                    ComponentInstance oppositCompInstance;
+                                    PortPainter oppositePort;
+                                    AutosarApplication.GetInstance().GetOppositePortAndComponent(portPainter, out oppositCompInstance, out oppositePort);
+                                    if (oppositCompInstance != null)
+                                    {
+                                        String functionName = RteFunctionsGenerator.Generate_RteCall_FunctionName(oppositCompInstance.ComponentDefenition, oppositePort.PortDefenition, operation);
+                                        String arguments = RteFunctionsGenerator.Generate_ClientServerPort_Arguments(oppositCompInstance, operation, oppositCompInstance.ComponentDefenition.MultipleInstantiation);
+                                        writer.WriteLine("    return " + functionName + arguments + ";");
+                                    }
+                                    else
+                                    {
+                                        writer.WriteLine("    return " + Properties.Resources.RTE_E_UNCONNECTED + ";");
+                                    }
+
+                                    writer.WriteLine("}");
+                                    writer.WriteLine("");
+                                }
+                            }
+                            else
+                            {
+                                /* Asyncronous operation */
+                                foreach (ClientServerOperation operation in csInterface.Operations)
+                                {
+                                    String returnValue = Properties.Resources.STD_RETURN_TYPE;
+
+                                    String RteFuncName = RteFunctionsGenerator.GenerateInternalCallConnectionFunctionName(component.Name, portDef, operation);
+
+                                    writer.WriteLine(returnValue + RteFuncName + "(void)");
+                                    writer.WriteLine("{");
+                                    PortPainter portPainter = component.Ports.FindPortByItsDefenition(portDef);
+                                    
+                                    List<PortPainter> oppositePorts = new List<PortPainter>();
+
+                                    AutosarApplication.GetInstance().GetOppositeComponentPorts(portPainter, oppositePorts);
+                                    if (oppositePorts.Count > 0)
+                                    {
+                                        foreach(PortPainter oppositePort in oppositePorts)
+                                        {
+                                            ComponentInstance compInstance = AutosarApplication.GetInstance().FindComponentInstanceByPort(oppositePort) as ComponentInstance;
+
+                                            String asyncField = "Rte_AsyncCall_" + compInstance.Name + "_" + oppositePort.PortDefenition.Name + "_" + operation.Name;
+                                            writer.WriteLine("    " + asyncField + " = TRUE;");
+                                        }
+                                        
+                                        writer.WriteLine("    return RTE_E_OK;");
+                                    }
+                                    else
+                                    {
+                                        writer.WriteLine("    return " + Properties.Resources.RTE_E_UNCONNECTED + ";");
+                                    }
+
+                                    writer.WriteLine("}");
+                                    writer.WriteLine("");
+                                }
                             }
                         }
                     }
@@ -269,7 +313,14 @@ namespace AutosarGuiEditor.Source.RteGenerator
                                 writer.WriteLine("{");
 
                                 String writeFieldName = "Rte_DataBuffer_" + component.Name + "_" + portDef.Name + "_" + field.Name;
-                                writer.WriteLine("    " + writeFieldName + " = (*data);");
+                                if (field.IsPointer == false)
+                                {
+                                    writer.WriteLine("    " + writeFieldName + " = (*data);");
+                                }
+                                else
+                                {
+                                    writer.WriteLine("    " + writeFieldName + " = data;");
+                                }
 
                                 writer.WriteLine("    return " + Properties.Resources.RTE_E_OK + ";");
                                 writer.WriteLine("}");
@@ -345,8 +396,42 @@ namespace AutosarGuiEditor.Source.RteGenerator
                             SenderReceiverInterface srInterface = (portDef.InterfaceDatatype as SenderReceiverInterface);
                             foreach (SenderReceiverInterfaceField field in srInterface.Fields)
                             {
-                                String fieldData = field.DataTypeName + " Rte_DataBuffer_" + component.Name + "_" + portDef.Name + "_" + field.Name + ";";
-                                writer.WriteLine(fieldData);
+                                if (field.IsPointer == false)
+                                {
+                                    String fieldData = field.DataTypeName + " Rte_DataBuffer_" + component.Name + "_" + portDef.Name + "_" + field.Name + ";";
+                                    writer.WriteLine(fieldData);
+                                }
+                                else
+                                {
+                                    String fieldData = field.DataTypeName + " * Rte_DataBuffer_" + component.Name + "_" + portDef.Name + "_" + field.Name + ";";
+                                    writer.WriteLine(fieldData);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            writer.WriteLine("");
+        }
+
+        void GenerateAllAsyncServerNotificators(StreamWriter writer)
+        {
+            foreach (CompositionInstance composition in AutosarApplication.GetInstance().Compositions)
+            {
+                foreach (ComponentInstance component in composition.ComponentInstances)
+                {
+                    ApplicationSwComponentType compDef = component.ComponentDefenition;
+
+                    foreach (PortDefenition portDef in compDef.Ports)
+                    {
+                        if ((portDef.PortType == PortType.Server) && ((portDef.InterfaceDatatype as ClientServerInterface).IsAsync == true))
+                        {
+                            ClientServerInterface csInterface = (portDef.InterfaceDatatype as ClientServerInterface);
+
+                            foreach (ClientServerOperation operation in csInterface.Operations)
+                            {
+                                String asyncField = "boolean Rte_AsyncCall_" + component.Name + "_" + portDef.Name + "_" + operation.Name + ";";
+                                writer.WriteLine(asyncField);
                             }
                         }
                     }

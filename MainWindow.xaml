@@ -56,6 +56,7 @@
                 <MenuItem Click="ProjectSettings_Click" Header="Settings..." />
                 <Separator />
                 <MenuItem Click="GenerateRTE_Click" Header="Generate RTE" />
+                <MenuItem Click="GenerateComponentSkeleton_Click" Header="Generate component skeleton" />
                 <MenuItem Click="GenerateTestEnvironment_Click" Header="Generate test environment" />
             </MenuItem>
             <MenuItem Header="Insert">
@@ -824,6 +825,12 @@
                         VerticalAlignment="Top"
                         Click="ClientServer_AddOperation_Button_Click"
                         Content="Add operation" />
+                    <CheckBox
+                        Name="AsyncCallCheckBox"
+                        Margin="124,80,0,0"
+                        HorizontalAlignment="Left"
+                        VerticalAlignment="Top"
+                        Content="Async Call" />
 
                 </Grid>
             </TabItem>

@@ -188,7 +188,16 @@ namespace AutosarGuiEditor.Source.Composition
         {
             if (AutosarApplication.GetInstance().ActiveComposition.Equals(this))
             {
-                bool clicked = InternalPortsInstances.IsClicked(sceneCoordinates, out clickedObject);
+                bool clicked;
+
+                /* Check anchors points first */
+                clicked = Connections.IsClicked(sceneCoordinates, out clickedObject, true);
+                if (clicked == true)
+                {
+                    return true;
+                }
+
+                clicked = InternalPortsInstances.IsClicked(sceneCoordinates, out clickedObject);
                 if (clicked == true)
                 {
                     return true;
@@ -200,7 +209,7 @@ namespace AutosarGuiEditor.Source.Composition
                     return true;
                 }
 
-                clicked = Connections.IsClicked(sceneCoordinates, out clickedObject);
+                clicked = Connections.IsClicked(sceneCoordinates, out clickedObject, false);
                 if (clicked == true)
                 {
                     return true;

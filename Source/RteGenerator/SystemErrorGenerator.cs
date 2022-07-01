@@ -33,7 +33,7 @@ namespace AutosarGuiEditor.Source.RteGenerator
         {
             int immediateSafeStateCount = AutosarApplication.GetInstance().SystemErrors.ErrorCount(SystemErrorStrictness.ImmediateSafeState);
             int totalErrorCount =  AutosarApplication.GetInstance().SystemErrors.Count;
-            writer.WriteLine(RteFunctionsGenerator.CreateDefine("SYSTEM_ERRORS_COUNT", totalErrorCount.ToString()));
+            writer.WriteLine(RteFunctionsGenerator.CreateDefine("SYSTEM_ERRORS_COUNT", (totalErrorCount + 1).ToString()));
             writer.WriteLine(RteFunctionsGenerator.CreateDefine("IMMEDIATE_SAFE_STATE_ERROR_COUNT", immediateSafeStateCount.ToString()));
             writer.WriteLine();
         }
@@ -52,8 +52,10 @@ namespace AutosarGuiEditor.Source.RteGenerator
 
             maxLen += 20; /* + #define and ERR_IR_ length */
 
-            int errCount = 0;
+            int errCount = 1;
 
+            writer.WriteLine(RteFunctionsGenerator.CreateDefine("ERR_ID_INCORRECT_ERROR_ID", "0u", false, maxLen));
+            writer.WriteLine();
             writer.WriteLine("/* Immediate Safe State errors */");
             /* Write only immediate safe safe state errors */
             for (int i = 0; i < errList.Count; i++)

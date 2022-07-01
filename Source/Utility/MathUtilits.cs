@@ -122,5 +122,27 @@ namespace AutosarGuiEditor.Source.Utility
         {
             return Math.Abs(d1 - d2) < 0.01;
         }
+
+        public static int NaimensheeObsheeKratnoe(int a, int b)
+        {
+            int krat = 0;
+            int n;
+
+            if (a > b) 
+                n = b;
+            else 
+                n = a;
+
+
+            for (int i = n; i <= (a + b) * 2; i++)
+            {
+                if ((i % a == 0) && (i % b) == 0)
+                {
+                    krat = i;
+                    break;
+                }
+            }
+            return krat;
+        }
     }
 }
