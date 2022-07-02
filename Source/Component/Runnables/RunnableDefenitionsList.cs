@@ -15,7 +15,7 @@ using AutosarGuiEditor.Source.Interfaces;
 
 namespace AutosarGuiEditor.Source.Component 
 {
-    public class RunnableDefenitionsList : IGuidList<PeriodicRunnableDefenition>
+    public class RunnableDefenitionsList : IGuidList<RunnableDefenition>
     {
         public RunnableDefenitionsList()
         {

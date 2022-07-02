@@ -714,15 +714,6 @@ namespace AutosarGuiEditor
             componentDefenitionViewController.AddRunnableButton_Click();
         }
 
-        private void ComponentGridView_EditFrequency(object sender, TextChangedEventArgs e)
-        {
-            if (ComponentRunnables_GridView.SelectedIndex >= 0)
-            {
-                TextBox tb = (TextBox)sender;
-                componentDefenitionViewController.UpdateFrequency(tb.Text);
-            }
-        }
-
         private void ComponentRunnables_DeleteButton_Click(object sender, RoutedEventArgs e)
         {
             componentDefenitionViewController.DeleteRunnableButtonClick();
@@ -1292,6 +1283,39 @@ namespace AutosarGuiEditor
                 MessageBox.Show("There are errors in the project. RTE generation is impossible. Check project for errors.");
             }
         }
+
+#region PERIODIC_EVENT
+        private void PeriodicEvent_DeleteButton_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void PeriodicEvent_FieldName_TextEdit_TextChanged(object sender, TextChangedEventArgs e)
+        {
+
+        }
+
+        private void PeriodicEvent_EditFrequency(object sender, TextChangedEventArgs e)
+        {
+            if (ComponentRunnables_GridView.SelectedIndex >= 0)
+            {
+                TextBox tb = (TextBox)sender;
+                componentDefenitionViewController.UpdateFrequency(tb.Text);
+            }
+        }
+
+        private void PeriodicEvent_AddEvent_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+#endregion
+#region SERVERCALL_EVENT
+        private void ServerCall_FieldName_TextEdit_TextChanged(object sender, TextChangedEventArgs e)
+        {
+
+        }
+#endregion
+
     }
 
 }

@@ -1,4 +1,5 @@
-﻿using AutosarGuiEditor.Source.Component.CData;
+﻿using AutosarGuiEditor.Source.Autosar.Events;
+using AutosarGuiEditor.Source.Component.CData;
 using AutosarGuiEditor.Source.Component.PerInstanceMemory;
 using AutosarGuiEditor.Source.Interfaces;
 using AutosarGuiEditor.Source.PortDefenitions;
@@ -21,12 +22,7 @@ namespace AutosarGuiEditor.Source.Component
             get;
         }
 
-
         public PortDefenitionsList Ports = new PortDefenitionsList();
-
-
-
-
 
         public Boolean MultipleInstantiation = false;
 
@@ -34,7 +30,7 @@ namespace AutosarGuiEditor.Source.Component
         
         public PerInstanceMemoryDefenitionList PerInstanceMemoryList = new PerInstanceMemoryDefenitionList();
         public CDataDefenitionList CDataDefenitions = new CDataDefenitionList();
-
+        
         public override void LoadFromXML(XElement xml)
         {
             base.LoadFromXML(xml);
@@ -48,6 +44,8 @@ namespace AutosarGuiEditor.Source.Component
             {
                 MultipleInstantiation = false; 
             }
+            serverCallEvents.LoadFromXML(xml);
+            timingEvents.LoadFromXML(xml);
         }
 
 
@@ -61,6 +59,8 @@ namespace AutosarGuiEditor.Source.Component
             CDataDefenitions.WriteToXML(xmlElement);
             XElement multInstantiation = new XElement("MultipleInstantiation", MultipleInstantiation.ToString());
             xmlElement.Add(multInstantiation);
+            serverCallEvents.WriteToXML(xmlElement);
+            timingEvents.WriteToXML(xmlElement);
 
             root.Add(xmlElement);
         }
@@ -72,9 +72,30 @@ namespace AutosarGuiEditor.Source.Component
             list.Add(Ports);
             list.Add(PerInstanceMemoryList);
             list.Add(CDataDefenitions);
+            list.Add(timingEvents);
+            list.Add(ServerCallEvents);
             return list;
         }
 
-       
+        TimingEventList timingEvents = new TimingEventList();
+
+        public TimingEventList TimingEvents
+        {
+            get
+            {
+                return timingEvents;
+            }
+        }
+
+
+        ServerCallEventList serverCallEvents = new ServerCallEventList();
+
+        public ServerCallEventList ServerCallEvents
+        {
+            get
+            {
+                return serverCallEvents;
+            }
+        }
     }
 }

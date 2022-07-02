@@ -8,11 +8,11 @@ using System.Xml.Linq;
 
 namespace AutosarGuiEditor.Source.Painters.Components.Runables
 {
-    public class RunnableInstancesList : IGuidList<PeriodicRunnableInstance>
+    public class RunnableInstancesList : IGuidList<RunnableInstance>
     {
-        public PeriodicRunnableInstance FindRunnable(Guid DefenitionGuid)
+        public RunnableInstance FindRunnable(Guid DefenitionGuid)
         {
-            foreach(PeriodicRunnableInstance runnableInstance in this)
+            foreach(RunnableInstance runnableInstance in this)
             {
                 if (runnableInstance.DefenitionGuid.Equals(DefenitionGuid) && !DefenitionGuid.Equals(Guid.Empty))
                 {
@@ -39,7 +39,7 @@ namespace AutosarGuiEditor.Source.Painters.Components.Runables
                         {
                             if (!resultGuid.Equals(Guid.Empty))
                             {
-                                PeriodicRunnableInstance runnableInstance = AutosarApplication.GetInstance().GetRunnableInstance(resultGuid);
+                                RunnableInstance runnableInstance = AutosarApplication.GetInstance().GetRunnableInstance(resultGuid);
                                 if (runnableInstance != null)
                                 {
                                     this.Add(runnableInstance);
@@ -54,7 +54,7 @@ namespace AutosarGuiEditor.Source.Painters.Components.Runables
         public void WriteGuidsToXml(XElement root)
         {
             XElement Guids = new XElement("Guids");
-            foreach (PeriodicRunnableInstance runnableInstance in this)
+            foreach (RunnableInstance runnableInstance in this)
             {
                 XElement xmlElement = new XElement("RunnableInstanceGuid");
                 xmlElement.Add(new XElement("InstanceGuid", runnableInstance.GUID.ToString("B")));
@@ -65,7 +65,7 @@ namespace AutosarGuiEditor.Source.Painters.Components.Runables
 
         public void SortByRunnablesIndex()
         {
-            Sort(delegate(PeriodicRunnableInstance x, PeriodicRunnableInstance y)
+            Sort(delegate(RunnableInstance x, RunnableInstance y)
             {
                 object startupOrderX = GetProperty(x, "StartupOrder");
                 object startupOrderY = GetProperty(y, "StartupOrder");

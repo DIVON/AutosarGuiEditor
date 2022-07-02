@@ -274,7 +274,7 @@ namespace AutosarGuiEditor.Source.RteGenerator
                 for (int runnableIndex = 0; runnableIndex < osTask.Runnables.Count; runnableIndex++)
                 {            
                    
-                    PeriodicRunnableDefenition runnableDefenition = AutosarApplication.GetInstance().FindRunnableDefenition(osTask.Runnables[runnableIndex].DefenitionGuid);
+                    RunnableDefenition runnableDefenition = AutosarApplication.GetInstance().FindRunnableDefenition(osTask.Runnables[runnableIndex].DefenitionGuid);
 
                     int runnablePeriod = Convert.ToInt32(runnableDefenition.PeriodMs * 1000);
                     int taskPeriod = Convert.ToInt32(osTask.PeriodMs * 1000);
@@ -444,7 +444,7 @@ namespace AutosarGuiEditor.Source.RteGenerator
             writer.WriteLine();
             foreach (ApplicationSwComponentType compDefinition in AutosarApplication.GetInstance().ComponentDefenitionsList)
             {
-                foreach (PeriodicRunnableDefenition runnable in compDefinition.Runnables)
+                foreach (RunnableDefenition runnable in compDefinition.Runnables)
                 {
                     writer.WriteLine(RteFunctionsGenerator.Generate_RunnableFunction(compDefinition, runnable) + ";");
                 }
@@ -513,9 +513,9 @@ namespace AutosarGuiEditor.Source.RteGenerator
             List<double> frequences = new List<double>();
             RunnableInstancesList runnables = AutosarApplication.GetInstance().GetAllRunnablesOrderedByStartup();
             
-            foreach (PeriodicRunnableInstance runnable in runnables)
+            foreach (RunnableInstance runnable in runnables)
             {
-                PeriodicRunnableDefenition runnableDefenition = AutosarApplication.GetInstance().FindRunnableDefenition(runnables[0].DefenitionGuid);
+                RunnableDefenition runnableDefenition = AutosarApplication.GetInstance().FindRunnableDefenition(runnables[0].DefenitionGuid);
                 if (!frequences.Exists(x => x == runnableDefenition.PeriodMs))
                 {
                     frequences.Add(runnableDefenition.PeriodMs);

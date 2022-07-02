@@ -126,17 +126,17 @@ namespace System
             return componentDefenition.Name + count.ToString();*/
         }
 
-        public PeriodicRunnableInstance CreateRunnableInstance(PeriodicRunnableDefenition runnableDefenition)
+        public RunnableInstance CreateRunnableInstance(RunnableDefenition runnableDefenition)
         {
-            PeriodicRunnableInstance runable = new PeriodicRunnableInstance();
+            RunnableInstance runable = new RunnableInstance();
             runable.Name = runnableDefenition.Name;
             runable.DefenitionGuid = runnableDefenition.GUID;
             return runable;
         }
 
-        public PeriodicRunnableDefenition CreateRunnableDefenition(string Name)
+        public RunnableDefenition CreateRunnableDefenition(string Name)
         {
-            PeriodicRunnableDefenition runable = new PeriodicRunnableDefenition(Name);
+            RunnableDefenition runable = new RunnableDefenition(Name);
             return runable;
         }
 

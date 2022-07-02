@@ -1,4 +1,5 @@
-﻿using AutosarGuiEditor.Source.AutosarInterfaces;
+﻿using AutosarGuiEditor.Source.Autosar.Events;
+using AutosarGuiEditor.Source.AutosarInterfaces;
 using AutosarGuiEditor.Source.Component;
 using AutosarGuiEditor.Source.Component.CData;
 using AutosarGuiEditor.Source.Component.PerInstanceMemory;
@@ -27,8 +28,23 @@ namespace AutosarGuiEditor.Source.Controllers
         AutosarTreeViewControl tree;
         TextBox componentDefenitionName_TextBox;
         public AllowUpdater allowUpdater = new AllowUpdater();
+        DataGrid periodicalEvenstDataGrid;
 
-        public ComponentDefenitionController(AutosarTreeViewControl AutosarTree, TextBox ComponentDefenitionName_TextBox, DataGrid portsGrid, DataGrid runnablesGrid, CheckBox multipleInstantiation_CheckBox, Button AddPerInstanceField_Button, DataGrid PerInstanceGrid, DataGrid CDataGrid, Button AddCDataButton)
+        public ComponentDefenitionController(
+            AutosarTreeViewControl AutosarTree, 
+            TextBox ComponentDefenitionName_TextBox, 
+            DataGrid portsGrid, 
+            DataGrid runnablesGrid, 
+            CheckBox multipleInstantiation_CheckBox, 
+
+            Button AddPerInstanceField_Button, 
+            DataGrid PerInstanceGrid, 
+
+            DataGrid CDataGrid, 
+            Button AddCDataButton,
+            
+            DataGrid periodicalEvenstDataGrid
+            )
         {
             this.tree = AutosarTree;
             this.portsGrid = portsGrid;
@@ -43,6 +59,8 @@ namespace AutosarGuiEditor.Source.Controllers
 
             this.CDataGrid = CDataGrid;
             AddCDataButton.Click += AddCDataButton_Click;
+
+            this.periodicalEvenstDataGrid = periodicalEvenstDataGrid;
         }
 
         void AddCDataButton_Click(object sender, RoutedEventArgs e)
@@ -113,7 +131,7 @@ namespace AutosarGuiEditor.Source.Controllers
             {
                 _componentDefenition = value;
                 
-                RefreshPortsGridView();
+                RefreshGridViews();
                 
             }
             get
@@ -226,7 +244,7 @@ namespace AutosarGuiEditor.Source.Controllers
         }
 
 
-        public void RefreshPortsGridView()
+        public void RefreshGridViews()
         {
             allowUpdater.StopUpdate();
 
@@ -241,6 +259,9 @@ namespace AutosarGuiEditor.Source.Controllers
 
             CDataGrid.ItemsSource = null;
             CDataGrid.ItemsSource = _componentDefenition.CDataDefenitions;
+
+            periodicalEvenstDataGrid.ItemsSource = null;
+            periodicalEvenstDataGrid.ItemsSource = _componentDefenition.TimingEvents;
 
             allowUpdater.AllowUpdate();
 
@@ -282,7 +303,7 @@ namespace AutosarGuiEditor.Source.Controllers
                 if (result == System.Windows.Forms.DialogResult.OK)
                 {
                     _componentDefenition.Ports[index].InterfaceGUID = DatatypeForm.GetInstance().SelectedDatatype.GUID;
-                    RefreshPortsGridView();
+                    RefreshGridViews();
                 }
             }
         }
@@ -301,7 +322,7 @@ namespace AutosarGuiEditor.Source.Controllers
                     _componentDefenition.Ports.Remove(portDef);
                     AutosarApplication.GetInstance().UpdatePortsInComponentInstances();
                     tree.UpdateAutosarTreeView(tree.SelectedItem);
-                    RefreshPortsGridView();
+                    RefreshGridViews();
                     result = true;
                 }             
             }
@@ -314,13 +335,13 @@ namespace AutosarGuiEditor.Source.Controllers
             bool result = false;
             if ((index < runnablesGrid.Items.Count) && (index >= 0))
             {
-                bool delete = MessageUtilities.AskToDelete("Do you want to delete " + (runnablesGrid.Items[index] as PeriodicRunnableDefenition).Name + "?");
+                bool delete = MessageUtilities.AskToDelete("Do you want to delete " + (runnablesGrid.Items[index] as RunnableDefenition).Name + "?");
                 if (delete == true)
                 {
                     _componentDefenition.Runnables.RemoveAt(index);
                     AutosarApplication.GetInstance().SyncronizeRunnables(_componentDefenition);
                     tree.UpdateAutosarTreeView(tree.SelectedItem);
-                    RefreshPortsGridView();
+                    RefreshGridViews();
                     result = true;
                 }
             }
@@ -345,11 +366,11 @@ namespace AutosarGuiEditor.Source.Controllers
 
         public void AddRunnableButton_Click()
         {
-            PeriodicRunnableDefenition runnable = ComponentFabric.GetInstance().CreateRunnableDefenition("Refresh");
+            RunnableDefenition runnable = ComponentFabric.GetInstance().CreateRunnableDefenition("Refresh");
             _componentDefenition.Runnables.Add(runnable);
             _componentDefenition.Runnables.DoSort();
             AutosarApplication.GetInstance().SyncronizeRunnables(_componentDefenition);
-            RefreshPortsGridView();
+            RefreshGridViews();
             tree.UpdateAutosarTreeView(tree.SelectedItem);
         }
 
@@ -392,12 +413,29 @@ namespace AutosarGuiEditor.Source.Controllers
                     ComponentDefenition.Ports.Add(AddPortForm.GetInstance().CreatedPortDefenition);
                     ComponentDefenition.Ports.DoSort();
                     AutosarApplication.GetInstance().UpdatePortsInComponentInstances();
-                    RefreshPortsGridView();
+                    RefreshGridViews();
                     tree.UpdateAutosarTreeView(tree.SelectedItem);
                     return true;
                 }
             }
             return false;
         }
+
+#region TimingEvents
+        public void AddTimingEventButtonClick()
+        {
+            if (ComponentDefenition != null)
+            {
+                TimingEvent timingEvent = new TimingEvent();
+                ComponentDefenition.TimingEvents.Add(timingEvent);
+
+                AutosarApplication.GetInstance().UpdateTimingEventsInComponentInstances();
+
+                RefreshGridViews();
+                tree.UpdateAutosarTreeView(tree.SelectedItem);
+            }
+        }
+#endregion
+
     }
 }

@@ -37,6 +37,7 @@ using AutosarGuiEditor.Source.Composition;
 using AutosarGuiEditor.Source.Render;
 using AutosarGuiEditor.Source.DataTypes.ArrayDataType;
 using AutosarGuiEditor.Source;
+using AutosarGuiEditor.Source.Autosar.Events;
 
 
 namespace System 
@@ -579,6 +580,58 @@ namespace System
         }
 
 
+        public void UpdateTimingEventsInComponentInstances()
+        {
+            throw new NotImplementedException();
+
+            /* Remove unexists port in defenition */
+            foreach (CompositionInstance composition in Compositions)
+            {
+                foreach (ComponentInstance compInstance in composition.ComponentInstances)
+                {
+                    ApplicationSwComponentType compDefenition = compInstance.ComponentDefenition;
+                    for (int i = compInstance.Ports.Count - 1; i >= 0; i--)
+                    {
+                        PortPainter portPainter = compInstance.Ports[i];
+                        PortDefenition portDefenition = compDefenition.Ports.FindObject(portPainter.PortDefenitionGuid);
+                        if (portDefenition == null)
+                        {
+                            DeletePort(portPainter);
+                        }
+                    }
+                }
+            }
+
+            /* Add new or missing ports */
+            foreach (CompositionInstance composition in Compositions)
+            {
+                foreach (ComponentInstance compInstance in composition.ComponentInstances)
+                {
+                    ApplicationSwComponentType compDefenition = compInstance.ComponentDefenition;
+                    foreach (PortDefenition portDef in compDefenition.Ports)
+                    {
+                        bool find = false;
+                        foreach (PortPainter portPainter in compInstance.Ports)
+                        {
+                            if (portPainter.PortDefenition.Equals(portDef))
+                            {
+                                find = true;
+                                break;
+                            }
+                        }
+                        if (!find)
+                        {
+                            double x = compInstance.Painter.Left - PortPainter.DefaultWidth / 2.0;
+                            double y = (compInstance.Painter.Top + compInstance.Painter.Bottom) / 2;
+
+                            PortPainter portPainter = ComponentFabric.GetInstance().CreatePortPainter(portDef, x, y);
+                            compInstance.Ports.Add(portPainter);
+                        }
+                    }
+                }
+            }
+        }
+
         public bool isComplexDataTypeUsed(ComplexDataType datatype)
         {
             return false;
@@ -716,10 +769,10 @@ namespace System
             return runnables;
         }
 
-        public PeriodicRunnableInstance GetRunnableInstance(Guid GUID)
+        public RunnableInstance GetRunnableInstance(Guid GUID)
         {
             RunnableInstancesList allRunnables = GetAllRunnableInstances();
-            foreach (PeriodicRunnableInstance runnable in allRunnables)
+            foreach (RunnableInstance runnable in allRunnables)
             {
                 if (runnable.GUID.Equals(GUID))
                 {
@@ -733,7 +786,7 @@ namespace System
         {
             RunnableInstancesList list = new RunnableInstancesList();
             RunnableInstancesList allRunnables = GetAllRunnableInstances();
-            foreach (PeriodicRunnableInstance runnable in allRunnables)
+            foreach (RunnableInstance runnable in allRunnables)
             {
                 if (GetRunnableTask(runnable) == null)
                 {
@@ -744,7 +797,7 @@ namespace System
             return list;
         }
 
-        public OsTask GetRunnableTask(PeriodicRunnableInstance runnableInstance)
+        public OsTask GetRunnableTask(RunnableInstance runnableInstance)
         {
             foreach (OsTask task in this.OsTasks)
             {
@@ -760,7 +813,7 @@ namespace System
         public RunnableInstancesList GetAllRunnablesOrderedByStartup()
         {
             RunnableInstancesList allrunnables = GetAllRunnableInstances();
-            List<PeriodicRunnableInstance> orderedRunnables = allrunnables.OrderBy(Obj => Obj.StartupOrder).ToList();
+            List<RunnableInstance> orderedRunnables = allrunnables.OrderBy(Obj => Obj.StartupOrder).ToList();
             allrunnables.Clear();
             allrunnables.AddRange(orderedRunnables);
             return allrunnables;
@@ -1124,15 +1177,38 @@ namespace System
         }
 
 
-        public PeriodicRunnableDefenition FindRunnableDefenition(Guid runnableDefGuid)
+        public RunnableDefenition FindRunnableDefenition(Guid runnableDefGuid)
         {
-            PeriodicRunnableDefenition runableDef = null;
+            RunnableDefenition runableDef = null;
             foreach (ApplicationSwComponentType compDef in this.ComponentDefenitionsList)
             {
                 runableDef = compDef.Runnables.FindObject(runnableDefGuid);
                 if (runableDef != null)
                 {
                     return runableDef;
+                }
+            }
+            return null;
+        }
+
+        public AutosarEvent FindEventDefenition(Guid eventDefGuid)
+        {
+            AutosarEvent eventDef = null;
+            foreach (ApplicationSwComponentType compDef in this.ComponentDefenitionsList)
+            {
+                eventDef = compDef.TimingEvents.FindObject(eventDefGuid);
+                if (eventDef != null)
+                {
+                    return eventDef;
+                }
+            }
+
+            foreach (ApplicationSwComponentType compDef in this.ComponentDefenitionsList)
+            {
+                eventDef = compDef.ServerCallEvents.FindObject(eventDefGuid);
+                if (eventDef != null)
+                {
+                    return eventDef;
                 }
             }
             return null;
@@ -1307,7 +1383,7 @@ namespace System
             return FindComponentDefenitionByPortGuid(portDefenition.GUID);
         }
 
-        public ApplicationSwComponentType FindComponentDefenitionByRunnnable(PeriodicRunnableDefenition runnableDef)
+        public ApplicationSwComponentType FindComponentDefenitionByRunnnable(RunnableDefenition runnableDef)
         {
             return FindComponentDefenitionByRunnnableGuid(runnableDef.GUID);
         }

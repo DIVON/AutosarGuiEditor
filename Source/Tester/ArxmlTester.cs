@@ -1,4 +1,5 @@
-﻿using AutosarGuiEditor.Source.Autosar.OsTasks;
+﻿using AutosarGuiEditor.Source.Autosar.Events;
+using AutosarGuiEditor.Source.Autosar.OsTasks;
 using AutosarGuiEditor.Source.AutosarInterfaces;
 using AutosarGuiEditor.Source.AutosarInterfaces.ClientServer;
 using AutosarGuiEditor.Source.AutosarInterfaces.SenderReceiver;
@@ -61,7 +62,7 @@ namespace AutosarGuiEditor.Source.Tester
             TestOsTasks();
             TestQueuedSenderReceiverInterface();
             TestWetherComponentDefenitionUsed();
-
+            TestTimingEvents();
             SortText();
         }
 
@@ -521,6 +522,27 @@ namespace AutosarGuiEditor.Source.Tester
                     if (initTask != task)
                     {
                         AppendText("OsTask : " + task.Name + " has zero frequency", MessageType.ERROR);
+                    }
+                }
+            }
+        }
+
+        protected void TestTimingEvents()
+        {
+            foreach (ApplicationSwComponentType compDef in autosarApp.ComponentDefenitionsList)
+            {
+                foreach(TimingEvent timingEvent in compDef.TimingEvents)
+                {
+
+                    foreach (TimingEvent timingEvent2 in compDef.TimingEvents)
+                    {
+                        if (timingEvent2 != timingEvent)
+                        {
+                            if (timingEvent.Name.Equals(timingEvent2.Name))
+                            {
+                                AppendText("Component shall have no similar timing events : " + timingEvent.Name, MessageType.ERROR);
+                            }
+                        }
                     }
                 }
             }

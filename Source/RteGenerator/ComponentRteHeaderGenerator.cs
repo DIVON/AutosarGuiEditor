@@ -180,7 +180,7 @@ namespace AutosarGuiEditor.Source.RteGenerator
 ");
             RteComponentGenerator.WriteAllFunctionWhichComponentCouldUse(compDef, writer);
             
-            foreach (PeriodicRunnableDefenition runnable in compDef.Runnables)
+            foreach (RunnableDefenition runnable in compDef.Runnables)
             {
                 writer.WriteLine(RteFunctionsGenerator.Generate_RunnableFunction(compDef, runnable) + ";");
             }

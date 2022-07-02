@@ -10,7 +10,7 @@ using System.Xml.Linq;
 
 namespace AutosarGuiEditor.Source.Painters.Components.Runables
 {
-    public class PeriodicRunnableInstance:IGUID
+    public class RunnableInstance:IGUID
     {
         int startupOrder = 0;
         public int StartupOrder
@@ -31,7 +31,7 @@ namespace AutosarGuiEditor.Source.Painters.Components.Runables
             get;
         }
 
-        public PeriodicRunnableDefenition Defenition
+        public RunnableDefenition Defenition
         {
             get 
             {

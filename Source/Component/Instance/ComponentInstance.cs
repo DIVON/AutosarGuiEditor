@@ -207,12 +207,12 @@ namespace AutosarGuiEditor.Source.Painters
             }
 
             /* Add new */
-            foreach (PeriodicRunnableDefenition runnableDefenition in ComponentDefenition.Runnables)
+            foreach (RunnableDefenition runnableDefenition in ComponentDefenition.Runnables)
             {
                 if (this.RunableInstances.FindRunnable(runnableDefenition.GUID) == null)
                 {
                     /* Create new runnable instance */
-                    PeriodicRunnableInstance newRunableInstance = ComponentFabric.GetInstance().CreateRunnableInstance(runnableDefenition);
+                    RunnableInstance newRunableInstance = ComponentFabric.GetInstance().CreateRunnableInstance(runnableDefenition);
                     this.RunableInstances.Add(newRunableInstance);
                 }
             }

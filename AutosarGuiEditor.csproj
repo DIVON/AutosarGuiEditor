@@ -105,6 +105,8 @@
     <Compile Include="Source\Autosar\ArxmlPackage.cs" />
     <Compile Include="Source\Autosar\AutosarApplication.cs" />
     <Compile Include="Source\Autosar\CDataPool\CDataPool.cs" />
+    <Compile Include="Source\Autosar\Events\AutosarEventInstances.cs" />
+    <Compile Include="Source\Autosar\Events\AutosarEvent.cs" />
     <Compile Include="Source\Autosar\OsTasks\OsTask.cs" />
     <Compile Include="Source\Autosar\OsTasks\OsTasksList.cs" />
     <Compile Include="Source\Autosar\SystemErrors\SystemErrorObject.cs" />

@@ -420,12 +420,12 @@ namespace AutosarGuiEditor.Source.RteGenerator
             return ComponentName + "_" + PortName + "_" + field.Name + "_VALUE";
         }
 
-        public static String Generate_RunnableFunctionName(ApplicationSwComponentType compDefenition, PeriodicRunnableDefenition runnable)
+        public static String Generate_RunnableFunctionName(ApplicationSwComponentType compDefenition, RunnableDefenition runnable)
         {
             return compDefenition.Name + "_ru" + runnable.Name;
         }
 
-        public static String Generate_RunnableFunction(ApplicationSwComponentType compDefenition, PeriodicRunnableDefenition runnable)
+        public static String Generate_RunnableFunction(ApplicationSwComponentType compDefenition, RunnableDefenition runnable)
         {             
             if (compDefenition.MultipleInstantiation)
             {
@@ -439,7 +439,7 @@ namespace AutosarGuiEditor.Source.RteGenerator
         }
 
 
-        public static String Generate_CallOfRunnable(PeriodicRunnableInstance runnable)
+        public static String Generate_CallOfRunnable(RunnableInstance runnable)
         {
             ComponentInstance compInstance = AutosarApplication.GetInstance().FindComponentInstanceByRunnableGuid(runnable.GUID);
             if (!compInstance.ComponentDefenition.MultipleInstantiation)

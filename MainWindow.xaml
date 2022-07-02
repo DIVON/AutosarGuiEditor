@@ -30,8 +30,8 @@
         RenderTransformOrigin="0.387,0.507">
 
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="94*" />
-            <ColumnDefinition Width="95*" />
+            <ColumnDefinition Width="386*" />
+            <ColumnDefinition Width="979*" />
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="18" />
@@ -216,18 +216,6 @@
                                                         BorderThickness="0"
                                                         Text="{Binding Name}"
                                                         TextChanged="ComponentRunnable_FieldName_TextEdit_TextChanged" />
-                                                </DataTemplate>
-                                            </DataGridTemplateColumn.CellTemplate>
-                                        </DataGridTemplateColumn>
-
-                                        <DataGridTemplateColumn Width="100" Header="Period, ms">
-                                            <DataGridTemplateColumn.CellTemplate>
-                                                <DataTemplate>
-                                                    <TextBox
-                                                        VerticalContentAlignment="Center"
-                                                        BorderThickness="0"
-                                                        Text="{Binding PeriodMs}"
-                                                        TextChanged="ComponentGridView_EditFrequency" />
                                                 </DataTemplate>
                                             </DataGridTemplateColumn.CellTemplate>
                                         </DataGridTemplateColumn>
@@ -421,7 +409,153 @@
                                     Content="Add configuration data" />
                             </Grid>
                         </TabItem>
+                        <TabItem Header="Events">
+                            <TabControl>
+                                <TabItem Header="Periodical events">
+                                    <Grid Background="#FFE5E5E5">
+                                        <DataGrid
+                                            x:Name="PeriodicalEventsDataGrid"
+                                            Margin="10,48,10,8"
+                                            AutoGenerateColumns="False"
+                                            BeginningEdit="ComplexDataType_GridView_BeginningEdit"
+                                            CanUserAddRows="False">
 
+                                            <DataGrid.Columns>
+                                                <DataGridTemplateColumn Width="250" Header="Name">
+                                                    <DataGridTemplateColumn.CellTemplate>
+                                                        <DataTemplate>
+                                                            <TextBox
+                                                                VerticalContentAlignment="Center"
+                                                                BorderThickness="0"
+                                                                Text="{Binding Name}"
+                                                                TextChanged="PeriodicEvent_FieldName_TextEdit_TextChanged" />
+                                                        </DataTemplate>
+                                                    </DataGridTemplateColumn.CellTemplate>
+                                                </DataGridTemplateColumn>
+
+                                                <DataGridTemplateColumn Width="100" Header="Period, ms">
+                                                    <DataGridTemplateColumn.CellTemplate>
+                                                        <DataTemplate>
+                                                            <TextBox
+                                                                VerticalContentAlignment="Center"
+                                                                BorderThickness="0"
+                                                                Text="{Binding PeriodMs}"
+                                                                TextChanged="PeriodicEvent_EditFrequency" />
+                                                        </DataTemplate>
+                                                    </DataGridTemplateColumn.CellTemplate>
+                                                </DataGridTemplateColumn>
+
+                                                <DataGridTemplateColumn Width="250" Header="Runnable">
+                                                    <DataGridTemplateColumn.CellTemplate>
+                                                        <DataTemplate>
+                                                            <DataGrid>
+                                                                <TextBox
+                                                                    Width="220"
+                                                                    VerticalContentAlignment="Center"
+                                                                    BorderThickness="0"
+                                                                    Text="{Binding RunnableName}" />
+                                                                <Button
+                                                                    Width="30"
+                                                                    Click="PeriodicEvent_ChangeRunnable_Click"
+                                                                    Content="..." />
+                                                            </DataGrid>
+                                                        </DataTemplate>
+                                                    </DataGridTemplateColumn.CellTemplate>
+                                                </DataGridTemplateColumn>
+
+                                            </DataGrid.Columns>
+                                        </DataGrid>
+                                        <Button
+                                            Width="29"
+                                            Height="24"
+                                            Margin="10,19,0,0"
+                                            HorizontalAlignment="Left"
+                                            VerticalAlignment="Top"
+                                            Click="PeriodicEvent_AddEvent_Click"
+                                            Content="+" />
+                                        <Button
+                                            Width="35"
+                                            Height="24"
+                                            Margin="44,19,0,0"
+                                            HorizontalAlignment="Left"
+                                            VerticalAlignment="Top"
+                                            Click="PeriodicEvent_CorrectName_Click"
+                                            Content="N" />
+                                        <Button
+                                            Height="24"
+                                            Margin="902,19,10,0"
+                                            VerticalAlignment="Top"
+                                            Click="PeriodicEvent_DeleteButton_Click"
+                                            Content="-" />
+                                    </Grid>
+                                </TabItem>
+                                <TabItem
+                                    Height="22"
+                                    VerticalAlignment="Top"
+                                    Header="Server call events">
+                                    <Grid Background="#FFE5E5E5">
+                                        <DataGrid
+                                            x:Name="ComponentRunnables_GridView_Copy1"
+                                            Margin="10,48,10,8"
+                                            AutoGenerateColumns="False"
+                                            BeginningEdit="ComplexDataType_GridView_BeginningEdit"
+                                            CanUserAddRows="False">
+
+                                            <DataGrid.Columns>
+                                                <DataGridTemplateColumn Width="250" Header="Name">
+                                                    <DataGridTemplateColumn.CellTemplate>
+                                                        <DataTemplate>
+                                                            <TextBox
+                                                                VerticalContentAlignment="Center"
+                                                                BorderThickness="0"
+                                                                Text="{Binding Name}"
+                                                                TextChanged="ServerCall_FieldName_TextEdit_TextChanged" />
+                                                        </DataTemplate>
+                                                    </DataGridTemplateColumn.CellTemplate>
+                                                </DataGridTemplateColumn>
+
+                                                <DataGridTemplateColumn Width="250" Header="Runnable">
+                                                    <DataGridTemplateColumn.CellTemplate>
+                                                        <DataTemplate>
+                                                            <DataGrid>
+                                                                <TextBox
+                                                                    VerticalContentAlignment="Center"
+                                                                    BorderThickness="0"
+                                                                    Text="{Binding RunnableName}" />
+                                                                <Button Click="ServerCallEvent_ChangeRunnable_Click" Content="..." />
+                                                            </DataGrid>
+                                                        </DataTemplate>
+                                                    </DataGridTemplateColumn.CellTemplate>
+                                                </DataGridTemplateColumn>
+
+                                            </DataGrid.Columns>
+                                        </DataGrid>
+                                        <Button
+                                            Width="29"
+                                            Height="24"
+                                            Margin="10,19,0,0"
+                                            HorizontalAlignment="Left"
+                                            VerticalAlignment="Top"
+                                            Click="ServerCallEvent_AddEvent_Click"
+                                            Content="+" />
+                                        <Button
+                                            Width="35"
+                                            Height="24"
+                                            Margin="44,19,0,0"
+                                            HorizontalAlignment="Left"
+                                            VerticalAlignment="Top"
+                                            Click="ServerCallEvent_CorrectName_Click"
+                                            Content="N" />
+                                        <Button
+                                            Height="24"
+                                            Margin="902,19,10,0"
+                                            VerticalAlignment="Top"
+                                            Click="ServerCallEvent_DeleteButton_Click"
+                                            Content="-" />
+                                    </Grid>
+                                </TabItem>
+                            </TabControl>
+                        </TabItem>
                     </TabControl>
                     <CheckBox
                         Name="MultipleInstantiation_CheckBox"

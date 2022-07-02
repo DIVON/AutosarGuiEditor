@@ -163,7 +163,7 @@ namespace WpfTreeView
                     var image = Path.GetDirectoryName(System.Windows.Forms.Application.ExecutablePath) + "\\Images\\icons\\tree\\ComponentDefenition.png";
                     return new BitmapImage(new Uri(image));
                 }
-                if ((value is PeriodicRunnableInstance) || (value is PeriodicRunnableDefenition))
+                if ((value is RunnableInstance) || (value is RunnableDefenition))
                 {
                     var image = Path.GetDirectoryName(System.Windows.Forms.Application.ExecutablePath) + "\\Images\\icons\\tree\\PeriodicRunnable.png";
                     return new BitmapImage(new Uri(image));

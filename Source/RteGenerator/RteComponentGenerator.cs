@@ -45,7 +45,7 @@ namespace AutosarGuiEditor.Source.RteGenerator
 
 
             /* Each component runnable shall be in its own file */
-            foreach (PeriodicRunnableDefenition runnable in component.Runnables)
+            foreach (RunnableDefenition runnable in component.Runnables)
             {
                 CreateRunnable(srcDir, runnable);
             }
@@ -108,7 +108,7 @@ namespace AutosarGuiEditor.Source.RteGenerator
             writer.Close();
         }
 
-        void CreateRunnable(String dir, PeriodicRunnableDefenition runnable)
+        void CreateRunnable(String dir, RunnableDefenition runnable)
         {
             ApplicationSwComponentType compDefenition = AutosarApplication.GetInstance().FindComponentDefenitionByRunnnable(runnable);
             String filename = dir + compDefenition.Name + "_" + runnable.Name + ".c";

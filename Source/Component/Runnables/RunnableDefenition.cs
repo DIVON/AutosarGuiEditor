@@ -16,7 +16,7 @@ using AutosarGuiEditor.Source.SystemInterfaces;
 
 namespace AutosarGuiEditor.Source.Component 
 {
-	public class PeriodicRunnableDefenition : IGUID 
+	public class RunnableDefenition : IGUID 
     {
         public Double PeriodMs
         {
@@ -32,13 +32,13 @@ namespace AutosarGuiEditor.Source.Component
             }
         }
 
-        public PeriodicRunnableDefenition()
+        public RunnableDefenition()
         {
             Name = "Refresh";
             PeriodMs = 0.250;
         }
 
-        public PeriodicRunnableDefenition(string name)
+        public RunnableDefenition(string name)
         {
             Name = name;
             PeriodMs = 0.250;

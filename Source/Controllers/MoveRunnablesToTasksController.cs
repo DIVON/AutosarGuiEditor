@@ -130,7 +130,7 @@ namespace AutosarGuiEditor.Source.Controllers
                 int index = TasksRunnablesGrid.SelectedIndex;
                 if ((index >= 0) && (index < TasksRunnablesGrid.Items.Count - 1))
                 {
-                    PeriodicRunnableInstance runnableInstance = currentTask.Runnables[index];
+                    RunnableInstance runnableInstance = currentTask.Runnables[index];
                     currentTask.Runnables.RemoveAt(index);
                     currentTask.Runnables.Insert(index + 1, runnableInstance);
                     ReenumerateRunnables();
@@ -146,7 +146,7 @@ namespace AutosarGuiEditor.Source.Controllers
                 int index = TasksRunnablesGrid.SelectedIndex;
                 if ((index > 0) && (index < TasksRunnablesGrid.Items.Count))
                 {
-                    PeriodicRunnableInstance runnableInstance = currentTask.Runnables[index];
+                    RunnableInstance runnableInstance = currentTask.Runnables[index];
                     currentTask.Runnables.RemoveAt(index);
                     currentTask.Runnables.Insert(index - 1, runnableInstance);
                     ReenumerateRunnables();
