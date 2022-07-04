@@ -132,19 +132,19 @@
     <Compile Include="Source\Component\PortDefenitions\PortType.cs" />
     <Compile Include="Source\Component\Runnables\RunnableDefenition.cs" />
     <Compile Include="Source\Component\Runnables\RunnableDefenitionsList.cs" />
-    <Compile Include="Source\Component\Runnables\RunnableInstance.cs" />
-    <Compile Include="Source\Component\Runnables\RunnableInstancesList.cs" />
     <Compile Include="Source\Composition\CompositionInstance.cs" />
     <Compile Include="Source\Composition\CompositionInstancesList.cs" />
     <Compile Include="Source\Controllers\AddObjectController.cs" />
     <Compile Include="Source\Controllers\ChangeViewportScaleController.cs" />
     <Compile Include="Source\Controllers\ArrayDataTypeController.cs" />
+    <Compile Include="Source\Controllers\EventsControllers\ClientServerEventController.cs" />
+    <Compile Include="Source\Controllers\EventsControllers\TimingEventController.cs" />
     <Compile Include="Source\Controllers\ComponentDefenitionController.cs" />
     <Compile Include="Source\Controllers\ComponentPropertiesController.cs" />
     <Compile Include="Source\Controllers\CompositionInstanceController.cs" />
     <Compile Include="Source\Controllers\ConnectionLineController.cs" />
     <Compile Include="Source\Controllers\MoveObjectsController.cs" />
-    <Compile Include="Source\Controllers\MoveRunnablesToTasksController.cs" />
+    <Compile Include="Source\Controllers\MoveAutosarEventsToTasksController.cs" />
     <Compile Include="Source\Controllers\OsTaskEditController.cs" />
     <Compile Include="Source\DataTypes\ArrayDataType\ArrayDataType.cs" />
     <Compile Include="Source\DataTypes\ArrayDataType\ArrayDataTypesList.cs" />
@@ -152,8 +152,14 @@
     <Compile Include="Source\Fabrics\OsTaskFabric.cs" />
     <Compile Include="Source\Fabrics\CDataFabric.cs" />
     <Compile Include="Source\Fabrics\PimFabric.cs" />
+    <Compile Include="Source\Forms\AllComponentRunnables\AllComponentRunnablesForm.xaml.cs">
+      <DependentUpon>AllComponentRunnablesForm.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Source\Forms\CalibrationDataForm\CalibrationDataForm.xaml.cs">
       <DependentUpon>CalibrationDataForm.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Source\Forms\ClientServerEventsForm\ClientServerEventSourceForm.xaml.cs">
+      <DependentUpon>ClientServerEventSourceForm.xaml</DependentUpon>
     </Compile>
     <Compile Include="Source\Forms\ConsoleForm\ConsoleData.cs" />
     <Compile Include="Source\Forms\ConsoleForm\ConsoleForm.xaml.cs">
@@ -287,7 +293,15 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="Source\Forms\AllComponentRunnables\AllComponentRunnablesForm.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Source\Forms\CalibrationDataForm\CalibrationDataForm.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Source\Forms\ClientServerEventsForm\ClientServerEventSourceForm.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

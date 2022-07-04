@@ -18,7 +18,6 @@ using AutosarGuiEditor.Source.Render;
 using System.Windows.Media.Imaging;
 using AutosarGuiEditor.Source.SystemInterfaces;
 using AutosarGuiEditor.Source.Painters.PortsPainters;
-using AutosarGuiEditor.Source.Painters.Components.Runables;
 using AutosarGuiEditor.Source.Component;
 using AutosarGuiEditor.Source.PortDefenitions;
 using AutosarGuiEditor.Source.Painters.Components.PerInstance;
@@ -26,13 +25,16 @@ using AutosarGuiEditor.Source.Component.PerInstanceMemory;
 using AutosarGuiEditor.Source.Fabrics;
 using AutosarGuiEditor.Source.Painters.Components.CData;
 using AutosarGuiEditor.Source.Component.CData;
+using AutosarGuiEditor.Source.Autosar.Events;
 
 
 namespace AutosarGuiEditor.Source.Painters
 {
     public class ComponentInstance : IElementWithPorts
-    {
-        public RunnableInstancesList RunableInstances = new RunnableInstancesList();
+    {        
+        public AutosarEventInstancesList TimingEventsList = new AutosarEventInstancesList();
+        public AutosarEventInstancesList SyncClientServerEventsInstancesList = new AutosarEventInstancesList();
+        public AutosarEventInstancesList AsyncClientServerEventsInstancesList = new AutosarEventInstancesList();
         public PimInstancesList PerInstanceMemories = new PimInstancesList();
         public CDataInstancesList CDataInstances = new CDataInstancesList();
 
@@ -94,9 +96,11 @@ namespace AutosarGuiEditor.Source.Painters
         public override void LoadFromXML(XElement xml)
         {
             base.LoadFromXML(xml);
-            RunableInstances.LoadFromXML(xml);
             PerInstanceMemories.LoadFromXML(xml);
             CDataInstances.LoadFromXML(xml);
+            TimingEventsList.LoadFromXML(xml);
+            SyncClientServerEventsInstancesList.LoadFromXML(xml);
+            AsyncClientServerEventsInstancesList.LoadFromXML(xml);
             String compDefString = XmlUtilits.GetFieldValue(xml, "ComponentDefenitionGuid", Guid.Empty.ToString());
             ComponentDefenitionGuid = GuidUtils.GetGuid(compDefString, false);
         }
@@ -106,9 +110,11 @@ namespace AutosarGuiEditor.Source.Painters
         {
             XElement xmlElement = new XElement("ComponentInstance");
             base.WriteToXML(xmlElement);  
-            RunableInstances.WriteToXML(xmlElement);
             PerInstanceMemories.WriteToXML(xmlElement);
             CDataInstances.WriteToXML(xmlElement);
+            TimingEventsList.WriteToXML(xmlElement);
+            SyncClientServerEventsInstancesList.LoadFromXML(xmlElement);
+            AsyncClientServerEventsInstancesList.LoadFromXML(xmlElement);
             XElement comptDefenitionGuid = new XElement("ComponentDefenitionGuid", ComponentDefenitionGuid.ToString());
             xmlElement.Add(comptDefenitionGuid);
 
@@ -195,25 +201,52 @@ namespace AutosarGuiEditor.Source.Painters
             }
         }
 
-        public void SyncronizeRunnablesWithDefenition()
+        public void SyncronizeTimingEventsWithDefenition()
         {
+            /* TimingEvents */
+
             /* Delete non existing */
-            for (int i = RunableInstances.Count - 1; i >= 0; i-- )
+            for (int i = TimingEventsList.Count - 1; i >= 0; i--)
             {
-                if (ComponentDefenition.Runnables.FindObject(RunableInstances[i].DefenitionGuid) == null)
+                if (ComponentDefenition.TimingEvents.FindObject(TimingEventsList[i].DefenitionGuid) == null)
                 {
-                    RunableInstances.RemoveAt(i);
+                    TimingEventsList.RemoveAt(i);
                 }
             }
 
             /* Add new */
-            foreach (RunnableDefenition runnableDefenition in ComponentDefenition.Runnables)
+            foreach (TimingEvent timingEventDefinition in ComponentDefenition.TimingEvents)
             {
-                if (this.RunableInstances.FindRunnable(runnableDefenition.GUID) == null)
+                if (this.TimingEventsList.FindEvent(timingEventDefinition.GUID) == null)
                 {
                     /* Create new runnable instance */
-                    RunnableInstance newRunableInstance = ComponentFabric.GetInstance().CreateRunnableInstance(runnableDefenition);
-                    this.RunableInstances.Add(newRunableInstance);
+                    AutosarEventInstance newEventInstance = ComponentFabric.GetInstance().CreateEventInstance(timingEventDefinition);
+                    this.TimingEventsList.Add(newEventInstance);
+                }
+            }
+        }
+
+        public void SyncronizeAsyncClientServerEventsWithDefenition()
+        {
+            /* TimingEvents */
+
+            /* Delete non existing */
+            for (int i = this.AsyncClientServerEventsInstancesList.Count - 1; i >= 0; i--)
+            {
+                if (ComponentDefenition.AsyncClientServerEvents.FindObject(AsyncClientServerEventsInstancesList[i].DefenitionGuid) == null)
+                {
+                    AsyncClientServerEventsInstancesList.RemoveAt(i);
+                }
+            }
+
+            /* Add new */
+            foreach (ClientServerEvent asyncEventDefinition in ComponentDefenition.AsyncClientServerEvents)
+            {
+                if (this.AsyncClientServerEventsInstancesList.FindEvent(asyncEventDefinition.GUID) == null)
+                {
+                    /* Create new runnable instance */
+                    AutosarEventInstance newEventInstance = ComponentFabric.GetInstance().CreateEventInstance(asyncEventDefinition);
+                    this.AsyncClientServerEventsInstancesList.Add(newEventInstance);
                 }
             }
         }

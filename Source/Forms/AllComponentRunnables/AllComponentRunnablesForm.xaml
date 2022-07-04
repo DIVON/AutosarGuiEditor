@@ -1,0 +1,31 @@
+﻿<Window
+    x:Class="AutosarGuiEditor.Source.Forms.AllComponentRunnables.AllComponentRunnablesForm"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:AutosarControllers="clr-namespace:AutosarGuiEditor.Source.Controllers"
+    xmlns:MyNamespace="clr-namespace:AutosarGuiEditor.Source.Forms.Controls"
+    Title="Choose one of component's runnbles"
+    Width="691"
+    Height="302">
+    <Grid>
+        <Button
+            Width="75"
+            Height="20"
+            Margin="0,0,10,10"
+            HorizontalAlignment="Right"
+            VerticalAlignment="Bottom"
+            Click="Button_Click"
+            Content="Ok" />
+
+        <ListBox
+            x:Name="AllRunnablesListBox"
+            Margin="10,10,10,35"
+            SelectionChanged="AllRunnablesListBox_SelectionChanged">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock Text="{Binding Name}" />
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+    </Grid>
+</Window>

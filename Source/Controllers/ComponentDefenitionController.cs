@@ -3,7 +3,9 @@ using AutosarGuiEditor.Source.AutosarInterfaces;
 using AutosarGuiEditor.Source.Component;
 using AutosarGuiEditor.Source.Component.CData;
 using AutosarGuiEditor.Source.Component.PerInstanceMemory;
+using AutosarGuiEditor.Source.Controllers.EventsControllers;
 using AutosarGuiEditor.Source.Forms;
+using AutosarGuiEditor.Source.Forms.AllComponentRunnables;
 using AutosarGuiEditor.Source.Forms.Controls;
 using AutosarGuiEditor.Source.PortDefenitions;
 using AutosarGuiEditor.Source.SystemInterfaces;
@@ -29,6 +31,8 @@ namespace AutosarGuiEditor.Source.Controllers
         TextBox componentDefenitionName_TextBox;
         public AllowUpdater allowUpdater = new AllowUpdater();
         DataGrid periodicalEvenstDataGrid;
+        DataGrid   syncEventDataGrid;
+        DataGrid   asyncEventDataGrid;
 
         public ComponentDefenitionController(
             AutosarTreeViewControl AutosarTree, 
@@ -43,7 +47,11 @@ namespace AutosarGuiEditor.Source.Controllers
             DataGrid CDataGrid, 
             Button AddCDataButton,
             
-            DataGrid periodicalEvenstDataGrid
+            DataGrid periodicalEvenstDataGrid,
+           
+            DataGrid   syncEventDataGrid,
+            DataGrid   asyncEventDataGrid
+            //Button   SelectRunnableButton
             )
         {
             this.tree = AutosarTree;
@@ -61,6 +69,29 @@ namespace AutosarGuiEditor.Source.Controllers
             AddCDataButton.Click += AddCDataButton_Click;
 
             this.periodicalEvenstDataGrid = periodicalEvenstDataGrid;
+            this.syncEventDataGrid = syncEventDataGrid;
+            this.asyncEventDataGrid = asyncEventDataGrid;
+
+            timingEventController = new TimingEventController(tree, periodicalEvenstDataGrid);
+            syncEventController = new ClientServerEventController(tree, false, syncEventDataGrid);
+            asyncEventController = new ClientServerEventController(tree, true, asyncEventDataGrid);
+        }
+
+        ClientServerEventController syncEventController;
+        public ClientServerEventController SyncEventController
+        {
+            get
+            {
+                return syncEventController;
+            }
+        }
+        ClientServerEventController asyncEventController;
+        public ClientServerEventController AsyncEventController
+        {
+            get
+            {
+                return asyncEventController;
+            }
         }
 
         void AddCDataButton_Click(object sender, RoutedEventArgs e)
@@ -76,6 +107,15 @@ namespace AutosarGuiEditor.Source.Controllers
             }
         }
 
+
+        TimingEventController timingEventController;
+        public TimingEventController TimingEvents
+        {
+            get
+            {
+                return timingEventController;
+            }
+        }
         void AddPerInstanceField_Button_Click(object sender, RoutedEventArgs e)
         {
             if (_componentDefenition != null)
@@ -130,9 +170,8 @@ namespace AutosarGuiEditor.Source.Controllers
             set
             {
                 _componentDefenition = value;
-                
+                timingEventController.ComponentDefenition = value;
                 RefreshGridViews();
-                
             }
             get
             {
@@ -339,7 +378,7 @@ namespace AutosarGuiEditor.Source.Controllers
                 if (delete == true)
                 {
                     _componentDefenition.Runnables.RemoveAt(index);
-                    AutosarApplication.GetInstance().SyncronizeRunnables(_componentDefenition);
+                    AutosarApplication.GetInstance().SyncronizeEvents(_componentDefenition);
                     tree.UpdateAutosarTreeView(tree.SelectedItem);
                     RefreshGridViews();
                     result = true;
@@ -369,22 +408,9 @@ namespace AutosarGuiEditor.Source.Controllers
             RunnableDefenition runnable = ComponentFabric.GetInstance().CreateRunnableDefenition("Refresh");
             _componentDefenition.Runnables.Add(runnable);
             _componentDefenition.Runnables.DoSort();
-            AutosarApplication.GetInstance().SyncronizeRunnables(_componentDefenition);
+            AutosarApplication.GetInstance().SyncronizeEvents(_componentDefenition);
             RefreshGridViews();
             tree.UpdateAutosarTreeView(tree.SelectedItem);
-        }
-
-        public void UpdateFrequency(String newFrequency)
-        {
-            int index = runnablesGrid.SelectedIndex;
-            if ((index < runnablesGrid.Items.Count) && (index >= 0))
-            {
-                double newPeriod;
-                if (double.TryParse(newFrequency, out newPeriod))
-                {
-                    _componentDefenition.Runnables[index].PeriodMs = newPeriod;
-                }              
-            }
         }
 
         public void RenameRunnable_TextEdit(string newName)
@@ -397,7 +423,7 @@ namespace AutosarGuiEditor.Source.Controllers
                     if (NameUtils.CheckComponentName(newName))
                     {
                         _componentDefenition.Runnables[index].Name = newName;
-                        AutosarApplication.GetInstance().SyncronizeRunnables(_componentDefenition);
+                        AutosarApplication.GetInstance().SyncronizeEvents(_componentDefenition);
                         tree.UpdateAutosarTreeView(tree.SelectedItem);
                     }
                 }
@@ -420,22 +446,5 @@ namespace AutosarGuiEditor.Source.Controllers
             }
             return false;
         }
-
-#region TimingEvents
-        public void AddTimingEventButtonClick()
-        {
-            if (ComponentDefenition != null)
-            {
-                TimingEvent timingEvent = new TimingEvent();
-                ComponentDefenition.TimingEvents.Add(timingEvent);
-
-                AutosarApplication.GetInstance().UpdateTimingEventsInComponentInstances();
-
-                RefreshGridViews();
-                tree.UpdateAutosarTreeView(tree.SelectedItem);
-            }
-        }
-#endregion
-
     }
 }

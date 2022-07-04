@@ -1,6 +1,6 @@
-﻿using AutosarGuiEditor.Source.Component;
+﻿using AutosarGuiEditor.Source.Autosar.Events;
+using AutosarGuiEditor.Source.Component;
 using AutosarGuiEditor.Source.Controllers;
-using AutosarGuiEditor.Source.Painters.Components.Runables;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,13 +21,13 @@ namespace AutosarGuiEditor.Source.Forms
     public partial class RunnablesOrderForm : Window
     {
         private OsTaskEditController osTaskEditController;
-        private MoveRunnablesToTasksController moveController;
+        private MoveEventsToTasksController moveController;
        
         public RunnablesOrderForm()
         {
             InitializeComponent();
             osTaskEditController = new OsTaskEditController(AddOSTask_Button, OSTasks_DataGrid);
-            moveController = new MoveRunnablesToTasksController(AllFreeRunnables_DataGrid, RunnablesOrder_DataGrid, SelectedOSTask_ComboBox, MoveLeft_Button, MoveRight_Button, MoveAllRight_Button);
+            moveController = new MoveEventsToTasksController(AllFreeRunnables_DataGrid, RunnablesOrder_DataGrid, SelectedOSTask_ComboBox, MoveLeft_Button, MoveRight_Button, MoveAllRight_Button);
         }
         /*
         private void RunnablesOrderUp_Button_Click(object sender, RoutedEventArgs e)
@@ -67,7 +67,7 @@ namespace AutosarGuiEditor.Source.Forms
         //    UpdateGrid();
         //}
 
-        private RunnableInstancesList workedRunnables = new RunnableInstancesList();
+        private AutosarEventInstancesList workedEvents = new AutosarEventInstancesList();
 
         //public void UpdateGrid(int selectedIndex = -1)
         //{
@@ -81,14 +81,14 @@ namespace AutosarGuiEditor.Source.Forms
 
         public void LoadData()
         {
-            workedRunnables.Clear();          
-            workedRunnables.AddRange(AutosarApplication.GetInstance().GetAllRunnablesOrderedByStartup());
+            workedEvents.Clear();          
+            workedEvents.AddRange(AutosarApplication.GetInstance().GetAllEventsOrderedByStartup());
         }
 
         public void ShowForm()
         {
             LoadData();
-            moveController.UpdateAllRunnablesGrid();
+            moveController.UpdateAllEventsGrid();
             osTaskEditController.UpdateGrid();
             this.ShowDialog();
         }
@@ -141,7 +141,7 @@ namespace AutosarGuiEditor.Source.Forms
                         previousSelectedTab = MappingRunnableTabItem;
 
                         moveController.UpdateAllOsTasksList();
-                        moveController.UpdateAllRunnablesGrid();
+                        moveController.UpdateAllEventsGrid();
                     }
                 }
             }
@@ -150,17 +150,17 @@ namespace AutosarGuiEditor.Source.Forms
         private void Window_Activated(object sender, EventArgs e)
         {
             moveController.UpdateAllOsTasksList();
-            moveController.UpdateAllRunnablesGrid();
+            moveController.UpdateAllEventsGrid();
         }
 
         private void OsTaskRunnableOrder_ButtonUp_Click(object sender, RoutedEventArgs e)
         {
-            moveController.OsTaskRunnableOrder_ButtonUp_Click();
+            moveController.OsTaskEventsOrder_ButtonUp_Click();
         }
 
         private void OsTaskRunnableOrder_ButtonDown_Click(object sender, RoutedEventArgs e)
         {
-            moveController.OsTaskRunnableOrder_ButtonDown_Click();
+            moveController.OsTaskEventOrder_ButtonDown_Click();
         }
 
         private void StackSizeTextBox_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)

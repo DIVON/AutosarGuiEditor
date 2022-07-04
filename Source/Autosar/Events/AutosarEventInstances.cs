@@ -1,6 +1,7 @@
 ﻿using AutosarGuiEditor.Source.Component;
 using AutosarGuiEditor.Source.Interfaces;
 using AutosarGuiEditor.Source.SystemInterfaces;
+using AutosarGuiEditor.Source.Utility;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,7 +11,7 @@ using System.Xml.Linq;
 
 namespace AutosarGuiEditor.Source.Autosar.Events
 {
-    public abstract class AutosarEventInstance:IGUID
+    public class AutosarEventInstance:IGUID
     {
         public Guid DefenitionGuid
         {
@@ -45,11 +46,12 @@ namespace AutosarGuiEditor.Source.Autosar.Events
             {
                 if (this.Defenition != null)
                 {
-                    if (this is TimingEvent)
+                    if (Defenition is TimingEvent)
                     {
-                        return Defenition.PeriodMs;
+                        return (Defenition as TimingEvent).PeriodMs;
                     }
                 }
+                return -1;
             }
         }
 
@@ -57,7 +59,15 @@ namespace AutosarGuiEditor.Source.Autosar.Events
         {
             get
             {
-                return Defenition.PeriodMs.ToString();
+                if (this.Defenition != null)
+                {
+                    if (Defenition is TimingEvent)
+                    {
+                        return (Defenition as TimingEvent).PeriodMs.ToString();
+                    }
+                }
+
+                return "-1";
             }
         }
 
@@ -85,95 +95,12 @@ namespace AutosarGuiEditor.Source.Autosar.Events
 
 
 
-    public class ServerCallEventInstance : AutosarEventInstance
+
+    public class AutosarEventInstancesList : IGuidList<AutosarEventInstance>
     {
-        public override void LoadFromXML(XElement xml)
+        public AutosarEventInstance FindEvent(Guid DefenitionGuid)
         {
-            base.LoadFromXML(xml);
-            XElement runnableXml = xml.Element("EventGuid");
-
-            if (Runnable != null)
-            {
-                runnableXml.Add(new XElement("RunnableGuid", Runnable.GUID.ToString("B")));
-            }
-
-        }
-
-        public override void WriteToXML(XElement root)
-        {
-            XElement xmlElement = new XElement("ServerCallEvent");
-            base.WriteToXML(xmlElement);
-            if (Runnable != null)
-            {
-                xmlElement.Add(new XElement("RunnableGuid", Runnable.GUID.ToString("B")));
-            }
-            root.Add(xmlElement);
-        }
-    }
-
-    public class ServerCallEventInstanceList : IGuidList<ServerCallEventInstance>
-    {
-
-    }
-
-
-
-
-
-
-    public class TimingEventInstance : AutosarEventInstance
-    {
-        public double Frequency
-        {
-            set;
-            get;
-        }
-
-        public double Period
-        {
-            set;
-            get;
-        }
-
-        public override void LoadFromXML(XElement xml)
-        {
-            base.LoadFromXML(xml);
-            XElement runnableXml = xml.Element("RunnableGuid");
-
-            if (Runnable != null)
-            {
-                runnableXml.Add(new XElement("RunnableGuid", Runnable.GUID.ToString("B")));
-            }
-
-        }
-
-        public override void WriteToXML(XElement root)
-        {
-            XElement xmlElement = new XElement("TimingEvent");
-            base.WriteToXML(xmlElement);
-            if (Runnable != null)
-            {
-                xmlElement.Add(new XElement("RunnableGuid", Runnable.GUID.ToString("B")));
-            }
-            xmlElement.Add(new XElement("Frequency", Frequency.ToString()));
-            xmlElement.Add(new XElement("Period", Period.ToString()));
-
-            root.Add(xmlElement);
-        }
-    }
-
-    public class TimingEventList : IGuidList<TimingEvent>
-    {
-
-    }
-
-
-
-    public class AutosarEventInstancesList : IGuidList<TimingEventInstance>
-    {
-        public TimingEventInstance FindRunnable(Guid DefenitionGuid)
-        {
-            foreach (TimingEventInstance timingEventInstance in this)
+            foreach (AutosarEventInstance timingEventInstance in this)
             {
                 if (timingEventInstance.DefenitionGuid.Equals(DefenitionGuid) && !DefenitionGuid.Equals(Guid.Empty))
                 {
@@ -200,7 +127,7 @@ namespace AutosarGuiEditor.Source.Autosar.Events
                         {
                             if (!resultGuid.Equals(Guid.Empty))
                             {
-                                RunnableInstance runnableInstance = AutosarApplication.GetInstance().GetRunnableInstance(resultGuid);
+                                AutosarEventInstance runnableInstance = AutosarApplication.GetInstance().GetEventInstance(resultGuid);
                                 if (runnableInstance != null)
                                 {
                                     this.Add(runnableInstance);
@@ -215,10 +142,10 @@ namespace AutosarGuiEditor.Source.Autosar.Events
         public void WriteGuidsToXml(XElement root)
         {
             XElement Guids = new XElement("Guids");
-            foreach (RunnableInstance runnableInstance in this)
+            foreach (AutosarEventInstance eventInstance in this)
             {
-                XElement xmlElement = new XElement("RunnableInstanceGuid");
-                xmlElement.Add(new XElement("InstanceGuid", runnableInstance.GUID.ToString("B")));
+                XElement xmlElement = new XElement("EventInstanceGuid");
+                xmlElement.Add(new XElement("InstanceGuid", eventInstance.GUID.ToString("B")));
                 Guids.Add(xmlElement);
             }
             root.Add(Guids);
@@ -226,7 +153,7 @@ namespace AutosarGuiEditor.Source.Autosar.Events
 
         public void SortByRunnablesIndex()
         {
-            Sort(delegate(RunnableInstance x, RunnableInstance y)
+            Sort(delegate(AutosarEventInstance x, AutosarEventInstance y)
             {
                 object startupOrderX = GetProperty(x, "StartupOrder");
                 object startupOrderY = GetProperty(y, "StartupOrder");

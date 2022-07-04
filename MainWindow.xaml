@@ -197,7 +197,7 @@
                         Text=""
                         TextChanged="ComponentNameTextBox_TextChanged"
                         TextWrapping="Wrap" />
-                    <TabControl Margin="10,115,10,8" SelectedIndex="3">
+                    <TabControl Margin="10,115,10,8" SelectedIndex="4">
                         <TabItem Header="Runnables">
                             <Grid Background="#FFE5E5E5">
                                 <DataGrid
@@ -208,7 +208,7 @@
                                     CanUserAddRows="False">
 
                                     <DataGrid.Columns>
-                                        <DataGridTemplateColumn Width="250" Header="Name">
+                                        <DataGridTemplateColumn Width="350" Header="Name">
                                             <DataGridTemplateColumn.CellTemplate>
                                                 <DataTemplate>
                                                     <TextBox
@@ -410,7 +410,7 @@
                             </Grid>
                         </TabItem>
                         <TabItem Header="Events">
-                            <TabControl>
+                            <TabControl SelectedIndex="1">
                                 <TabItem Header="Periodical events">
                                     <Grid Background="#FFE5E5E5">
                                         <DataGrid
@@ -418,7 +418,8 @@
                                             Margin="10,48,10,8"
                                             AutoGenerateColumns="False"
                                             BeginningEdit="ComplexDataType_GridView_BeginningEdit"
-                                            CanUserAddRows="False">
+                                            CanUserAddRows="False"
+                                            IsReadOnly="True">
 
                                             <DataGrid.Columns>
                                                 <DataGridTemplateColumn Width="250" Header="Name">
@@ -448,17 +449,29 @@
                                                 <DataGridTemplateColumn Width="250" Header="Runnable">
                                                     <DataGridTemplateColumn.CellTemplate>
                                                         <DataTemplate>
-                                                            <DataGrid>
+                                                            <StackPanel Orientation="Horizontal">
                                                                 <TextBox
-                                                                    Width="220"
+                                                                    Width="200"
                                                                     VerticalContentAlignment="Center"
                                                                     BorderThickness="0"
+                                                                    IsReadOnly="True"
                                                                     Text="{Binding RunnableName}" />
                                                                 <Button
                                                                     Width="30"
-                                                                    Click="PeriodicEvent_ChangeRunnable_Click"
+                                                                    Click="PeriodicEvent_SelectRunnable_Click"
                                                                     Content="..." />
-                                                            </DataGrid>
+                                                            </StackPanel>
+                                                        </DataTemplate>
+                                                    </DataGridTemplateColumn.CellTemplate>
+                                                </DataGridTemplateColumn>
+
+                                                <DataGridTemplateColumn Width="60" Header="Remove">
+                                                    <DataGridTemplateColumn.CellTemplate>
+                                                        <DataTemplate>
+                                                            <Button
+                                                                Width="30"
+                                                                Click="PeriodicEvent_DeleteEvent_Click"
+                                                                Content="X" />
                                                         </DataTemplate>
                                                     </DataGridTemplateColumn.CellTemplate>
                                                 </DataGridTemplateColumn>
@@ -480,22 +493,17 @@
                                             HorizontalAlignment="Left"
                                             VerticalAlignment="Top"
                                             Click="PeriodicEvent_CorrectName_Click"
-                                            Content="N" />
-                                        <Button
-                                            Height="24"
-                                            Margin="902,19,10,0"
-                                            VerticalAlignment="Top"
-                                            Click="PeriodicEvent_DeleteButton_Click"
-                                            Content="-" />
+                                            Content="N"
+                                            RenderTransformOrigin="1.543,0.542" />
                                     </Grid>
                                 </TabItem>
                                 <TabItem
                                     Height="22"
                                     VerticalAlignment="Top"
-                                    Header="Server call events">
+                                    Header="Sync events">
                                     <Grid Background="#FFE5E5E5">
                                         <DataGrid
-                                            x:Name="ComponentRunnables_GridView_Copy1"
+                                            x:Name="SyncEventDataGrid"
                                             Margin="10,48,10,8"
                                             AutoGenerateColumns="False"
                                             BeginningEdit="ComplexDataType_GridView_BeginningEdit"
@@ -509,7 +517,23 @@
                                                                 VerticalContentAlignment="Center"
                                                                 BorderThickness="0"
                                                                 Text="{Binding Name}"
-                                                                TextChanged="ServerCall_FieldName_TextEdit_TextChanged" />
+                                                                TextChanged="SyncEventCall_FieldName_TextEdit_TextChanged" />
+                                                        </DataTemplate>
+                                                    </DataGridTemplateColumn.CellTemplate>
+                                                </DataGridTemplateColumn>
+
+                                                <DataGridTemplateColumn Width="250" Header="Source">
+                                                    <DataGridTemplateColumn.CellTemplate>
+                                                        <DataTemplate>
+                                                            <StackPanel Orientation="Horizontal">
+                                                                <TextBox
+                                                                    Width=""
+                                                                    VerticalContentAlignment="Center"
+                                                                    BorderThickness="0"
+                                                                    IsReadOnly="True"
+                                                                    Text="{Binding EventSource}" />
+                                                                <Button Click="SyncEventCall_SelectSource_Click" Content="..." />
+                                                            </StackPanel>
                                                         </DataTemplate>
                                                     </DataGridTemplateColumn.CellTemplate>
                                                 </DataGridTemplateColumn>
@@ -517,17 +541,25 @@
                                                 <DataGridTemplateColumn Width="250" Header="Runnable">
                                                     <DataGridTemplateColumn.CellTemplate>
                                                         <DataTemplate>
-                                                            <DataGrid>
+                                                            <StackPanel Orientation="Horizontal">
                                                                 <TextBox
                                                                     VerticalContentAlignment="Center"
                                                                     BorderThickness="0"
+                                                                    IsReadOnly="True"
                                                                     Text="{Binding RunnableName}" />
-                                                                <Button Click="ServerCallEvent_ChangeRunnable_Click" Content="..." />
-                                                            </DataGrid>
+                                                                <Button Click="SyncEventCall_ChangeRunnable_Click" Content="..." />
+                                                            </StackPanel>
                                                         </DataTemplate>
                                                     </DataGridTemplateColumn.CellTemplate>
                                                 </DataGridTemplateColumn>
 
+                                                <DataGridTemplateColumn Width="50" Header="Delete">
+                                                    <DataGridTemplateColumn.CellTemplate>
+                                                        <DataTemplate>
+                                                            <Button Click="SyncEventCall_DeleteEvent_Click" Content="x" />
+                                                        </DataTemplate>
+                                                    </DataGridTemplateColumn.CellTemplate>
+                                                </DataGridTemplateColumn>
                                             </DataGrid.Columns>
                                         </DataGrid>
                                         <Button
@@ -536,7 +568,7 @@
                                             Margin="10,19,0,0"
                                             HorizontalAlignment="Left"
                                             VerticalAlignment="Top"
-                                            Click="ServerCallEvent_AddEvent_Click"
+                                            Click="SyncEventCall_AddEvent_Click"
                                             Content="+" />
                                         <Button
                                             Width="35"
@@ -544,14 +576,96 @@
                                             Margin="44,19,0,0"
                                             HorizontalAlignment="Left"
                                             VerticalAlignment="Top"
-                                            Click="ServerCallEvent_CorrectName_Click"
+                                            Click="SyncEventCall_CorrectName_Click"
                                             Content="N" />
+                                    </Grid>
+                                </TabItem>
+                                <TabItem
+                                    Height="22"
+                                    VerticalAlignment="Top"
+                                    Header="Async events">
+                                    <Grid Background="#FFE5E5E5">
+                                        <DataGrid
+                                            x:Name="AsyncEventDataGrid"
+                                            Margin="10,48,10,8"
+                                            AutoGenerateColumns="False"
+                                            BeginningEdit="ComplexDataType_GridView_BeginningEdit"
+                                            CanUserAddRows="False">
+
+                                            <DataGrid.Columns>
+                                                <DataGridTemplateColumn Width="250" Header="Name">
+                                                    <DataGridTemplateColumn.CellTemplate>
+                                                        <DataTemplate>
+                                                            <TextBox
+                                                                VerticalContentAlignment="Center"
+                                                                BorderThickness="0"
+                                                                Text="{Binding Name}"
+                                                                TextChanged="AsyncEventCall_FieldName_TextEdit_TextChanged" />
+                                                        </DataTemplate>
+                                                    </DataGridTemplateColumn.CellTemplate>
+                                                </DataGridTemplateColumn>
+
+                                                <DataGridTemplateColumn Width="250" Header="Source">
+                                                    <DataGridTemplateColumn.CellTemplate>
+                                                        <DataTemplate>
+                                                            <StackPanel Orientation="Horizontal">
+                                                                <TextBox
+                                                                    Width="220"
+                                                                    VerticalContentAlignment="Center"
+                                                                    BorderThickness="0"
+                                                                    Text="{Binding EventSource}" />
+                                                                <Button
+                                                                    Width="30"
+                                                                    Click="AsyncEventCall_SelectSource_Click"
+                                                                    Content="..." />
+                                                            </StackPanel>
+                                                        </DataTemplate>
+                                                    </DataGridTemplateColumn.CellTemplate>
+                                                </DataGridTemplateColumn>
+
+                                                <DataGridTemplateColumn Width="250" Header="Runnable">
+                                                    <DataGridTemplateColumn.CellTemplate>
+                                                        <DataTemplate>
+                                                            <StackPanel Orientation="Horizontal">
+                                                                <TextBox
+                                                                    Width="220"
+                                                                    VerticalContentAlignment="Center"
+                                                                    BorderThickness="0"
+                                                                    Text="{Binding RunnableName}" />
+                                                                <Button
+                                                                    Width="30"
+                                                                    Click="AsyncEventCall_ChangeRunnable_Click"
+                                                                    Content="..." />
+                                                            </StackPanel>
+                                                        </DataTemplate>
+                                                    </DataGridTemplateColumn.CellTemplate>
+                                                </DataGridTemplateColumn>
+
+                                                <DataGridTemplateColumn Width="50" Header="Delete">
+                                                    <DataGridTemplateColumn.CellTemplate>
+                                                        <DataTemplate>
+                                                            <Button Click="AsyncEventCall_DeleteEvent_Click" Content="x" />
+                                                        </DataTemplate>
+                                                    </DataGridTemplateColumn.CellTemplate>
+                                                </DataGridTemplateColumn>
+                                            </DataGrid.Columns>
+                                        </DataGrid>
                                         <Button
+                                            Width="29"
                                             Height="24"
-                                            Margin="902,19,10,0"
+                                            Margin="10,19,0,0"
+                                            HorizontalAlignment="Left"
                                             VerticalAlignment="Top"
-                                            Click="ServerCallEvent_DeleteButton_Click"
-                                            Content="-" />
+                                            Click="AsyncEventCall_AddEvent_Click"
+                                            Content="+" />
+                                        <Button
+                                            Width="35"
+                                            Height="24"
+                                            Margin="44,19,0,0"
+                                            HorizontalAlignment="Left"
+                                            VerticalAlignment="Top"
+                                            Click="AsyncEventCall_CorrectName_Click"
+                                            Content="N" />
                                     </Grid>
                                 </TabItem>
                             </TabControl>

@@ -16,7 +16,7 @@ using AutosarGuiEditor.Source.Component;
 using AutosarGuiEditor.Source.PortDefenitions;
 using AutosarGuiEditor.Source.Painters.PortsPainters;
 using AutosarGuiEditor.Source.Utility;
-using AutosarGuiEditor.Source.Painters.Components.Runables;
+using AutosarGuiEditor.Source.Autosar.Events;
 
 
 
@@ -106,7 +106,8 @@ namespace System
             }
             componentInstance.UpdateCData();
             componentInstance.UpdatePims();
-            componentInstance.SyncronizeRunnablesWithDefenition();
+            componentInstance.SyncronizeAsyncClientServerEventsWithDefenition();
+            componentInstance.SyncronizeTimingEventsWithDefenition();
             return componentInstance;
 		}
 
@@ -126,12 +127,12 @@ namespace System
             return componentDefenition.Name + count.ToString();*/
         }
 
-        public RunnableInstance CreateRunnableInstance(RunnableDefenition runnableDefenition)
+        public AutosarEventInstance CreateEventInstance(AutosarEvent eventDefenition)
         {
-            RunnableInstance runable = new RunnableInstance();
-            runable.Name = runnableDefenition.Name;
-            runable.DefenitionGuid = runnableDefenition.GUID;
-            return runable;
+            AutosarEventInstance eventInstance = new AutosarEventInstance();
+            eventInstance.Name = eventDefenition.Name;
+            eventInstance.DefenitionGuid = eventDefenition.GUID;
+            return eventInstance;
         }
 
         public RunnableDefenition CreateRunnableDefenition(string Name)

@@ -1,4 +1,4 @@
-﻿using AutosarGuiEditor.Source.Painters.Components.Runables;
+﻿using AutosarGuiEditor.Source.Autosar.Events;
 using AutosarGuiEditor.Source.SystemInterfaces;
 using System;
 using System.Collections.Generic;
@@ -16,7 +16,7 @@ namespace AutosarGuiEditor.Source.Autosar.OsTasks
             StackSizeInBytes = defaultStackSize;
         }
 
-        public RunnableInstancesList Runnables = new RunnableInstancesList();
+        public AutosarEventInstancesList Events = new AutosarEventInstancesList();
 
         public Double PeriodMs
         {
@@ -56,7 +56,7 @@ namespace AutosarGuiEditor.Source.Autosar.OsTasks
         public override void LoadFromXML(XElement xml)
         {
             base.LoadFromXML(xml);
-            Runnables.LoadGuidsFromXML(xml);
+            Events.LoadGuidsFromXML(xml);
             XElement msElement = xml.Element("PeriodMs");
             if (msElement == null)
             {
@@ -100,7 +100,7 @@ namespace AutosarGuiEditor.Source.Autosar.OsTasks
                 }
             }
 
-            Runnables.SortByRunnablesIndex();
+            Events.SortByRunnablesIndex();
         }
 
         private int defaultStackSize = 128;
@@ -114,7 +114,7 @@ namespace AutosarGuiEditor.Source.Autosar.OsTasks
             xmlElement.Add(new XElement("Priority", Priority));
             xmlElement.Add(new XElement("StackSizeInBytes", StackSizeInBytes));
 
-            Runnables.WriteGuidsToXml(xmlElement);
+            Events.WriteGuidsToXml(xmlElement);
             root.Add(xmlElement);
         }
 

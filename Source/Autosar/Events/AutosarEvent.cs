@@ -1,5 +1,9 @@
-﻿using AutosarGuiEditor.Source.Component;
+﻿using AutosarGuiEditor.Source.AutosarInterfaces;
+using AutosarGuiEditor.Source.AutosarInterfaces.ClientServer;
+using AutosarGuiEditor.Source.Component;
 using AutosarGuiEditor.Source.Interfaces;
+using AutosarGuiEditor.Source.Painters.PortsPainters;
+using AutosarGuiEditor.Source.PortDefenitions;
 using AutosarGuiEditor.Source.SystemInterfaces;
 using AutosarGuiEditor.Source.Utility;
 using System;
@@ -46,13 +50,17 @@ namespace AutosarGuiEditor.Source.Autosar.Events
                 }
                 return runnableName;
             }
+            set
+            {
+
+            }
         }
     }
 
 
 
 
-    public class ServerCallEvent : AutosarEvent
+    public class ClientServerEvent : AutosarEvent
     {
         public override void LoadFromXML(XElement xml)
         {
@@ -71,9 +79,61 @@ namespace AutosarGuiEditor.Source.Autosar.Events
             }
             root.Add(xmlElement);
         }
+
+        private Guid SourcePortGuid
+        {
+            set;
+            get;
+        }
+
+        PortDefenition sourcePort = null;
+        public PortDefenition SourcePort
+        {
+            set
+            {
+                /* Impossible to set Source port */
+            }
+            get
+            {
+                if (sourcePort == null)
+                {
+                    sourcePort = AutosarApplication.GetInstance().FindPortDefenition(SourcePortGuid);                    
+                }
+
+                return sourcePort;
+            }
+        }
+
+        private Guid SourceOperationGuid
+        {
+            set;
+            get;
+        }
+
+        ClientServerOperation sourceOperation = null;
+        public ClientServerOperation SourceOperation
+        {
+            set
+            {
+
+            }
+            get
+            {
+                /* Find source once */
+                if (sourceOperation == null)
+                {
+                    ClientServerInterface csInterface = SourcePort.InterfaceDatatype as ClientServerInterface;
+                    if (csInterface != null)
+                    {
+                        sourceOperation = csInterface.Operations.Find(op => op.GUID == SourceOperationGuid);
+                    }
+                }
+                return sourceOperation;
+            }
+        }
     }
 
-    public class ServerCallEventList : IGuidList<ServerCallEvent>
+    public class ClientServerEventList : IGuidList<ClientServerEvent>
     {
 
     }

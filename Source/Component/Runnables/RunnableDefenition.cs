@@ -18,59 +18,25 @@ namespace AutosarGuiEditor.Source.Component
 {
 	public class RunnableDefenition : IGUID 
     {
-        public Double PeriodMs
-        {
-            set;
-            get;
-        }
-
-        public String PeriodMsString
-        {
-            get
-            {
-                return PeriodMs.ToString();
-            }
-        }
-
         public RunnableDefenition()
         {
             Name = "Refresh";
-            PeriodMs = 0.250;
         }
 
         public RunnableDefenition(string name)
         {
             Name = name;
-            PeriodMs = 0.250;
 		}
 
         public override void LoadFromXML(XElement xml)
         {
             base.LoadFromXML(xml);
-            XElement periodStr = xml.Element("PeriodMs");
-            if (periodStr != null)
-            {
-                double period;
-                if (double.TryParse(periodStr.Value, out period))
-                {
-                    PeriodMs = period;
-                }
-                else
-                {
-                    PeriodMs = 0.250;
-                }
-            }
-            else
-            {
-                PeriodMs = 0.250;
-            }
         }
 
         public override void WriteToXML(XElement root)
         {
             XElement xmlElement = new XElement("Runnable");
             base.WriteToXML(xmlElement);
-            xmlElement.Add(new XElement("PeriodMs", PeriodMs.ToString()));
             root.Add(xmlElement);
         }
 	}

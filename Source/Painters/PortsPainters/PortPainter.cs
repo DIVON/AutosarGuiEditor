@@ -99,7 +99,6 @@ namespace AutosarGuiEditor.Source.Painters.PortsPainters
             cummulatedShift.X += x;
             cummulatedShift.Y += y;
 
-            bool doMove = false;
 
             if (Math.Abs(cummulatedShift.X) > AnchorsStep.Step)
             {
@@ -108,7 +107,6 @@ namespace AutosarGuiEditor.Source.Painters.PortsPainters
                 rectanglePainter.Left = Math.Round(cummulatedShift.X / 5) * 5;
                 cummulatedShift.X -= ceilPart;
                 translate.X = ceilPart;
-                doMove = true;
             }
 
             if (Math.Abs(cummulatedShift.Y) > AnchorsStep.Step)
@@ -117,7 +115,6 @@ namespace AutosarGuiEditor.Source.Painters.PortsPainters
                 rectanglePainter.MoveY(ceilPart);
                 cummulatedShift.Y -= ceilPart;
                 translate.Y = ceilPart;
-                doMove = true;
             }
         }
 

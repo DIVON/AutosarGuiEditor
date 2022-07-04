@@ -44,7 +44,8 @@ namespace AutosarGuiEditor.Source.Component
             {
                 MultipleInstantiation = false; 
             }
-            serverCallEvents.LoadFromXML(xml);
+            syncClientServerEvents.LoadFromXML(xml);
+            asyncClientServerEvents.LoadFromXML(xml);
             timingEvents.LoadFromXML(xml);
         }
 
@@ -59,7 +60,8 @@ namespace AutosarGuiEditor.Source.Component
             CDataDefenitions.WriteToXML(xmlElement);
             XElement multInstantiation = new XElement("MultipleInstantiation", MultipleInstantiation.ToString());
             xmlElement.Add(multInstantiation);
-            serverCallEvents.WriteToXML(xmlElement);
+            syncClientServerEvents.WriteToXML(xmlElement);
+            asyncClientServerEvents.WriteToXML(xmlElement);
             timingEvents.WriteToXML(xmlElement);
 
             root.Add(xmlElement);
@@ -73,7 +75,8 @@ namespace AutosarGuiEditor.Source.Component
             list.Add(PerInstanceMemoryList);
             list.Add(CDataDefenitions);
             list.Add(timingEvents);
-            list.Add(ServerCallEvents);
+            list.Add(syncClientServerEvents);
+            list.Add(asyncClientServerEvents);
             return list;
         }
 
@@ -88,13 +91,21 @@ namespace AutosarGuiEditor.Source.Component
         }
 
 
-        ServerCallEventList serverCallEvents = new ServerCallEventList();
-
-        public ServerCallEventList ServerCallEvents
+        ClientServerEventList syncClientServerEvents = new ClientServerEventList();
+        public ClientServerEventList SyncClientServerEvents
         {
             get
             {
-                return serverCallEvents;
+                return syncClientServerEvents;
+            }
+        }
+
+        ClientServerEventList asyncClientServerEvents = new ClientServerEventList();
+        public ClientServerEventList AsyncClientServerEvents
+        {
+            get
+            {
+                return asyncClientServerEvents;
             }
         }
     }

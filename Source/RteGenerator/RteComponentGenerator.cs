@@ -5,7 +5,6 @@ using AutosarGuiEditor.Source.Component;
 using AutosarGuiEditor.Source.Component.CData;
 using AutosarGuiEditor.Source.Component.PerInstanceMemory;
 using AutosarGuiEditor.Source.Painters;
-using AutosarGuiEditor.Source.Painters.Components.Runables;
 using AutosarGuiEditor.Source.Painters.PortsPainters;
 using AutosarGuiEditor.Source.PortDefenitions;
 using System;

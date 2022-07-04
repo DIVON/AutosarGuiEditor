@@ -15,13 +15,13 @@ using AutosarGuiEditor.Source.DataTypes.BaseDataType;
 using AutosarGuiEditor.Source.AutosarInterfaces;
 using AutosarGuiEditor.Source.AutosarInterfaces.SenderReceiver;
 using AutosarGuiEditor.Source.Component;
-using AutosarGuiEditor.Source.Painters.Components.Runables;
 using AutosarGuiEditor.Source.Painters.Components.CData;
 using AutosarGuiEditor.Source.Component.CData;
 using AutosarGuiEditor.Source.Component.PerInstanceMemory;
 using AutosarGuiEditor.Source.Painters.Components.PerInstance;
 using AutosarGuiEditor.Source.Autosar.OsTasks;
 using AutosarGuiEditor.Source.AutosarInterfaces.ClientServer;
+using AutosarGuiEditor.Source.Autosar.Events;
 
 namespace WpfTreeView
 {
@@ -163,7 +163,7 @@ namespace WpfTreeView
                     var image = Path.GetDirectoryName(System.Windows.Forms.Application.ExecutablePath) + "\\Images\\icons\\tree\\ComponentDefenition.png";
                     return new BitmapImage(new Uri(image));
                 }
-                if ((value is RunnableInstance) || (value is RunnableDefenition))
+                if ((value is TimingEvent) || (value is ClientServerEvent))
                 {
                     var image = Path.GetDirectoryName(System.Windows.Forms.Application.ExecutablePath) + "\\Images\\icons\\tree\\PeriodicRunnable.png";
                     return new BitmapImage(new Uri(image));

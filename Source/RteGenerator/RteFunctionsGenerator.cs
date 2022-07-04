@@ -1,4 +1,5 @@
 ﻿using AutosarGuiEditor.Source.App.Settings;
+using AutosarGuiEditor.Source.Autosar.Events;
 using AutosarGuiEditor.Source.Autosar.OsTasks;
 using AutosarGuiEditor.Source.AutosarInterfaces;
 using AutosarGuiEditor.Source.AutosarInterfaces.ClientServer;
@@ -10,7 +11,6 @@ using AutosarGuiEditor.Source.DataTypes.Enum;
 using AutosarGuiEditor.Source.Painters;
 using AutosarGuiEditor.Source.Painters.Components.CData;
 using AutosarGuiEditor.Source.Painters.Components.PerInstance;
-using AutosarGuiEditor.Source.Painters.Components.Runables;
 using AutosarGuiEditor.Source.Painters.PortsPainters;
 using AutosarGuiEditor.Source.PortDefenitions;
 using AutosarGuiEditor.Source.Render;
@@ -439,16 +439,16 @@ namespace AutosarGuiEditor.Source.RteGenerator
         }
 
 
-        public static String Generate_CallOfRunnable(RunnableInstance runnable)
+        public static String Generate_CallOfEvent(AutosarEventInstance eventInstance)
         {
-            ComponentInstance compInstance = AutosarApplication.GetInstance().FindComponentInstanceByRunnableGuid(runnable.GUID);
+            ComponentInstance compInstance = AutosarApplication.GetInstance().FindComponentInstanceByEventGuid(eventInstance.GUID);
             if (!compInstance.ComponentDefenition.MultipleInstantiation)
             {
-                return Generate_RunnableFunctionName(compInstance.ComponentDefenition, runnable.Defenition) + "();";
+                return Generate_RunnableFunctionName(compInstance.ComponentDefenition, eventInstance.Defenition.Runnable) + "();";
             }
             else
             {
-                String funcName = Generate_RunnableFunctionName(compInstance.ComponentDefenition, runnable.Defenition);
+                String funcName = Generate_RunnableFunctionName(compInstance.ComponentDefenition, eventInstance.Defenition.Runnable);
                 String compName = GenerateComponentName(compInstance.Name);
 
                 return funcName + "(" + LinkToTheComponentInstance(compInstance) + ");";

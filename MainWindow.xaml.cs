@@ -87,7 +87,7 @@ namespace AutosarGuiEditor
             enumsMenu = new EnumsMenu(AutosarTree, Enums_GridView, EnumDataType_NameEdit);
             senderReceiverInterfaceController = new SenderReceiverInterfaceController(AutosarTree, SenderReceiver_GridView, SenderReceiver_NameTextBox, SenderReceiver_IsQueuedCheckBox, SenderReceiver_QueueSizeTB);
             clientServerInterfaceController = new ClientServerInterfaceController(AutosarTree, ClientServer_GridView, ClientServer_NameTextBox, AsyncCallCheckBox);
-            componentDefenitionViewController = new ComponentDefenitionController(AutosarTree, ComponentDefenitionName_TextBox, ComponentPorts_GridView, ComponentRunnables_GridView, MultipleInstantiation_CheckBox, AddPerInstanceDefenition_Button, PerInstanceDefenition_Grid, CDataDescription_Grid, AddCDataDescription_Button);
+            componentDefenitionViewController = new ComponentDefenitionController(AutosarTree, ComponentDefenitionName_TextBox, ComponentPorts_GridView, ComponentRunnables_GridView, MultipleInstantiation_CheckBox, AddPerInstanceDefenition_Button, PerInstanceDefenition_Grid, CDataDescription_Grid, AddCDataDescription_Button, PeriodicalEventsDataGrid, SyncEventDataGrid, AsyncEventDataGrid);//, PeriodicEvent_AddEventButton, PeriodicEvent_SelectRunnable_Button);
             connectionLineController = new ConnectionLineController(AutosarTree);
             changeViewportScaleController = new ChangeViewportScaleController(scene, ViewPortImage);
             addComponentInstancesController = new AddObjectController(AutosarTree);
@@ -1184,8 +1184,6 @@ namespace AutosarGuiEditor
 
         }
 
-        String lastTestEnvironmentDir;
-
         private void GenerateTestEnvironment_Click(object sender, RoutedEventArgs e)
         {
             TestRteEnvironmentGenerator generator = new TestRteEnvironmentGenerator();
@@ -1285,37 +1283,105 @@ namespace AutosarGuiEditor
         }
 
 #region PERIODIC_EVENT
-        private void PeriodicEvent_DeleteButton_Click(object sender, RoutedEventArgs e)
-        {
-
-        }
 
         private void PeriodicEvent_FieldName_TextEdit_TextChanged(object sender, TextChangedEventArgs e)
         {
-
+            componentDefenitionViewController.TimingEvents.TextEdit_TextChanged(sender, e);
         }
 
         private void PeriodicEvent_EditFrequency(object sender, TextChangedEventArgs e)
         {
-            if (ComponentRunnables_GridView.SelectedIndex >= 0)
+            if (PeriodicalEventsDataGrid.SelectedIndex >= 0)
             {
                 TextBox tb = (TextBox)sender;
-                componentDefenitionViewController.UpdateFrequency(tb.Text);
+                componentDefenitionViewController.TimingEvents.UpdateFrequency(tb.Text);
             }
+        }
+
+        private void PeriodicEvent_SelectRunnable_Click(object sender, RoutedEventArgs e)
+        {
+            componentDefenitionViewController.TimingEvents.TimingEvent_SelectRunnableButton_Click(sender, e);
         }
 
         private void PeriodicEvent_AddEvent_Click(object sender, RoutedEventArgs e)
         {
-
+            componentDefenitionViewController.TimingEvents.AddTimingEventButtonClick(sender, e);
         }
-#endregion
-#region SERVERCALL_EVENT
-        private void ServerCall_FieldName_TextEdit_TextChanged(object sender, TextChangedEventArgs e)
+
+
+        private void PeriodicEvent_DeleteEvent_Click(object sender, RoutedEventArgs e)
         {
+            componentDefenitionViewController.TimingEvents.PeriodicEvent_DeleteEventClick(sender, e);
+        }
 
+        private void PeriodicEvent_CorrectName_Click(object sender, RoutedEventArgs e)
+        {
+            componentDefenitionViewController.TimingEvents.Event_CorrectNameClick(sender, e);
+        }
+#endregion
+#region SYNC_EVENT
+        private void SyncEventCall_FieldName_TextEdit_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            componentDefenitionViewController.SyncEventController.EventName_TextChanged(sender, e);
+        }
+
+        private void SyncEventCall_AddEvent_Click(object sender, RoutedEventArgs e)
+        {
+            componentDefenitionViewController.SyncEventController.AddEventButtonClick(sender, e);
+        }
+
+        private void SyncEventCall_CorrectName_Click(object sender, RoutedEventArgs e)
+        {
+            componentDefenitionViewController.SyncEventController.Event_CorrectNameClick(sender, e);
+        }
+
+        private void SyncEventCall_SelectSource_Click(object sender, RoutedEventArgs e)
+        {
+            componentDefenitionViewController.SyncEventController.SelectSourceButton_Click(sender, e);
+        }
+
+        private void SyncEventCall_ChangeRunnable_Click(object sender, RoutedEventArgs e)
+        {
+            componentDefenitionViewController.SyncEventController.SelectRunnableButton_Click(sender, e);
+        }
+
+        private void SyncEventCall_DeleteEvent_Click(object sender, RoutedEventArgs e)
+        {
+            componentDefenitionViewController.SyncEventController.DeleteEventClick(sender, e);
         }
 #endregion
 
+#region ASYNC_EVENT
+        private void AsyncEventCall_FieldName_TextEdit_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            componentDefenitionViewController.AsyncEventController.EventName_TextChanged(sender, e);
+        }
+
+        private void AsyncEventCall_AddEvent_Click(object sender, RoutedEventArgs e)
+        {
+            componentDefenitionViewController.AsyncEventController.AddEventButtonClick(sender, e);
+        }
+
+        private void AsyncEventCall_CorrectName_Click(object sender, RoutedEventArgs e)
+        {
+            componentDefenitionViewController.AsyncEventController.Event_CorrectNameClick(sender, e);
+        }
+
+        private void AsyncEventCall_SelectSource_Click(object sender, RoutedEventArgs e)
+        {
+            componentDefenitionViewController.AsyncEventController.SelectSourceButton_Click(sender, e);
+        }
+
+        private void AsyncEventCall_ChangeRunnable_Click(object sender, RoutedEventArgs e)
+        {
+            componentDefenitionViewController.AsyncEventController.SelectRunnableButton_Click(sender, e);
+        }
+
+        private void AsyncEventCall_DeleteEvent_Click(object sender, RoutedEventArgs e)
+        {
+            componentDefenitionViewController.AsyncEventController.DeleteEventClick(sender, e);
+        }
+#endregion
     }
 
 }

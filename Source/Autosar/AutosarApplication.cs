@@ -27,7 +27,6 @@ using AutosarGuiEditor.Source.PortDefenitions;
 using AutosarGuiEditor.Source.Component;
 using AutosarGuiEditor.Source.Painters;
 using AutosarGuiEditor.Source.Painters.PortsPainters;
-using AutosarGuiEditor.Source.Painters.Components.Runables;
 using AutosarGuiEditor.Source.Painters.Components.PerInstance;
 using AutosarGuiEditor.Source.Component.PerInstanceMemory;
 using AutosarGuiEditor.Source.Fabrics;
@@ -231,7 +230,7 @@ namespace System
                 arrayDataTypes.LoadFromXML(xroot);
                 MCUType.LoadFromXML(xroot);
                 BaseDataTypes.CheckBaseDataTypes();
-                SyncronizeRunnables(null, true);
+                SyncronizeEvents(null, true);
                 UpdateConnections();
 
                 FileName = filename;
@@ -580,54 +579,15 @@ namespace System
         }
 
 
-        public void UpdateTimingEventsInComponentInstances()
+        public void UpdateEventsInComponentInstances()
         {
-            throw new NotImplementedException();
-
             /* Remove unexists port in defenition */
             foreach (CompositionInstance composition in Compositions)
             {
                 foreach (ComponentInstance compInstance in composition.ComponentInstances)
                 {
-                    ApplicationSwComponentType compDefenition = compInstance.ComponentDefenition;
-                    for (int i = compInstance.Ports.Count - 1; i >= 0; i--)
-                    {
-                        PortPainter portPainter = compInstance.Ports[i];
-                        PortDefenition portDefenition = compDefenition.Ports.FindObject(portPainter.PortDefenitionGuid);
-                        if (portDefenition == null)
-                        {
-                            DeletePort(portPainter);
-                        }
-                    }
-                }
-            }
-
-            /* Add new or missing ports */
-            foreach (CompositionInstance composition in Compositions)
-            {
-                foreach (ComponentInstance compInstance in composition.ComponentInstances)
-                {
-                    ApplicationSwComponentType compDefenition = compInstance.ComponentDefenition;
-                    foreach (PortDefenition portDef in compDefenition.Ports)
-                    {
-                        bool find = false;
-                        foreach (PortPainter portPainter in compInstance.Ports)
-                        {
-                            if (portPainter.PortDefenition.Equals(portDef))
-                            {
-                                find = true;
-                                break;
-                            }
-                        }
-                        if (!find)
-                        {
-                            double x = compInstance.Painter.Left - PortPainter.DefaultWidth / 2.0;
-                            double y = (compInstance.Painter.Top + compInstance.Painter.Bottom) / 2;
-
-                            PortPainter portPainter = ComponentFabric.GetInstance().CreatePortPainter(portDef, x, y);
-                            compInstance.Ports.Add(portPainter);
-                        }
-                    }
+                    compInstance.SyncronizeAsyncClientServerEventsWithDefenition();
+                    compInstance.SyncronizeTimingEventsWithDefenition();
                 }
             }
         }
@@ -756,52 +716,52 @@ namespace System
             return names;
         }
 
-        public RunnableInstancesList GetAllRunnableInstances()
+        public AutosarEventInstancesList GetAllAutosarEventsInstances()
         {
-            RunnableInstancesList runnables = new RunnableInstancesList();
+            AutosarEventInstancesList events = new AutosarEventInstancesList();
             foreach (CompositionInstance composition in Compositions)
             {
                 foreach (ComponentInstance component in composition.ComponentInstances)
                 {
-                    runnables.AddRange(component.RunableInstances);
+                    events.AddRange(component.AsyncClientServerEventsInstancesList);
+                    events.AddRange(component.TimingEventsList);
                 }
             }
-            return runnables;
+            return events;
         }
 
-        public RunnableInstance GetRunnableInstance(Guid GUID)
+        public AutosarEventInstance GetEventInstance(Guid GUID)
         {
-            RunnableInstancesList allRunnables = GetAllRunnableInstances();
-            foreach (RunnableInstance runnable in allRunnables)
+            AutosarEventInstancesList allEventInstances = GetAllAutosarEventsInstances();
+            foreach (AutosarEventInstance eventInstance in allEventInstances)
             {
-                if (runnable.GUID.Equals(GUID))
+                if (eventInstance.GUID.Equals(GUID))
                 {
-                    return runnable;
+                    return eventInstance;
                 }
             }
             return null;
         }
 
-        public RunnableInstancesList GetAllUnnassignedRunnables()
+        public AutosarEventInstancesList GetAllUnnassignedEvents()
         {
-            RunnableInstancesList list = new RunnableInstancesList();
-            RunnableInstancesList allRunnables = GetAllRunnableInstances();
-            foreach (RunnableInstance runnable in allRunnables)
+            AutosarEventInstancesList list = new AutosarEventInstancesList();
+            AutosarEventInstancesList allEvents = GetAllAutosarEventsInstances();
+            foreach (AutosarEventInstance eventInstance in allEvents)
             {
-                if (GetRunnableTask(runnable) == null)
+                if (GetEventTask(eventInstance) == null)
                 {
-                    list.Add(runnable);
+                    list.Add(eventInstance);
                 }
             }
             
             return list;
         }
 
-        public OsTask GetRunnableTask(RunnableInstance runnableInstance)
+        public OsTask GetEventTask(AutosarEventInstance eventInstance)
         {
             foreach (OsTask task in this.OsTasks)
             {
-                if (task.Runnables.FindObject(runnableInstance.GUID) != null)
                 {
                     return task;
                 }
@@ -810,13 +770,13 @@ namespace System
         }
 
 
-        public RunnableInstancesList GetAllRunnablesOrderedByStartup()
+        public AutosarEventInstancesList GetAllEventsOrderedByStartup()
         {
-            RunnableInstancesList allrunnables = GetAllRunnableInstances();
-            List<RunnableInstance> orderedRunnables = allrunnables.OrderBy(Obj => Obj.StartupOrder).ToList();
-            allrunnables.Clear();
-            allrunnables.AddRange(orderedRunnables);
-            return allrunnables;
+            AutosarEventInstancesList allEvents = GetAllAutosarEventsInstances();
+            List<AutosarEventInstance> orderedRunnables = allEvents.OrderBy(Obj => Obj.StartupOrder).ToList();
+            allEvents.Clear();
+            allEvents.AddRange(orderedRunnables);
+            return allEvents;
         }
 
 
@@ -1201,26 +1161,38 @@ namespace System
                 {
                     return eventDef;
                 }
-            }
 
-            foreach (ApplicationSwComponentType compDef in this.ComponentDefenitionsList)
-            {
-                eventDef = compDef.ServerCallEvents.FindObject(eventDefGuid);
+                eventDef = compDef.SyncClientServerEvents.FindObject(eventDefGuid);
+                if (eventDef != null)
+                {
+                    return eventDef;
+                }
+
+                eventDef = compDef.AsyncClientServerEvents.FindObject(eventDefGuid);
                 if (eventDef != null)
                 {
                     return eventDef;
                 }
             }
+
             return null;
         }
 
-        public ComponentInstance FindComponentInstanceByRunnableGuid(Guid runnableGuid)
+        public ComponentInstance FindComponentInstanceByEventGuid(Guid runnableGuid)
         {
             foreach (CompositionInstance composition in Compositions)
             {
                 foreach (ComponentInstance compInstance in composition.ComponentInstances)
                 {
-                    if (compInstance.RunableInstances.FindObject(runnableGuid) != null)
+                    if (compInstance.TimingEventsList.FindObject(runnableGuid) != null)
+                    {
+                        return compInstance;
+                    }
+                    if (compInstance.AsyncClientServerEventsInstancesList.FindObject(runnableGuid) != null)
+                    {
+                        return compInstance;
+                    }
+                    if (compInstance.SyncClientServerEventsInstancesList.FindObject(runnableGuid) != null)
                     {
                         return compInstance;
                     }
@@ -1484,7 +1456,7 @@ namespace System
             }
         }
 
-        public void SyncronizeRunnables(ApplicationSwComponentType compDef, bool useAllDefenition = false)
+        public void SyncronizeEvents(ApplicationSwComponentType compDef, bool useAllDefenition = false)
         {
             foreach (CompositionInstance composition in Compositions)
             {
@@ -1492,7 +1464,8 @@ namespace System
                 {
                     if (useAllDefenition || compInstance.ComponentDefenition.Equals(compDef))
                     {
-                        compInstance.SyncronizeRunnablesWithDefenition();
+                        compInstance.SyncronizeTimingEventsWithDefenition();
+                        compInstance.SyncronizeAsyncClientServerEventsWithDefenition();
                     }
                 }
             }
