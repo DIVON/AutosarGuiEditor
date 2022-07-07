@@ -57,10 +57,7 @@ namespace AutosarGuiEditor.Source.Autosar.Events
         }
     }
 
-
-
-
-    public class ClientServerEvent : AutosarEvent
+    public class OneTimeEvent : AutosarEvent
     {
         public override void LoadFromXML(XElement xml)
         {
@@ -71,11 +68,48 @@ namespace AutosarGuiEditor.Source.Autosar.Events
 
         public override void WriteToXML(XElement root)
         {
-            XElement xmlElement = new XElement("ServerCallEvent");
+            XElement xmlElement = new XElement("OneTimeEvent");
             base.WriteToXML(xmlElement);
-            if (Runnable != null)
+            if (RunnableGuid != null)
             {
                 xmlElement.Add(new XElement("RunnableGuid", RunnableGuid.ToString("B")));
+            }
+           
+            root.Add(xmlElement);
+        }
+    }
+
+    public class OneTimeEventList : IGuidList<OneTimeEvent>
+    {
+
+    }
+
+    public class ClientServerEvent : AutosarEvent
+    {
+        public override void LoadFromXML(XElement xml)
+        {
+            base.LoadFromXML(xml);
+
+            RunnableGuid        = GuidUtils.GetGuid(XmlUtilits.GetFieldValue(xml, "RunnableGuid", ""),          false);
+            SourcePortGuid      = GuidUtils.GetGuid(XmlUtilits.GetFieldValue(xml, "SourcePortGuid", ""),        false);
+            SourceOperationGuid = GuidUtils.GetGuid(XmlUtilits.GetFieldValue(xml, "SourceOperationGuid", ""),   false);
+        }
+
+        public override void WriteToXML(XElement root)
+        {
+            XElement xmlElement = new XElement("ServerCallEvent");
+            base.WriteToXML(xmlElement);
+            if (RunnableGuid != null)
+            {
+                xmlElement.Add(new XElement("RunnableGuid", RunnableGuid.ToString("B")));
+            }
+            if (SourcePortGuid != null)
+            {
+                xmlElement.Add(new XElement("SourcePortGuid", SourcePortGuid.ToString("B")));
+            }
+            if (SourceOperationGuid != null)
+            {
+                xmlElement.Add(new XElement("SourceOperationGuid", SourceOperationGuid.ToString("B")));
             }
             root.Add(xmlElement);
         }
@@ -91,7 +125,8 @@ namespace AutosarGuiEditor.Source.Autosar.Events
         {
             set
             {
-                /* Impossible to set Source port */
+                sourcePort = value;
+                SourcePortGuid = value.GUID;
             }
             get
             {
@@ -101,6 +136,25 @@ namespace AutosarGuiEditor.Source.Autosar.Events
                 }
 
                 return sourcePort;
+            }
+        }
+
+        public String EventSource
+        {
+            set
+            {
+
+            }
+            get
+            {
+                if ((SourcePort != null) && (SourceOperation != null))
+                {
+                    return SourcePort.Name + ": " + sourceOperation.Name;
+                }
+                else
+                {
+                    return "ERROR";
+                }
             }
         }
 
@@ -115,7 +169,8 @@ namespace AutosarGuiEditor.Source.Autosar.Events
         {
             set
             {
-
+                SourceOperationGuid = value.GUID;
+                sourceOperation = value;
             }
             get
             {
@@ -138,6 +193,15 @@ namespace AutosarGuiEditor.Source.Autosar.Events
 
     }
 
+    public class SyncClientServerEventList : ClientServerEventList
+    {
+
+    }
+
+    public class AsyncClientServerEventList : ClientServerEventList
+    {
+
+    }
 
 
 

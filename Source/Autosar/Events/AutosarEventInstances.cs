@@ -1,18 +1,34 @@
-﻿using AutosarGuiEditor.Source.Component;
-using AutosarGuiEditor.Source.Interfaces;
+﻿using AutosarGuiEditor.Source.Interfaces;
+using AutosarGuiEditor.Source.Render;
 using AutosarGuiEditor.Source.SystemInterfaces;
 using AutosarGuiEditor.Source.Utility;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Xml.Linq;
 
 namespace AutosarGuiEditor.Source.Autosar.Events
 {
     public class AutosarEventInstance:IGUID
     {
+        public String FullName
+        {
+            get
+            {
+                String fullName;
+                IElementWithPorts compInstance = AutosarApplication.GetInstance().FindComponentInstanceByEventId(this.GUID);
+
+                if (Defenition != null)
+                {
+                    fullName = compInstance.Name + "_" + Defenition.Name;
+                }
+                else
+                {
+                    fullName = compInstance.Name + "_ERROR";
+                }
+                return fullName;
+            }
+        }
+
         public Guid DefenitionGuid
         {
             set;
@@ -36,7 +52,8 @@ namespace AutosarGuiEditor.Source.Autosar.Events
         {
             get
             {
-                return AutosarApplication.GetInstance().FindEventDefenition(DefenitionGuid);
+                AutosarEvent eventDef = AutosarApplication.GetInstance().FindEventDefenition(DefenitionGuid);
+                return eventDef;
             }
         }
 

@@ -87,7 +87,22 @@ namespace AutosarGuiEditor
             enumsMenu = new EnumsMenu(AutosarTree, Enums_GridView, EnumDataType_NameEdit);
             senderReceiverInterfaceController = new SenderReceiverInterfaceController(AutosarTree, SenderReceiver_GridView, SenderReceiver_NameTextBox, SenderReceiver_IsQueuedCheckBox, SenderReceiver_QueueSizeTB);
             clientServerInterfaceController = new ClientServerInterfaceController(AutosarTree, ClientServer_GridView, ClientServer_NameTextBox, AsyncCallCheckBox);
-            componentDefenitionViewController = new ComponentDefenitionController(AutosarTree, ComponentDefenitionName_TextBox, ComponentPorts_GridView, ComponentRunnables_GridView, MultipleInstantiation_CheckBox, AddPerInstanceDefenition_Button, PerInstanceDefenition_Grid, CDataDescription_Grid, AddCDataDescription_Button, PeriodicalEventsDataGrid, SyncEventDataGrid, AsyncEventDataGrid);//, PeriodicEvent_AddEventButton, PeriodicEvent_SelectRunnable_Button);
+
+            componentDefenitionViewController = new ComponentDefenitionController(
+                AutosarTree, 
+                ComponentDefenitionName_TextBox, 
+                ComponentPorts_GridView, 
+                ComponentRunnables_GridView, 
+                MultipleInstantiation_CheckBox, 
+                AddPerInstanceDefenition_Button, 
+                PerInstanceDefenition_Grid, 
+                CDataDescription_Grid, 
+                AddCDataDescription_Button, 
+                PeriodicalEventsDataGrid, 
+                SyncEventDataGrid, 
+                AsyncEventDataGrid, 
+                OneTimeEventsDataGrid);
+
             connectionLineController = new ConnectionLineController(AutosarTree);
             changeViewportScaleController = new ChangeViewportScaleController(scene, ViewPortImage);
             addComponentInstancesController = new AddObjectController(AutosarTree);
@@ -1381,7 +1396,43 @@ namespace AutosarGuiEditor
         {
             componentDefenitionViewController.AsyncEventController.DeleteEventClick(sender, e);
         }
-#endregion
+        #endregion
+
+#region ONE_TIME_EVENT
+        private void OneTimeEvent_FieldName_TextEdit_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            componentDefenitionViewController.OneTimeEventController.TextEdit_TextChanged(sender, e);
+        }
+
+        private void OneTimeEvent_SelectRunnable_Click(object sender, RoutedEventArgs e)
+        {
+            componentDefenitionViewController.OneTimeEventController.SelectRunnableButton_Click(sender, e);
+        }
+
+        private void OneTimeEvent_DeleteEvent_Click(object sender, RoutedEventArgs e)
+        {
+            componentDefenitionViewController.OneTimeEventController.DeleteEventClick(sender, e);
+        }
+
+        private void OneTimeEvent_AddEvent_Click(object sender, RoutedEventArgs e)
+        {
+            componentDefenitionViewController.OneTimeEventController.AddEventButtonClick(sender, e);
+        }
+        private void OneTimeEvent_CorrectName_Click(object sender, RoutedEventArgs e)
+        {
+            componentDefenitionViewController.OneTimeEventController.Event_CorrectNameClick(sender, e);
+        }
+
+        #endregion
+
+        private void SynchronizeInstances_Click(object sender, RoutedEventArgs e)
+        {
+            autosarApp.SyncronizeEvents(null, true);
+            autosarApp.SyncronizeCData(null, true);
+            autosarApp.SyncronizePerInstanceMemory(null, true);
+            autosarApp.SyncronizePimNames(null, true);
+            autosarApp.SyncronizeCDataNames(null, true);
+        }
     }
 
 }

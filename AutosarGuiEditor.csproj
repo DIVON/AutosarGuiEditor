@@ -138,6 +138,7 @@
     <Compile Include="Source\Controllers\ChangeViewportScaleController.cs" />
     <Compile Include="Source\Controllers\ArrayDataTypeController.cs" />
     <Compile Include="Source\Controllers\EventsControllers\ClientServerEventController.cs" />
+    <Compile Include="Source\Controllers\EventsControllers\OneTimeEventController.cs" />
     <Compile Include="Source\Controllers\EventsControllers\TimingEventController.cs" />
     <Compile Include="Source\Controllers\ComponentDefenitionController.cs" />
     <Compile Include="Source\Controllers\ComponentPropertiesController.cs" />

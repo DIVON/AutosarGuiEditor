@@ -588,6 +588,7 @@ namespace System
                 {
                     compInstance.SyncronizeAsyncClientServerEventsWithDefenition();
                     compInstance.SyncronizeTimingEventsWithDefenition();
+                    compInstance.SyncronizeOneTimeEventsWithDefenition();
                 }
             }
         }
@@ -725,6 +726,7 @@ namespace System
                 {
                     events.AddRange(component.AsyncClientServerEventsInstancesList);
                     events.AddRange(component.TimingEventsList);
+                    events.AddRange(component.OneTimeEventsList);
                 }
             }
             return events;
@@ -762,6 +764,7 @@ namespace System
         {
             foreach (OsTask task in this.OsTasks)
             {
+                if (task.Events.FindObject(eventInstance.GUID) != null)
                 {
                     return task;
                 }
@@ -1173,6 +1176,12 @@ namespace System
                 {
                     return eventDef;
                 }
+
+                eventDef = compDef.OneTimeEvents.FindObject(eventDefGuid);
+                if (eventDef != null)
+                {
+                    return eventDef;
+                }
             }
 
             return null;
@@ -1259,6 +1268,34 @@ namespace System
         public PortDefenition FindPortDefenition(PortPainter portPainter)
         {
             return FindPortDefenition(portPainter.PortDefenitionGuid);
+        }
+
+        public IElementWithPorts FindComponentInstanceByEventId(Guid eventInstanceGuid)
+        {
+            foreach (CompositionInstance composition in Compositions)
+            {
+                /* Check ports in all components inside the composition */
+                foreach (ComponentInstance compInstance in composition.ComponentInstances)
+                {
+                    if (compInstance.AsyncClientServerEventsInstancesList.FindObject(eventInstanceGuid) != null)
+                    {
+                        return compInstance;
+                    }
+                    if (compInstance.SyncClientServerEventsInstancesList.FindObject(eventInstanceGuid) != null)
+                    {
+                        return compInstance;
+                    }
+                    if (compInstance.TimingEventsList.FindObject(eventInstanceGuid) != null)
+                    {
+                        return compInstance;
+                    }
+                    if (compInstance.OneTimeEventsList.FindObject(eventInstanceGuid) != null)
+                    {
+                        return compInstance;
+                    }
+                }
+            }
+            return null;
         }
 
         public IElementWithPorts FindComponentInstanceByPortGuid(Guid portGuid)
@@ -1414,7 +1451,7 @@ namespace System
             }
         }
 
-        public void SysncronizePimNames(ApplicationSwComponentType compDef, bool useAllDefenition = false)
+        public void SyncronizePimNames(ApplicationSwComponentType compDef, bool useAllDefenition = false)
         {
             foreach (CompositionInstance composition in Compositions)
             {
@@ -1428,7 +1465,7 @@ namespace System
             }
         }
 
-        public void SysncronizeCDataNames(ApplicationSwComponentType compDef, bool useAllDefenition = false)
+        public void SyncronizeCDataNames(ApplicationSwComponentType compDef, bool useAllDefenition = false)
         {
             foreach (CompositionInstance composition in Compositions)
             {
@@ -1466,6 +1503,7 @@ namespace System
                     {
                         compInstance.SyncronizeTimingEventsWithDefenition();
                         compInstance.SyncronizeAsyncClientServerEventsWithDefenition();
+                        compInstance.SyncronizeOneTimeEventsWithDefenition();
                     }
                 }
             }

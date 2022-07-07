@@ -31,7 +31,8 @@ using AutosarGuiEditor.Source.Autosar.Events;
 namespace AutosarGuiEditor.Source.Painters
 {
     public class ComponentInstance : IElementWithPorts
-    {        
+    {
+        public AutosarEventInstancesList OneTimeEventsList = new AutosarEventInstancesList();
         public AutosarEventInstancesList TimingEventsList = new AutosarEventInstancesList();
         public AutosarEventInstancesList SyncClientServerEventsInstancesList = new AutosarEventInstancesList();
         public AutosarEventInstancesList AsyncClientServerEventsInstancesList = new AutosarEventInstancesList();
@@ -98,9 +99,10 @@ namespace AutosarGuiEditor.Source.Painters
             base.LoadFromXML(xml);
             PerInstanceMemories.LoadFromXML(xml);
             CDataInstances.LoadFromXML(xml);
-            TimingEventsList.LoadFromXML(xml);
-            SyncClientServerEventsInstancesList.LoadFromXML(xml);
-            AsyncClientServerEventsInstancesList.LoadFromXML(xml);
+            TimingEventsList.LoadFromXML(xml, "Timing");
+            SyncClientServerEventsInstancesList.LoadFromXML(xml, "Sync");
+            AsyncClientServerEventsInstancesList.LoadFromXML(xml, "Async");
+            OneTimeEventsList.LoadFromXML(xml, "OneTime");
             String compDefString = XmlUtilits.GetFieldValue(xml, "ComponentDefenitionGuid", Guid.Empty.ToString());
             ComponentDefenitionGuid = GuidUtils.GetGuid(compDefString, false);
         }
@@ -112,9 +114,10 @@ namespace AutosarGuiEditor.Source.Painters
             base.WriteToXML(xmlElement);  
             PerInstanceMemories.WriteToXML(xmlElement);
             CDataInstances.WriteToXML(xmlElement);
-            TimingEventsList.WriteToXML(xmlElement);
-            SyncClientServerEventsInstancesList.LoadFromXML(xmlElement);
-            AsyncClientServerEventsInstancesList.LoadFromXML(xmlElement);
+            TimingEventsList.WriteToXML(xmlElement, "Timing");
+            SyncClientServerEventsInstancesList.WriteToXML(xmlElement, "Sync");
+            AsyncClientServerEventsInstancesList.WriteToXML(xmlElement, "Async");
+            OneTimeEventsList.WriteToXML(xmlElement, "OneTime");
             XElement comptDefenitionGuid = new XElement("ComponentDefenitionGuid", ComponentDefenitionGuid.ToString());
             xmlElement.Add(comptDefenitionGuid);
 
@@ -222,6 +225,32 @@ namespace AutosarGuiEditor.Source.Painters
                     /* Create new runnable instance */
                     AutosarEventInstance newEventInstance = ComponentFabric.GetInstance().CreateEventInstance(timingEventDefinition);
                     this.TimingEventsList.Add(newEventInstance);
+                }
+            }
+        }
+
+        
+        public void SyncronizeOneTimeEventsWithDefenition()
+        {
+            /* TimingEvents */
+
+            /* Delete non existing */
+            for (int i = this.OneTimeEventsList.Count - 1; i >= 0; i--)
+            {
+                if (ComponentDefenition.OneTimeEvents.FindObject(OneTimeEventsList[i].DefenitionGuid) == null)
+                {
+                    OneTimeEventsList.RemoveAt(i);
+                }
+            }
+
+            /* Add new */
+            foreach (OneTimeEvent eventDefinition in ComponentDefenition.OneTimeEvents)
+            {
+                if (this.OneTimeEventsList.FindEvent(eventDefinition.GUID) == null)
+                {
+                    /* Create new runnable instance */
+                    AutosarEventInstance newEventInstance = ComponentFabric.GetInstance().CreateEventInstance(eventDefinition);
+                    this.OneTimeEventsList.Add(newEventInstance);
                 }
             }
         }

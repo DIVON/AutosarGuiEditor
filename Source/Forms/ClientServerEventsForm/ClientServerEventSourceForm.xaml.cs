@@ -44,8 +44,9 @@ namespace AutosarGuiEditor.Source.Forms.ClientServerEventsForm
                         TreeViewItem portTreeItem = new TreeViewItem();
                         portTreeItem.Header = portDef.Name;
                         portTreeItem.Tag = portDef;
+                        portTreeItem.IsExpanded = true;
 
-                        foreach(ClientServerOperation op in csInterface.Operations)
+                        foreach (ClientServerOperation op in csInterface.Operations)
                         {
                             TreeViewItem operationTreeItem = new TreeViewItem();
                             operationTreeItem.Header = op.Name;
@@ -79,15 +80,15 @@ namespace AutosarGuiEditor.Source.Forms.ClientServerEventsForm
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            //if ((treeView.SelectedItem != null) && (treeView.SelectedItem.Tag is ClientServerOperation))
+            if ((treeView.SelectedItem != null) && (treeView.SelectedItem is TreeViewItem))
             {
-                //operation = treeView.SelectedItem.Tag as ClientServerOperation;
-                //port      = treeView.SelectedItem.Parent as PortDefenition;
+                operation = (treeView.SelectedItem as TreeViewItem).Tag as ClientServerOperation;
+                port      = ((treeView.SelectedItem as TreeViewItem).Parent as TreeViewItem).Tag as PortDefenition;
                 DialogResult = true;
             }
-            //else
+            else
             {
-                //MessageBox.Show("Operation is not selected");
+                MessageBox.Show("Operation is not selected");
             }
         }
     }

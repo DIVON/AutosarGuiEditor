@@ -49,6 +49,7 @@ namespace AutosarGuiEditor.Source.Controllers.EventsControllers
             if (ComponentDefenition != null)
             {
                 ClientServerEvent csEvent = new ClientServerEvent();
+                csEvent.Name = "defaultEvent";
                 if (isAsync == true)
                 {
                     ComponentDefenition.AsyncClientServerEvents.Add(csEvent);
@@ -61,7 +62,6 @@ namespace AutosarGuiEditor.Source.Controllers.EventsControllers
                 AutosarApplication.GetInstance().UpdateEventsInComponentInstances();
 
                 UpdateEventsDataGrid();
-                tree.UpdateAutosarTreeView(tree.SelectedItem);
             }
         }
 
@@ -85,15 +85,25 @@ namespace AutosarGuiEditor.Source.Controllers.EventsControllers
         {
             if (ComponentDefenition != null)
             {
+                ClientServerEventList list;
+
+                if (isAsync == true)
+                {
+                    list = _componentDefenition.AsyncClientServerEvents;
+                }
+                else
+                {
+                    list = _componentDefenition.SyncClientServerEvents;
+                }
+
                 int index = evenstDataGrid.SelectedIndex;
                 if ((index < evenstDataGrid.Items.Count) && (index >= 0))
                 {
-                    bool delete = MessageUtilities.AskToDelete("Do you want to delete " + _componentDefenition.TimingEvents[index].Name + "?");
+                    bool delete = MessageUtilities.AskToDelete("Do you want to delete " + list[index].Name + "?");
                     if (delete == true)
                     {
-                        _componentDefenition.TimingEvents.RemoveAt(index);
+                        list.RemoveAt(index);
                         AutosarApplication.GetInstance().SyncronizeEvents(_componentDefenition);
-                        tree.UpdateAutosarTreeView(tree.SelectedItem);
                         UpdateEventsDataGrid();
                     }
                 }
@@ -109,14 +119,14 @@ namespace AutosarGuiEditor.Source.Controllers.EventsControllers
                 {
                     ClientServerEvent csEvent = evenstDataGrid.SelectedItem as ClientServerEvent;
 
-                    if (isAsync)
+                    if ((csEvent.SourcePort != null) && (csEvent.SourceOperation != null))
                     {
                         csEvent.Name = isAsync == true ? "asyncEvent" : "syncEvent";
+
+                        csEvent.Name += csEvent.SourcePort.Name + "_" + csEvent.SourceOperation.Name;
+
+                        UpdateEventsDataGrid();
                     }
-
-                    csEvent.Name += csEvent.SourcePort.Name + "_" + csEvent.SourceOperation.Name;
-
-                    UpdateEventsDataGrid();
                 }
             }
         }
@@ -125,7 +135,16 @@ namespace AutosarGuiEditor.Source.Controllers.EventsControllers
         {
             allowUpdater.StopUpdate();
             evenstDataGrid.ItemsSource = null;
-            evenstDataGrid.ItemsSource = isAsync == true ? _componentDefenition.AsyncClientServerEvents : _componentDefenition.SyncClientServerEvents;
+
+            if (isAsync == true)
+            {
+                evenstDataGrid.ItemsSource = _componentDefenition.AsyncClientServerEvents;
+            }
+            else
+            {
+                evenstDataGrid.ItemsSource = _componentDefenition.SyncClientServerEvents;
+            }
+            
             allowUpdater.AllowUpdate();
         }
 

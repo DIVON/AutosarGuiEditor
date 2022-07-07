@@ -33,7 +33,7 @@ namespace AutosarGuiEditor.Source.Controllers
         DataGrid periodicalEvenstDataGrid;
         DataGrid   syncEventDataGrid;
         DataGrid   asyncEventDataGrid;
-
+        DataGrid   oneTimeEventDataGrid;
         public ComponentDefenitionController(
             AutosarTreeViewControl AutosarTree, 
             TextBox ComponentDefenitionName_TextBox, 
@@ -50,8 +50,8 @@ namespace AutosarGuiEditor.Source.Controllers
             DataGrid periodicalEvenstDataGrid,
            
             DataGrid   syncEventDataGrid,
-            DataGrid   asyncEventDataGrid
-            //Button   SelectRunnableButton
+            DataGrid   asyncEventDataGrid,
+            DataGrid   oneTimeEventDataGrid
             )
         {
             this.tree = AutosarTree;
@@ -71,10 +71,12 @@ namespace AutosarGuiEditor.Source.Controllers
             this.periodicalEvenstDataGrid = periodicalEvenstDataGrid;
             this.syncEventDataGrid = syncEventDataGrid;
             this.asyncEventDataGrid = asyncEventDataGrid;
+            this.oneTimeEventDataGrid = oneTimeEventDataGrid;
 
             timingEventController = new TimingEventController(tree, periodicalEvenstDataGrid);
             syncEventController = new ClientServerEventController(tree, false, syncEventDataGrid);
             asyncEventController = new ClientServerEventController(tree, true, asyncEventDataGrid);
+            oneTimeEventController = new OneTimeEventController(oneTimeEventDataGrid);
         }
 
         ClientServerEventController syncEventController;
@@ -91,6 +93,15 @@ namespace AutosarGuiEditor.Source.Controllers
             get
             {
                 return asyncEventController;
+            }
+        }
+
+        OneTimeEventController oneTimeEventController;
+        public OneTimeEventController OneTimeEventController
+        {
+            get
+            {
+                return oneTimeEventController;
             }
         }
 
@@ -171,6 +182,9 @@ namespace AutosarGuiEditor.Source.Controllers
             {
                 _componentDefenition = value;
                 timingEventController.ComponentDefenition = value;
+                asyncEventController.ComponentDefenition = value;
+                syncEventController.ComponentDefenition = value;
+                oneTimeEventController.ComponentDefenition = value;
                 RefreshGridViews();
             }
             get
@@ -191,7 +205,7 @@ namespace AutosarGuiEditor.Source.Controllers
                     if (NameUtils.CheckComponentName(newName))
                     {
                         _componentDefenition.PerInstanceMemoryList[index].Name = newName;
-                        AutosarApplication.GetInstance().SysncronizePimNames(_componentDefenition);
+                        AutosarApplication.GetInstance().SyncronizePimNames(_componentDefenition);
                         tree.UpdateAutosarTreeView(tree.SelectedItem);
                     }
                 }
@@ -209,7 +223,7 @@ namespace AutosarGuiEditor.Source.Controllers
                     if (NameUtils.CheckComponentName(newName))
                     {
                         _componentDefenition.CDataDefenitions[index].Name = newName;
-                        AutosarApplication.GetInstance().SysncronizeCDataNames(_componentDefenition);
+                        AutosarApplication.GetInstance().SyncronizeCDataNames(_componentDefenition);
                         tree.UpdateAutosarTreeView(tree.SelectedItem);
                     }
                 }
@@ -298,9 +312,6 @@ namespace AutosarGuiEditor.Source.Controllers
 
             CDataGrid.ItemsSource = null;
             CDataGrid.ItemsSource = _componentDefenition.CDataDefenitions;
-
-            periodicalEvenstDataGrid.ItemsSource = null;
-            periodicalEvenstDataGrid.ItemsSource = _componentDefenition.TimingEvents;
 
             allowUpdater.AllowUpdate();
 

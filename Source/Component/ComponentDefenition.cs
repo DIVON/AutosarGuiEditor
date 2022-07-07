@@ -47,6 +47,7 @@ namespace AutosarGuiEditor.Source.Component
             syncClientServerEvents.LoadFromXML(xml);
             asyncClientServerEvents.LoadFromXML(xml);
             timingEvents.LoadFromXML(xml);
+            onetimeEvents.LoadFromXML(xml);
         }
 
 
@@ -63,7 +64,7 @@ namespace AutosarGuiEditor.Source.Component
             syncClientServerEvents.WriteToXML(xmlElement);
             asyncClientServerEvents.WriteToXML(xmlElement);
             timingEvents.WriteToXML(xmlElement);
-
+            onetimeEvents.WriteToXML(xmlElement);
             root.Add(xmlElement);
         }
 
@@ -77,6 +78,7 @@ namespace AutosarGuiEditor.Source.Component
             list.Add(timingEvents);
             list.Add(syncClientServerEvents);
             list.Add(asyncClientServerEvents);
+            list.Add(onetimeEvents);
             return list;
         }
 
@@ -91,8 +93,8 @@ namespace AutosarGuiEditor.Source.Component
         }
 
 
-        ClientServerEventList syncClientServerEvents = new ClientServerEventList();
-        public ClientServerEventList SyncClientServerEvents
+        SyncClientServerEventList syncClientServerEvents = new SyncClientServerEventList();
+        public SyncClientServerEventList SyncClientServerEvents
         {
             get
             {
@@ -100,12 +102,22 @@ namespace AutosarGuiEditor.Source.Component
             }
         }
 
-        ClientServerEventList asyncClientServerEvents = new ClientServerEventList();
-        public ClientServerEventList AsyncClientServerEvents
+        AsyncClientServerEventList asyncClientServerEvents = new AsyncClientServerEventList();
+        public AsyncClientServerEventList AsyncClientServerEvents
         {
             get
             {
                 return asyncClientServerEvents;
+            }
+        }
+
+
+        OneTimeEventList onetimeEvents = new OneTimeEventList();
+        public OneTimeEventList OneTimeEvents
+        {
+            get
+            {
+                return onetimeEvents;
             }
         }
     }
