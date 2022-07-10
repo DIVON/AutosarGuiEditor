@@ -167,7 +167,7 @@
     <value>Rte_Scheduler.h</value>
   </data>
   <data name="STD_RETURN_TYPE" xml:space="preserve">
-    <value>Std_ReturnType </value>
+    <value>Std_ReturnType</value>
   </data>
   <data name="SYSTICK_FREQUENCY" xml:space="preserve">
     <value>SYSTICK_FREQUENCY</value>

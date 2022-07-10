@@ -63,6 +63,8 @@ namespace AutosarGuiEditor.Source.Tester
             TestQueuedSenderReceiverInterface();
             TestWetherComponentDefenitionUsed();
             TestTimingEvents();
+            TestServerPorts();
+            TestClientServerEvents();
             SortText();
         }
 
@@ -533,7 +535,6 @@ namespace AutosarGuiEditor.Source.Tester
             {
                 foreach(TimingEvent timingEvent in compDef.TimingEvents)
                 {
-
                     foreach (TimingEvent timingEvent2 in compDef.TimingEvents)
                     {
                         if (timingEvent2 != timingEvent)
@@ -543,6 +544,49 @@ namespace AutosarGuiEditor.Source.Tester
                                 AppendText("Component shall have no similar timing events : " + timingEvent.Name, MessageType.ERROR);
                             }
                         }
+                    }
+                }
+            }
+
+            /*  Check that period is more than zero */
+            foreach (ApplicationSwComponentType compDef in autosarApp.ComponentDefenitionsList)
+            {
+                foreach (TimingEvent timingEvent in compDef.TimingEvents)
+                {
+                    if (timingEvent.PeriodMs <= 0)
+                    {
+                        AppendText("Timing event shall have period more than zero: " + compDef.Name + " " + timingEvent.Name, MessageType.ERROR);
+                    }
+                }
+            }
+        }
+
+        void TestClientServerEvents()
+        {
+            /* Check that each client -server event has filled runnable and source */
+            foreach (ApplicationSwComponentType compDef in autosarApp.ComponentDefenitionsList)
+            {
+                foreach (ClientServerEvent csEvent in compDef.SyncClientServerEvents)
+                {
+                    if (csEvent.Runnable == null)
+                    {
+                        AppendText("Each sync client-server events shall have filled runnables : " + compDef.Name + " event: " + csEvent.Name, MessageType.ERROR);
+                    }
+                    if (csEvent.SourceOperation == null)
+                    {
+                        AppendText("Each sync client-server events shall have filled source operation : " + compDef.Name + " event: " + csEvent.Name, MessageType.ERROR);
+                    }
+                }
+
+                foreach (ClientServerEvent csEvent in compDef.AsyncClientServerEvents)
+                {
+                    if (csEvent.Runnable == null)
+                    {
+                        AppendText("Each async client-server events shall have filled runnables : " + compDef.Name + " event: " + csEvent.Name, MessageType.ERROR);
+                    }
+                    if (csEvent.SourceOperation == null)
+                    {
+                        AppendText("Each async client-server events shall have filled source operation : " + compDef.Name + " event: " + csEvent.Name, MessageType.ERROR);
                     }
                 }
             }
@@ -558,6 +602,32 @@ namespace AutosarGuiEditor.Source.Tester
                     if (srInterface.Fields.Count > 1u)
                     {
                         //AppendText("Queued Sender-Receiver interface shall have only one field : " + srInterface.Name, MessageType.ERROR);
+                    }
+                }
+            }
+        }
+
+        protected void TestServerPorts()
+        {
+            foreach (ApplicationSwComponentType compDef in autosarApp.ComponentDefenitionsList)
+            {
+                foreach (PortDefenition portDef in compDef.Ports)
+                {
+                    if (portDef.PortType == PortType.Server)
+                    {
+                        if (portDef.InterfaceDatatype is ClientServerInterface)
+                        {
+                            ClientServerInterface csInterface = portDef.InterfaceDatatype as ClientServerInterface;
+                            foreach (ClientServerOperation csOperation in csInterface.Operations)
+                            {
+                                /* Looking for runnable of operation */
+                                ClientServerEvent csEvent = compDef.GetEventsWithServerOperation(csOperation);
+                                if (csEvent == null)
+                                {
+                                    AppendText("Each operation at server port shall have event: " + compDef.Name + " " + portDef.Name + " " + csOperation.Name, MessageType.ERROR);
+                                }
+                            }
+                        }
                     }
                 }
             }

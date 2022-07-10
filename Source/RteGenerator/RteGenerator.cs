@@ -46,6 +46,8 @@ namespace AutosarGuiEditor.Source.RteGenerator
             SystemErrorGenerator systemErrorGenerator = new SystemErrorGenerator();
             systemErrorGenerator.GenerateSystemErrorsFile(RteFunctionsGenerator.GetRteFolder());
 
+            GenerateComponentsFiles();
+            
             return true;
         }
 

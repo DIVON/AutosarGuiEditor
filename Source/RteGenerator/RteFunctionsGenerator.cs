@@ -121,9 +121,9 @@ namespace AutosarGuiEditor.Source.RteGenerator
             return resFolder;
         }
 
-        public static String Generate_RteCall_FunctionName(ApplicationSwComponentType compDef, PortDefenition portDef, ClientServerOperation operation)
+        public static String Generate_RteCall_FunctionName(ApplicationSwComponentType compDef, RunnableDefenition runnable)
         {
-            return compDef.Name + "_" + portDef.Name + "_ru" + operation.Name;
+            return compDef.Name + "_ru" + runnable.Name;
         }
 
         public static String Generate_InternalRteCall_FunctionName(PortDefenition portDef, ClientServerOperation operation)
@@ -192,7 +192,7 @@ namespace AutosarGuiEditor.Source.RteGenerator
 
         public static String GenerateClientServerInterfaceArguments(ClientServerOperation operation, Boolean MultipleInstantiation = false)
         {
-            String result = "(";
+            String result = "";
 
             if (MultipleInstantiation)
             {
@@ -221,7 +221,7 @@ namespace AutosarGuiEditor.Source.RteGenerator
                 }
             }
             
-            return result + ")";
+            return result;
         }
 
         public static String GenerateClientServerInterfaceArgumentsForDefine(ClientServerOperation operation, Boolean MultipleInstantiation = false)
@@ -425,17 +425,61 @@ namespace AutosarGuiEditor.Source.RteGenerator
             return compDefenition.Name + "_ru" + runnable.Name;
         }
 
-        public static String Generate_RunnableFunction(ApplicationSwComponentType compDefenition, RunnableDefenition runnable)
+        public static String Generate_RunnableFunction(ApplicationSwComponentType compDefenition, RunnableDefenition runnable, String arguments, String returnType)
         {             
             if (compDefenition.MultipleInstantiation)
             {
                 String CDSName = RteFunctionsGenerator.ComponentDataStructureDefenitionName(compDefenition);
-                return "void " + Generate_RunnableFunctionName(compDefenition, runnable) + "(const " + CDSName + " * const instance)";
+                if (arguments.Length == 0)
+                {
+                    return returnType + " " + Generate_RunnableFunctionName(compDefenition, runnable) + "(const " + CDSName + " * const instance)";
+                }
+                else
+                {
+                    return returnType + " " + Generate_RunnableFunctionName(compDefenition, runnable) + "(const " + CDSName + " * const instance, " + arguments + ")";
+                }
+
             }
             else /* Single instantiation */
             {
-                return "void " + Generate_RunnableFunctionName(compDefenition, runnable) + "(void)";
+                if (arguments.Length == 0)
+                {
+                    return returnType + " " + Generate_RunnableFunctionName(compDefenition, runnable) + "(void)";
+                }
+                else
+                {
+                    return returnType + " " + Generate_RunnableFunctionName(compDefenition, runnable) + "(" + arguments + ")";
+                }
             }
+        }
+
+        public static String Generate_RunnableDeclaration(ApplicationSwComponentType compDefenition, RunnableDefenition runnable)
+        {
+            string arguments = "";
+            string returnType = "void";
+
+            AutosarEventsList aevents = compDefenition.GetEventsWithTheRunnable(runnable);
+
+            if (aevents.Count != 0)
+            {
+                /* Check that client-server interfaces do not have arguments */
+                foreach (AutosarEvent aEvent in aevents)
+                {
+                    if (aEvent is ClientServerEvent)
+                    {
+                        ClientServerEvent csEvent = aEvent as ClientServerEvent;
+
+                        if (csEvent.SourceOperation.Fields.Count != 0)
+                        {
+                            arguments = RteFunctionsGenerator.GenerateClientServerInterfaceArguments(csEvent.SourceOperation, compDefenition.MultipleInstantiation); ;
+                        }
+
+                        returnType = Properties.Resources.STD_RETURN_TYPE;
+                    }
+                }
+            }
+
+            return Generate_RunnableFunction(compDefenition, runnable, arguments, returnType);
         }
 
 

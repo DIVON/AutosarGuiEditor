@@ -233,6 +233,10 @@ namespace AutosarGuiEditor.Source.RteGenerator
                     {
                         WritePeriodicalEvent(writer, ref osTask, osTask.Events[eventIndex], ref wasBracersOpen, ref lastPeriod);
                     }
+                    if (autosarEventDefenition is OneTimeEvent)
+                    {
+                        WriteOneTimeEvent(writer, osTask.Events[eventIndex]);
+                    }
                     if (autosarEventDefenition is ClientServerEvent)
                     {
                         if (wasBracersOpen)
@@ -300,6 +304,11 @@ namespace AutosarGuiEditor.Source.RteGenerator
         void WriteAsyncClientServerEvent(ClientServerEvent asyncEvent)
         {
 
+        }
+
+        void WriteOneTimeEvent(StreamWriter writer, AutosarEventInstance eventInstance)
+        {
+            writer.WriteLine("    " + RteFunctionsGenerator.Generate_CallOfEvent(eventInstance));
         }
 
         void Generate_RunTimeEnvironment_Header_File(String dir)
@@ -372,36 +381,13 @@ namespace AutosarGuiEditor.Source.RteGenerator
             RteFunctionsGenerator.AddInclude(writer, Properties.Resources.RTE_DATATYPES_H_FILENAME);
 
             writer.WriteLine();
-            writer.WriteLine("/* Declaration of all periodic runnables */");
+            writer.WriteLine("/* Declaration of all component's runnables */");
             writer.WriteLine();
             foreach (ApplicationSwComponentType compDefinition in AutosarApplication.GetInstance().ComponentDefenitionsList)
             {
                 foreach (RunnableDefenition runnable in compDefinition.Runnables)
                 {
-                    writer.WriteLine(RteFunctionsGenerator.Generate_RunnableFunction(compDefinition, runnable) + ";");
-                }
-            }
-
-            writer.WriteLine();
-            writer.WriteLine("/* Declaration of all server call functions */");
-            writer.WriteLine();
-            foreach (ApplicationSwComponentType componentDefenition in AutosarApplication.GetInstance().ComponentDefenitionsList)
-            {
-                foreach (PortDefenition port in componentDefenition.Ports)
-                {
-                    if (port.PortType == PortType.Server)
-                    {
-                        ClientServerInterface csInterface = AutosarApplication.GetInstance().ClientServerInterfaces.FindObject(port.InterfaceGUID);
-                        if (csInterface != null)
-                        {
-                            foreach (ClientServerOperation operation in csInterface.Operations)
-                            {
-                                String funcName = RteFunctionsGenerator.Generate_RteCall_FunctionName(componentDefenition, port, operation);
-                                String funcArguments = RteFunctionsGenerator.GenerateClientServerInterfaceArguments(operation, componentDefenition.MultipleInstantiation);
-                                writer.WriteLine(Properties.Resources.STD_RETURN_TYPE + funcName + funcArguments + ";");
-                            }
-                        }
-                    }                    
+                    writer.WriteLine(RteFunctionsGenerator.Generate_RunnableDeclaration(compDefinition, runnable) + ";");
                 }
             }
 
@@ -413,24 +399,6 @@ namespace AutosarGuiEditor.Source.RteGenerator
             writer.Close();
 
         }
-
-       /* List<double> GetDifferentFrequences()
-        {
-            List<double> frequences = new List<double>();
-            AutosarEventInstancesList events = AutosarApplication.GetInstance().GetAllEventsOrderedByStartup();
-
-            foreach (AutosarEventInstance autosarEvent in events)
-            {
-                RunnableDefenition runnableDefenition = events[0].Defenition.Runnable;
-                if (!frequences.Exists(x => x == runnableDefenition.PeriodMs))
-                {
-                    frequences.Add(runnableDefenition.PeriodMs);
-                }                    
-            }
-            
-            return frequences;
-        }
-        */
 
         void Generate_RteTaskScheduler_Header_File(String dir)
         {

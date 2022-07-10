@@ -1,4 +1,5 @@
-﻿using AutosarGuiEditor.Source.AutosarInterfaces;
+﻿using AutosarGuiEditor.Source.Autosar.Events;
+using AutosarGuiEditor.Source.AutosarInterfaces;
 using AutosarGuiEditor.Source.AutosarInterfaces.ClientServer;
 using AutosarGuiEditor.Source.AutosarInterfaces.SenderReceiver;
 using AutosarGuiEditor.Source.Component;
@@ -18,7 +19,7 @@ namespace AutosarGuiEditor.Source.RteGenerator
     {
         public static void GenerateHeader(String dir, ApplicationSwComponentType compDef)
         {
-            String filename = dir +"\\"+ RteFunctionsGenerator.GenerateComponentHeaderFile(compDef);
+            String filename = dir + "\\" + RteFunctionsGenerator.GenerateComponentHeaderFile(compDef);
 
             StreamWriter writer = new StreamWriter(filename);
             RteFunctionsGenerator.GenerateFileTitle(writer, filename, "Implementation for " + compDef.Name + " header file");
@@ -48,12 +49,12 @@ namespace AutosarGuiEditor.Source.RteGenerator
             PortDefenitionsList rpPorts = compDef.Ports.PortsWithSenderReceiverInterface();
             List<String> createdInterfaces = new List<string>();
 
-            foreach(PortDefenition portDef in rpPorts)
-            {  
+            foreach (PortDefenition portDef in rpPorts)
+            {
                 SenderReceiverInterface srInterface = portDef.InterfaceDatatype as SenderReceiverInterface;
 
                 String portDataStructureName = RteFunctionsGenerator.GeneratePortDataStructureDefenition(compDef, srInterface, portDef.PortType);
-                
+
                 if (!createdInterfaces.Contains(portDataStructureName))
                 {
                     createdInterfaces.Add(portDataStructureName);
@@ -63,7 +64,7 @@ namespace AutosarGuiEditor.Source.RteGenerator
                     {
                         string data = "    Std_ReturnType (*";
                         data += (portDef.PortType == PortType.Sender) ? "Write_" : "Read_";
-                        data += field.Name + ")";                        
+                        data += field.Name + ")";
                         String fieldVariable = RteFunctionsGenerator.GenerateSenderReceiverInterfaceArguments(field, portDef.PortType, false);
                         data += fieldVariable + ";";
                         writer.WriteLine(data);
@@ -95,7 +96,7 @@ namespace AutosarGuiEditor.Source.RteGenerator
                         {
                             string data = "    Std_ReturnType (*";
                             data += "Call_";
-                            data += operation.Name + ")" + RteFunctionsGenerator.GenerateClientServerInterfaceArguments(operation, false) + ";";
+                            data += operation.Name + ")(" + RteFunctionsGenerator.GenerateClientServerInterfaceArguments(operation, false) + ");";
                             writer.WriteLine(data);
                         }
                         writer.WriteLine("} " + portDataStructureName + ";");
@@ -115,7 +116,7 @@ namespace AutosarGuiEditor.Source.RteGenerator
 
 ");
             String CDSname = RteFunctionsGenerator.ComponentDataStructureDefenitionName(compDef);
-            writer.WriteLine("typedef struct "+ CDSname + " {");
+            writer.WriteLine("typedef struct " + CDSname + " {");
             writer.WriteLine("    /* Per Instance Memory Section */");
             foreach (PimDefenition pim in compDef.PerInstanceMemoryList)
             {
@@ -163,13 +164,13 @@ namespace AutosarGuiEditor.Source.RteGenerator
  * BEGIN Component Instance Handle
  *************************************************************/
 ");
-             String singleComponentInstanceVariableName = "Rte_Instance_" +compDef.Name;
-             if (compDef.MultipleInstantiation == false)
-             {
-                writer.WriteLine("extern const " + CDSname + " "+ singleComponentInstanceVariableName + ";");
-             }
+            String singleComponentInstanceVariableName = "Rte_Instance_" + compDef.Name;
+            if (compDef.MultipleInstantiation == false)
+            {
+                writer.WriteLine("extern const " + CDSname + " " + singleComponentInstanceVariableName + ";");
+            }
 
-             writer.WriteLine(@"
+            writer.WriteLine(@"
 /*************************************************************
  * END Component Instance Handle
  *************************************************************/
@@ -179,14 +180,13 @@ namespace AutosarGuiEditor.Source.RteGenerator
  *************************************************************/
 ");
             RteComponentGenerator.WriteAllFunctionWhichComponentCouldUse(compDef, writer);
-            
+
             foreach (RunnableDefenition runnable in compDef.Runnables)
             {
-                writer.WriteLine(RteFunctionsGenerator.Generate_RunnableFunction(compDef, runnable) + ";");
+                writer.WriteLine(RteFunctionsGenerator.Generate_RunnableDeclaration(compDef, runnable) + ";");
             }
+
             writer.WriteLine();
-            writer.WriteLine("/* Server calls */");
-            CreateRteCallFunctionDeclarations(writer, compDef);
 
             writer.WriteLine(
 @"
@@ -212,7 +212,7 @@ namespace AutosarGuiEditor.Source.RteGenerator
                 {
                     define = RteFunctionsGenerator.CreateDefine(RteFunctionsGenerator.GenerateShortCDataFunctionName(cdata) + "(instance)", "(instance)->CData_" + cdata.Name + "()", true);
                 }
-                
+
                 writer.WriteLine(define);
             }
 
@@ -227,10 +227,10 @@ namespace AutosarGuiEditor.Source.RteGenerator
                 }
                 else
                 {
-                    define = RteFunctionsGenerator.CreateDefine(RteFunctionsGenerator.GenerateShortPimFunctionName(pim) + "(instance)", "(instance)->Pim_" + pim.Name , true);
+                    define = RteFunctionsGenerator.CreateDefine(RteFunctionsGenerator.GenerateShortPimFunctionName(pim) + "(instance)", "(instance)->Pim_" + pim.Name, true);
                 }
 
-                
+
                 writer.WriteLine(define);
             }
 
@@ -286,14 +286,14 @@ namespace AutosarGuiEditor.Source.RteGenerator
                         {
                             rteFuncName = "(instance)->" + portDefenition.Name + ".";
                         }
-                        rteFuncName += "Call_" + operation.Name  + argumentsWithoutInstance;
+                        rteFuncName += "Call_" + operation.Name + argumentsWithoutInstance;
 
                         String funcArgument = RteFunctionsGenerator.GenerateClientServerInterfaceArguments(operation, compDef.MultipleInstantiation);
 
 
                         String define = RteFunctionsGenerator.CreateDefine(funcName + defineArguments, rteFuncName, true);
                         writer.WriteLine(define);
-                        
+
                     }
                 }
             }
@@ -308,26 +308,6 @@ namespace AutosarGuiEditor.Source.RteGenerator
 ");
             RteFunctionsGenerator.CloseGuardDefine(writer);
             writer.Close();
-        }
-
-
-        static void CreateRteCallFunctionDeclarations(StreamWriter writer, ApplicationSwComponentType compDefenition)
-        {
-            foreach (PortDefenition port in compDefenition.Ports)
-            {
-                if (port.PortType == PortType.Server)
-                {
-                    ClientServerInterface csInterface = port.InterfaceDatatype as ClientServerInterface;
-                    foreach (ClientServerOperation operation in csInterface.Operations)
-                    {
-                        String returnValue = Properties.Resources.STD_RETURN_TYPE;
-                        String RteFuncName = RteFunctionsGenerator.Generate_RteCall_FunctionName(compDefenition, port, operation);
-                        String fieldVariable = RteFunctionsGenerator.GenerateClientServerInterfaceArguments(operation, compDefenition.MultipleInstantiation);
-                        String writeValue = returnValue + RteFuncName + fieldVariable + ";";
-                        writer.WriteLine(writeValue);
-                    }
-                }
-            }
         }
     }
 

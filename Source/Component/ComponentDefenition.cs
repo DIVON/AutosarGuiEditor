@@ -1,4 +1,5 @@
 ﻿using AutosarGuiEditor.Source.Autosar.Events;
+using AutosarGuiEditor.Source.AutosarInterfaces.ClientServer;
 using AutosarGuiEditor.Source.Component.CData;
 using AutosarGuiEditor.Source.Component.PerInstanceMemory;
 using AutosarGuiEditor.Source.Interfaces;
@@ -119,6 +120,62 @@ namespace AutosarGuiEditor.Source.Component
             {
                 return onetimeEvents;
             }
+        }
+
+        public AutosarEventsList GetEventsWithTheRunnable(RunnableDefenition runnableDef)
+        {
+            AutosarEventsList list = new AutosarEventsList();
+
+            foreach (AutosarEvent aEvent in this.asyncClientServerEvents)
+            {
+                if (aEvent.Runnable == runnableDef)
+                {
+                    list.Add(aEvent);
+                }
+            }
+            foreach (AutosarEvent aEvent in this.syncClientServerEvents)
+            {
+                if (aEvent.Runnable == runnableDef)
+                {
+                    list.Add(aEvent);
+                }
+            }
+            foreach (AutosarEvent aEvent in this.timingEvents)
+            {
+                if (aEvent.Runnable == runnableDef)
+                {
+                    list.Add(aEvent);
+                }
+            }
+            foreach (AutosarEvent aEvent in this.onetimeEvents)
+            {
+                if (aEvent.Runnable == runnableDef)
+                {
+                    list.Add(aEvent);
+                }
+            }
+            return list;
+        }
+
+        public ClientServerEvent GetEventsWithServerOperation(ClientServerOperation csOperation)
+        {
+            foreach (AutosarEvent aEvent in this.asyncClientServerEvents)
+            {
+                ClientServerEvent csEvent = aEvent as ClientServerEvent;
+                if (csEvent.SourceOperation == csOperation)
+                {
+                    return csEvent;
+                }
+            }
+            foreach (AutosarEvent aEvent in this.syncClientServerEvents)
+            {
+                ClientServerEvent csEvent = aEvent as ClientServerEvent;
+                if (csEvent.SourceOperation == csOperation)
+                {
+                    return csEvent;
+                }
+            }
+            return null;
         }
     }
 }

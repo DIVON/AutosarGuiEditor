@@ -211,8 +211,8 @@ namespace AutosarGuiEditor.Source.RteGenerator.TestGenerator
                             writer.WriteLine("            " + fieldDataType + " " + field.Name + ";");
                         }
                         writer.WriteLine("        } Arguments;");
-                        writer.WriteLine("        Std_ReturnType (*redirection)" + RteFunctionsGenerator.GenerateClientServerInterfaceArguments(csOperation, compDef.MultipleInstantiation) + ";");
-                        writer.WriteLine("        Std_ReturnType (*hook)" + RteFunctionsGenerator.GenerateClientServerInterfaceArguments(csOperation, compDef.MultipleInstantiation) + ";");
+                        writer.WriteLine("        Std_ReturnType (*redirection)(" + RteFunctionsGenerator.GenerateClientServerInterfaceArguments(csOperation, compDef.MultipleInstantiation) + ");");
+                        writer.WriteLine("        Std_ReturnType (*hook)(" + RteFunctionsGenerator.GenerateClientServerInterfaceArguments(csOperation, compDef.MultipleInstantiation) + ");");
                         String operationName = RteFunctionsGenerator.Generate_InternalRteCall_FunctionName(portDef, csOperation);
                         writer.WriteLine("    } " + operationName + ";");
                         writer.WriteLine();

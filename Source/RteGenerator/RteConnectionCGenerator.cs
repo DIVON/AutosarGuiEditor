@@ -1,4 +1,5 @@
-﻿using AutosarGuiEditor.Source.AutosarInterfaces;
+﻿using AutosarGuiEditor.Source.Autosar.Events;
+using AutosarGuiEditor.Source.AutosarInterfaces;
 using AutosarGuiEditor.Source.AutosarInterfaces.ClientServer;
 using AutosarGuiEditor.Source.AutosarInterfaces.SenderReceiver;
 using AutosarGuiEditor.Source.Component;
@@ -112,7 +113,7 @@ namespace AutosarGuiEditor.Source.RteGenerator
                                     String RteFuncName = RteFunctionsGenerator.GenerateInternalCallConnectionFunctionName(component.Name, portDef, operation);
                                     String fieldVariable = RteFunctionsGenerator.GenerateClientServerInterfaceArguments(operation, false);
 
-                                    writer.WriteLine(returnValue + RteFuncName + fieldVariable);
+                                    writer.WriteLine(returnValue + " " + RteFuncName + "(" + fieldVariable + ")");
                                     writer.WriteLine("{");
                                     PortPainter portPainter = component.Ports.FindPortByItsDefenition(portDef);
                                     ComponentInstance oppositCompInstance;
@@ -120,7 +121,10 @@ namespace AutosarGuiEditor.Source.RteGenerator
                                     AutosarApplication.GetInstance().GetOppositePortAndComponent(portPainter, out oppositCompInstance, out oppositePort);
                                     if (oppositCompInstance != null)
                                     {
-                                        String functionName = RteFunctionsGenerator.Generate_RteCall_FunctionName(oppositCompInstance.ComponentDefenition, oppositePort.PortDefenition, operation);
+                                        /* Get assigned event */
+                                        ClientServerEvent csEvent = oppositCompInstance.ComponentDefenition.GetEventsWithServerOperation(operation);
+                                        
+                                        String functionName = RteFunctionsGenerator.Generate_RteCall_FunctionName(oppositCompInstance.ComponentDefenition, csEvent.Runnable);
                                         String arguments = RteFunctionsGenerator.Generate_ClientServerPort_Arguments(oppositCompInstance, operation, oppositCompInstance.ComponentDefenition.MultipleInstantiation);
                                         writer.WriteLine("    return " + functionName + arguments + ";");
                                     }
@@ -142,7 +146,7 @@ namespace AutosarGuiEditor.Source.RteGenerator
 
                                     String RteFuncName = RteFunctionsGenerator.GenerateInternalCallConnectionFunctionName(component.Name, portDef, operation);
 
-                                    writer.WriteLine(returnValue + RteFuncName + "(void)");
+                                    writer.WriteLine(returnValue + " " + RteFuncName + "(void)");
                                     writer.WriteLine("{");
                                     PortPainter portPainter = component.Ports.FindPortByItsDefenition(portDef);
                                     
@@ -195,7 +199,7 @@ namespace AutosarGuiEditor.Source.RteGenerator
                                 String RteFuncName = RteFunctionsGenerator.GenerateInternalSendReceiveConnectionFunctionName(component.Name, portDef, field);
                                 String fieldVariable = RteFunctionsGenerator.GenerateSenderReceiverInterfaceArguments(field, portDef.PortType, false);
 
-                                writer.WriteLine(returnValue + RteFuncName + fieldVariable);
+                                writer.WriteLine(returnValue + " " + RteFuncName + fieldVariable);
                                 writer.WriteLine("{");
 
                                 int queueSize = srInterface.QueueSize;
@@ -245,7 +249,7 @@ namespace AutosarGuiEditor.Source.RteGenerator
                                 String RteFuncName = RteFunctionsGenerator.GenerateInternalSendReceiveConnectionFunctionName(component.Name, portDef, field);
                                 String fieldVariable = RteFunctionsGenerator.GenerateSenderReceiverInterfaceArguments(field, portDef.PortType, false);
 
-                                writer.WriteLine(returnValue + RteFuncName + fieldVariable);
+                                writer.WriteLine(returnValue + " " + RteFuncName + fieldVariable);
                                 writer.WriteLine("{");
 
                                 PortPainter portPainter = component.Ports.FindPortByItsDefenition(portDef);
@@ -309,7 +313,7 @@ namespace AutosarGuiEditor.Source.RteGenerator
                                 String RteFuncName = RteFunctionsGenerator.GenerateInternalReadWriteConnectionFunctionName(component.Name, portDef, field);
                                 String fieldVariable = RteFunctionsGenerator.GenerateSenderReceiverInterfaceArguments(field, portDef.PortType, false);
 
-                                writer.WriteLine(returnValue + RteFuncName + fieldVariable);
+                                writer.WriteLine(returnValue + " " + RteFuncName + fieldVariable);
                                 writer.WriteLine("{");
 
                                 String writeFieldName = "Rte_DataBuffer_" + component.Name + "_" + portDef.Name + "_" + field.Name;
@@ -351,7 +355,7 @@ namespace AutosarGuiEditor.Source.RteGenerator
                                 String RteFuncName = RteFunctionsGenerator.GenerateInternalReadWriteConnectionFunctionName(component.Name, portDef, field);
                                 String fieldVariable = RteFunctionsGenerator.GenerateSenderReceiverInterfaceArguments(field, portDef.PortType, false);
 
-                                writer.WriteLine(returnValue + RteFuncName + fieldVariable);
+                                writer.WriteLine(returnValue + " " + RteFuncName + fieldVariable);
                                 writer.WriteLine("{");
 
 

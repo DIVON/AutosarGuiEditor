@@ -1205,6 +1205,10 @@ namespace System
                     {
                         return compInstance;
                     }
+                    if (compInstance.OneTimeEventsList.FindObject(runnableGuid) != null)
+                    {
+                        return compInstance;
+                    }
                 }
             }
             return null;

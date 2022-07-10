@@ -30,6 +30,10 @@ namespace AutosarGuiEditor.Source.Autosar.Events
             }
             get
             {
+                if (runnable == null)
+                {
+                    runnable = AutosarApplication.GetInstance().FindRunnableDefenition(RunnableGuid);
+                }
                 return runnable;
             }
         }
@@ -53,6 +57,39 @@ namespace AutosarGuiEditor.Source.Autosar.Events
             set
             {
 
+            }
+        }
+    }
+
+
+    public class AutosarEventsList : List<AutosarEvent>
+    {
+        Boolean IsAllTheSimilarType()
+        {
+            int val = 0;
+            foreach (AutosarEvent aEvent in this)
+            {
+                if (aEvent is TimingEvent)
+                {
+                    val |= 1;
+                }
+                if (aEvent is ClientServerEvent)
+                {
+                    val |= 2;
+                }
+                if (aEvent is OneTimeEvent)
+                {
+                    val |= 4;
+                }
+            }
+
+            if ((val == 1) || (val == 2) || (val == 4))
+            {
+                return true;
+            }
+            else
+            {
+                return false;
             }
         }
     }

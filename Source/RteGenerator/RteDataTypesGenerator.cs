@@ -39,7 +39,7 @@ namespace AutosarGuiEditor.Source.RteGenerator
 
             GenerateQueuedSenderReceiverFieldsDataTypes(writer);
 
-            //GenerateComponentsDataTypes(writer);
+            GenerateComponentsDataTypes(writer);
 
             RteFunctionsGenerator.CloseGuardDefine(writer);
             writer.Close();

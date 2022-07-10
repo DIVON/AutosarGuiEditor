@@ -75,7 +75,18 @@ namespace AutosarGuiEditor.Source.Controllers.EventsControllers
                     TextBox tb = sender as TextBox;
                     if (NameUtils.CheckComponentName(tb.Text))
                     {
-                        _componentDefenition.TimingEvents[index].Name = tb.Text;
+                        ClientServerEventList list;
+
+                        if (isAsync == true)
+                        {
+                            list = _componentDefenition.AsyncClientServerEvents;
+                        }
+                        else
+                        {
+                            list = _componentDefenition.SyncClientServerEvents;
+                        }
+
+                        list[index].Name = tb.Text;
                     }
                 }
             }
