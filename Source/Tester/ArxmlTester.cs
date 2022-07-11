@@ -65,6 +65,7 @@ namespace AutosarGuiEditor.Source.Tester
             TestTimingEvents();
             TestServerPorts();
             TestClientServerEvents();
+            TestRunnableUsing();
             SortText();
         }
 
@@ -589,6 +590,71 @@ namespace AutosarGuiEditor.Source.Tester
                         AppendText("Each async client-server events shall have filled source operation : " + compDef.Name + " event: " + csEvent.Name, MessageType.ERROR);
                     }
                 }
+            }
+        }
+
+        void TestRunnableUsing()
+        {
+            /* Check that each client -server event has filled runnable and source */
+            foreach (ApplicationSwComponentType compDef in autosarApp.ComponentDefenitionsList)
+            {
+                foreach (RunnableDefenition runnableDef in compDef.Runnables)
+                {
+                    Boolean runnableUsedInPeriodicEvents = false;
+                    Boolean runnableUsedInClientServerEvents = false;
+
+                    foreach (ClientServerEvent csEvent in compDef.SyncClientServerEvents)
+                    {
+                        if (csEvent.Runnable != null)
+                        {
+                            if (csEvent.Runnable == runnableDef)
+                            {
+                                runnableUsedInClientServerEvents = true;
+                            }
+                        }
+                    }
+
+                    foreach (ClientServerEvent csEvent in compDef.AsyncClientServerEvents)
+                    {
+                        if (csEvent.Runnable != null)
+                        {
+                            if (csEvent.Runnable == runnableDef)
+                            {
+                                runnableUsedInClientServerEvents = true;
+                            }
+                        }
+                    }
+
+                    foreach (TimingEvent timingEvent in compDef.TimingEvents)
+                    {
+                        if (timingEvent.Runnable != null)
+                        {
+                            if (timingEvent.Runnable == runnableDef)
+                            {
+                                runnableUsedInPeriodicEvents = true;
+                            }
+                        }
+                    }
+
+
+                    foreach (OneTimeEvent oneTimeEvent in compDef.OneTimeEvents)
+                    {
+                        if (oneTimeEvent.Runnable != null)
+                        {
+                            if (oneTimeEvent.Runnable == runnableDef)
+                            {
+                                runnableUsedInPeriodicEvents = true;
+                            }
+                        }
+                    }
+
+                    if (runnableUsedInPeriodicEvents && runnableUsedInClientServerEvents)
+                    {
+                        AppendText("The same runnable shall not be used for periodical and client-server events : " + compDef.Name + " runnable: " + runnableDef.Name, MessageType.ERROR);
+                    }
+                }
+
+                
             }
         }
 
