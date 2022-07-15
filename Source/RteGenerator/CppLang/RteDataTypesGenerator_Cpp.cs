@@ -2,31 +2,26 @@
 using AutosarGuiEditor.Source.Component;
 using AutosarGuiEditor.Source.Component.CData;
 using AutosarGuiEditor.Source.Component.PerInstanceMemory;
-using AutosarGuiEditor.Source.DataTypes.BaseDataType;
 using AutosarGuiEditor.Source.DataTypes.ComplexDataType;
 using AutosarGuiEditor.Source.DataTypes.Enum;
 using AutosarGuiEditor.Source.PortDefenitions;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 
-namespace AutosarGuiEditor.Source.RteGenerator
+namespace AutosarGuiEditor.Source.RteGenerator.CppLang
 {
-    public class RteDataTypesGenerator
+    public class RteDataTypesGenerator_Cpp
     {
         public void GenerateDataTypesFile(String folder)
         {
             String FileName = folder + "\\" + Properties.Resources.RTE_DATATYPES_H_FILENAME;
             StreamWriter writer = new StreamWriter(FileName);
-            RteFunctionsGenerator.GenerateFileTitle(writer, Properties.Resources.RTE_DATATYPES_H_FILENAME, Properties.Resources.DATATYPES_H_FILE_DESCRIPTION);
-            RteFunctionsGenerator.OpenGuardDefine(writer);
+            RteFunctionsGenerator_Cpp.GenerateFileTitle(writer, Properties.Resources.RTE_DATATYPES_H_FILENAME, Properties.Resources.DATATYPES_H_FILE_DESCRIPTION);
+            RteFunctionsGenerator_Cpp.OpenGuardDefine(writer);
 
             writer.WriteLine();
-            RteFunctionsGenerator.AddInclude(writer, Properties.Resources.RTE_RETURN_CODES_FILENAME);
+            RteFunctionsGenerator_Cpp.AddInclude(writer, Properties.Resources.RTE_RETURN_CODES_FILENAME);
             writer.WriteLine();
 
             WriteStaticGlobal(writer);
@@ -41,7 +36,7 @@ namespace AutosarGuiEditor.Source.RteGenerator
 
             GenerateComponentsDataTypes(writer);
 
-            RteFunctionsGenerator.CloseGuardDefine(writer);
+            RteFunctionsGenerator_Cpp.CloseGuardDefine(writer);
             writer.Close();
         }
 
@@ -148,23 +143,23 @@ namespace AutosarGuiEditor.Source.RteGenerator
 
         public void GenerateDataTypeForPim(StreamWriter writer, ApplicationSwComponentType componentDefenition, PimDefenition pimDefenition)       
         {
-            writer.WriteLine("    " + pimDefenition.DataTypeName + " " + RteFunctionsGenerator.GenerateRtePimFieldInComponentDefenitionStruct(componentDefenition, pimDefenition) + ";");            
+            writer.WriteLine("    " + pimDefenition.DataTypeName + " " + RteFunctionsGenerator_Cpp.GenerateRtePimFieldInComponentDefenitionStruct(componentDefenition, pimDefenition) + ";");            
         }
 
         public void GenerateDataTypeForCData(StreamWriter writer, ApplicationSwComponentType componentDefenition, CDataDefenition cdata)
         {
-            writer.WriteLine("    " + cdata.DataTypeName + " " + RteFunctionsGenerator.GenerateRteCDataFieldInComponentDefenitionStruct(componentDefenition, cdata) + ";");     
+            writer.WriteLine("    " + cdata.DataTypeName + " " + RteFunctionsGenerator_Cpp.GenerateRteCDataFieldInComponentDefenitionStruct(componentDefenition, cdata) + ";");     
         }
 
         public void GenerateFieldsForSenderPorts(StreamWriter writer, ApplicationSwComponentType componentDefenition, PortDefenition portDefenition, SenderReceiverInterfaceField srInterfaceField)
         {
-            writer.WriteLine("    " + srInterfaceField.DataTypeName + " " + RteFunctionsGenerator.GenerateRteWriteFieldInComponentDefenitionStruct(portDefenition, srInterfaceField) + ";");
+            writer.WriteLine("    " + srInterfaceField.DataTypeName + " " + RteFunctionsGenerator_Cpp.GenerateRteWriteFieldInComponentDefenitionStruct(portDefenition, srInterfaceField) + ";");
         }
 
         public void GenerateFieldsForQueuedReceiverPort(StreamWriter writer, ApplicationSwComponentType componentDefenition, PortDefenition portDefenition, SenderReceiverInterfaceField srInterfaceField)
         {
             SenderReceiverInterface srInterface = portDefenition.InterfaceDatatype as SenderReceiverInterface;
-            writer.WriteLine("    " + srInterfaceField.QueuedInterfaceName(srInterface.Name) + " " + RteFunctionsGenerator.GenerateRteWriteFieldInComponentDefenitionStruct(portDefenition, srInterfaceField) + ";");
+            writer.WriteLine("    " + srInterfaceField.QueuedInterfaceName(srInterface.Name) + " " + RteFunctionsGenerator_Cpp.GenerateRteWriteFieldInComponentDefenitionStruct(portDefenition, srInterfaceField) + ";");
         }
 
         static bool isComplexDataTypeWithoutDependenciesToOtherCDT(ComplexDataType cdt)
@@ -313,7 +308,7 @@ namespace AutosarGuiEditor.Source.RteGenerator
             writer.WriteLine("");
 
             /* Generate an array if it existis*/
-            ArrayDataTypeGenerator.GenerateArrayForDataType(writer, datatype);
+            ArrayDataTypeGenerator_Cpp.GenerateArrayForDataType(writer, datatype);
         }
 
         public void WriteBaseDataTypes(StreamWriter writer)
@@ -327,12 +322,12 @@ namespace AutosarGuiEditor.Source.RteGenerator
             writer.WriteLine("#endif");
             writer.WriteLine("");
 
-            BaseDataTypesCodeGenerator.GenerateCode(writer, AutosarApplication.GetInstance().BaseDataTypes);
+            BaseDataTypesCodeGenerator_Cpp.GenerateCode(writer, AutosarApplication.GetInstance().BaseDataTypes);
 
             writer.WriteLine("");
             writer.WriteLine("/* Rte data types */");
             writer.WriteLine("typedef uint16               Std_ReturnType;");
-            writer.WriteLine("typedef void    *" + RteFunctionsGenerator.ComponentInstancePointerDatatype + ";");
+            writer.WriteLine("typedef void    *" + RteFunctionsGenerator_Cpp.ComponentInstancePointerDatatype + ";");
             writer.WriteLine("");
         }
 
@@ -391,19 +386,19 @@ namespace AutosarGuiEditor.Source.RteGenerator
                 minValue = acceptFloatValue(datatype.MinValue);
                 maxValue = acceptFloatValue(datatype.MaxValue);
             }
-            writer.WriteLine(RteFunctionsGenerator.CreateDefine(upperLimit, maxValue, false));
+            writer.WriteLine(RteFunctionsGenerator_Cpp.CreateDefine(upperLimit, maxValue, false));
 
             String lowerLimit = datatype.Name + "_LOWER_LIMIT";
-            writer.WriteLine(RteFunctionsGenerator.CreateDefine(lowerLimit, minValue, false));
+            writer.WriteLine(RteFunctionsGenerator_Cpp.CreateDefine(lowerLimit, minValue, false));
 
             /* Write datatype */
             String dataTypeName = AutosarApplication.GetInstance().GetDataTypeName(datatype.BaseDataTypeGUID);
-            string typedef = RteFunctionsGenerator.FillStringForCount("typedef  " + dataTypeName, ' ', 24);
+            string typedef = RteFunctionsGenerator_Cpp.FillStringForCount("typedef  " + dataTypeName, ' ', 24);
             writer.WriteLine(typedef + datatype.Name + ";");
             writer.WriteLine("");
 
             /* Generate an array if it existis*/
-            ArrayDataTypeGenerator.GenerateArrayForDataType(writer, datatype);
+            ArrayDataTypeGenerator_Cpp.GenerateArrayForDataType(writer, datatype);
         }
 
         public void WriteEnumDataType(StreamWriter writer, EnumDataType datatype)
@@ -417,7 +412,7 @@ namespace AutosarGuiEditor.Source.RteGenerator
             /* Write values */
             for (int i = 0; i < datatype.Fields.Count; i++)                
             {                
-                writer.Write(RteFunctionsGenerator.CreateEnumValue(datatype.Fields[i]));
+                writer.Write(RteFunctionsGenerator_Cpp.CreateEnumValue(datatype.Fields[i]));
                 writer.WriteLine(",");
             }
 
@@ -428,21 +423,21 @@ namespace AutosarGuiEditor.Source.RteGenerator
             writer.WriteLine("");
 
             int minLimit = datatype.GetLimit(LimitType.ltLowerLimit);
-            String defineMin = RteFunctionsGenerator.CreateDefine(datatype.Name + "_LOWER_LIMIT", minLimit.ToString(), false);
+            String defineMin = RteFunctionsGenerator_Cpp.CreateDefine(datatype.Name + "_LOWER_LIMIT", minLimit.ToString(), false);
             writer.WriteLine(defineMin);
 
             int upperLimit = datatype.GetLimit(LimitType.ltUpperLimit);
-            String defineMax = RteFunctionsGenerator.CreateDefine(datatype.Name + "_UPPER_LIMIT", upperLimit.ToString(), false);
+            String defineMax = RteFunctionsGenerator_Cpp.CreateDefine(datatype.Name + "_UPPER_LIMIT", upperLimit.ToString(), false);
             writer.WriteLine(defineMax);
 
             int elementsCount = datatype.Fields.Count;
-            String elementsCountStr = RteFunctionsGenerator.CreateDefine(datatype.Name + "_ELEMENTS_COUNT", elementsCount.ToString(), false);
+            String elementsCountStr = RteFunctionsGenerator_Cpp.CreateDefine(datatype.Name + "_ELEMENTS_COUNT", elementsCount.ToString(), false);
             writer.WriteLine(elementsCountStr);
 
             writer.WriteLine("");
 
             /* Generate an array if it existis*/
-            ArrayDataTypeGenerator.GenerateArrayForDataType(writer, datatype);
+            ArrayDataTypeGenerator_Cpp.GenerateArrayForDataType(writer, datatype);
         }
     }
 }

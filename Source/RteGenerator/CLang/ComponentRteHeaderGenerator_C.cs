@@ -1,5 +1,4 @@
-﻿using AutosarGuiEditor.Source.Autosar.Events;
-using AutosarGuiEditor.Source.AutosarInterfaces;
+﻿using AutosarGuiEditor.Source.AutosarInterfaces;
 using AutosarGuiEditor.Source.AutosarInterfaces.ClientServer;
 using AutosarGuiEditor.Source.AutosarInterfaces.SenderReceiver;
 using AutosarGuiEditor.Source.Component;
@@ -9,21 +8,18 @@ using AutosarGuiEditor.Source.PortDefenitions;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace AutosarGuiEditor.Source.RteGenerator
+namespace AutosarGuiEditor.Source.RteGenerator.CLang
 {
-    public class ComponentRteHeaderGenerator
+    public class ComponentRteHeaderGenerator_C
     {
         public static void GenerateHeader(String dir, ApplicationSwComponentType compDef)
         {
-            String filename = dir + "\\" + RteFunctionsGenerator.GenerateComponentHeaderFile(compDef);
+            String filename = dir + "\\" + RteFunctionsGenerator_C.GenerateComponentHeaderFile(compDef);
 
             StreamWriter writer = new StreamWriter(filename);
-            RteFunctionsGenerator.GenerateFileTitle(writer, filename, "Implementation for " + compDef.Name + " header file");
-            RteFunctionsGenerator.OpenGuardDefine(writer);
+            RteFunctionsGenerator_C.GenerateFileTitle(writer, filename, "Implementation for " + compDef.Name + " header file");
+            RteFunctionsGenerator_C.OpenGuardDefine(writer);
 
 
             writer.WriteLine(@"
@@ -36,7 +32,7 @@ namespace AutosarGuiEditor.Source.RteGenerator
 #endif
 
 #include <Rte_DataTypes.h>
-#include <" + RteFunctionsGenerator.GenerateComponentHeaderFile(compDef) + @">
+#include <" + RteFunctionsGenerator_C.GenerateComponentHeaderFile(compDef) + @">
 
 
 #define RTE_DEFINED
@@ -53,7 +49,7 @@ namespace AutosarGuiEditor.Source.RteGenerator
             {
                 SenderReceiverInterface srInterface = portDef.InterfaceDatatype as SenderReceiverInterface;
 
-                String portDataStructureName = RteFunctionsGenerator.GeneratePortDataStructureDefenition(compDef, srInterface, portDef.PortType);
+                String portDataStructureName = RteFunctionsGenerator_C.GeneratePortDataStructureDefenition(compDef, srInterface, portDef.PortType);
 
                 if (!createdInterfaces.Contains(portDataStructureName))
                 {
@@ -65,7 +61,7 @@ namespace AutosarGuiEditor.Source.RteGenerator
                         string data = "    Std_ReturnType (*";
                         data += (portDef.PortType == PortType.Sender) ? "Write_" : "Read_";
                         data += field.Name + ")";
-                        String fieldVariable = RteFunctionsGenerator.GenerateSenderReceiverInterfaceArguments(field, portDef.PortType, false);
+                        String fieldVariable = RteFunctionsGenerator_C.GenerateSenderReceiverInterfaceArguments(field, portDef.PortType, false);
                         data += fieldVariable + ";";
                         writer.WriteLine(data);
                     }
@@ -85,7 +81,7 @@ namespace AutosarGuiEditor.Source.RteGenerator
 
                 if (portDef.PortType == PortType.Client)
                 {
-                    String portDataStructureName = RteFunctionsGenerator.GeneratePortDataStructureDefenition(compDef, csInterface);
+                    String portDataStructureName = RteFunctionsGenerator_C.GeneratePortDataStructureDefenition(compDef, csInterface);
 
                     if (!createdClientInterfaces.Contains(portDataStructureName))
                     {
@@ -96,7 +92,7 @@ namespace AutosarGuiEditor.Source.RteGenerator
                         {
                             string data = "    Std_ReturnType (*";
                             data += "Call_";
-                            data += operation.Name + ")(" + RteFunctionsGenerator.GenerateClientServerInterfaceArguments(operation, false) + ");";
+                            data += operation.Name + ")(" + RteFunctionsGenerator_C.GenerateClientServerInterfaceArguments(operation, false) + ");";
                             writer.WriteLine(data);
                         }
                         writer.WriteLine("} " + portDataStructureName + ";");
@@ -115,7 +111,7 @@ namespace AutosarGuiEditor.Source.RteGenerator
  *************************************************************/
 
 ");
-            String CDSname = RteFunctionsGenerator.ComponentDataStructureDefenitionName(compDef);
+            String CDSname = RteFunctionsGenerator_C.ComponentDataStructureDefenitionName(compDef);
             writer.WriteLine("typedef struct " + CDSname + " {");
             writer.WriteLine("    /* Per Instance Memory Section */");
             foreach (PimDefenition pim in compDef.PerInstanceMemoryList)
@@ -130,7 +126,7 @@ namespace AutosarGuiEditor.Source.RteGenerator
                 if (portDef.InterfaceDatatype is SenderReceiverInterface)
                 {
                     SenderReceiverInterface srInterface = portDef.InterfaceDatatype as SenderReceiverInterface;
-                    String portDatatype = RteFunctionsGenerator.GeneratePortDataStructureDefenition(compDef, srInterface, portDef.PortType);
+                    String portDatatype = RteFunctionsGenerator_C.GeneratePortDataStructureDefenition(compDef, srInterface, portDef.PortType);
                     writer.WriteLine("    " + portDatatype + " " + portDef.Name + ";");
                 }
                 else if (portDef.InterfaceDatatype is ClientServerInterface)
@@ -138,7 +134,7 @@ namespace AutosarGuiEditor.Source.RteGenerator
                     ClientServerInterface csInterface = portDef.InterfaceDatatype as ClientServerInterface;
                     if (portDef.PortType == PortType.Client)
                     {
-                        String portDatatype = RteFunctionsGenerator.GeneratePortDataStructureDefenition(compDef, csInterface);
+                        String portDatatype = RteFunctionsGenerator_C.GeneratePortDataStructureDefenition(compDef, csInterface);
                         writer.WriteLine("    " + portDatatype + " " + portDef.Name + ";");
                     }
                 }
@@ -179,11 +175,11 @@ namespace AutosarGuiEditor.Source.RteGenerator
  * BEGIN Runnable Entity
  *************************************************************/
 ");
-            RteComponentGenerator.WriteAllFunctionWhichComponentCouldUse(compDef, writer);
+            RteComponentGenerator_C.WriteAllFunctionWhichComponentCouldUse(compDef, writer);
 
             foreach (RunnableDefenition runnable in compDef.Runnables)
             {
-                writer.WriteLine(RteFunctionsGenerator.Generate_RunnableDeclaration(compDef, runnable) + ";");
+                writer.WriteLine(RteFunctionsGenerator_C.Generate_RunnableDeclaration(compDef, runnable) + ";");
             }
 
             writer.WriteLine();
@@ -206,11 +202,11 @@ namespace AutosarGuiEditor.Source.RteGenerator
                 String define;
                 if (compDef.MultipleInstantiation == false)
                 {
-                    define = RteFunctionsGenerator.CreateDefine(RteFunctionsGenerator.GenerateShortCDataFunctionName(cdata) + "()", singleComponentInstanceVariableName + ".CData_" + cdata.Name + "()", true);
+                    define = RteFunctionsGenerator_C.CreateDefine(RteFunctionsGenerator_C.GenerateShortCDataFunctionName(cdata) + "()", singleComponentInstanceVariableName + ".CData_" + cdata.Name + "()", true);
                 }
                 else
                 {
-                    define = RteFunctionsGenerator.CreateDefine(RteFunctionsGenerator.GenerateShortCDataFunctionName(cdata) + "(instance)", "(instance)->CData_" + cdata.Name + "()", true);
+                    define = RteFunctionsGenerator_C.CreateDefine(RteFunctionsGenerator_C.GenerateShortCDataFunctionName(cdata) + "(instance)", "(instance)->CData_" + cdata.Name + "()", true);
                 }
 
                 writer.WriteLine(define);
@@ -223,11 +219,11 @@ namespace AutosarGuiEditor.Source.RteGenerator
                 String define;
                 if (compDef.MultipleInstantiation == false)
                 {
-                    define = RteFunctionsGenerator.CreateDefine(RteFunctionsGenerator.GenerateShortPimFunctionName(pim) + "()", singleComponentInstanceVariableName + ".Pim_" + pim.Name, true);
+                    define = RteFunctionsGenerator_C.CreateDefine(RteFunctionsGenerator_C.GenerateShortPimFunctionName(pim) + "()", singleComponentInstanceVariableName + ".Pim_" + pim.Name, true);
                 }
                 else
                 {
-                    define = RteFunctionsGenerator.CreateDefine(RteFunctionsGenerator.GenerateShortPimFunctionName(pim) + "(instance)", "(instance)->Pim_" + pim.Name, true);
+                    define = RteFunctionsGenerator_C.CreateDefine(RteFunctionsGenerator_C.GenerateShortPimFunctionName(pim) + "(instance)", "(instance)->Pim_" + pim.Name, true);
                 }
 
 
@@ -242,7 +238,7 @@ namespace AutosarGuiEditor.Source.RteGenerator
                     SenderReceiverInterface srInterface = AutosarApplication.GetInstance().SenderReceiverInterfaces.FindObject(portDefenition.InterfaceGUID);
                     foreach (SenderReceiverInterfaceField field in srInterface.Fields)
                     {
-                        String funcName = RteFunctionsGenerator.GenerateReadWriteFunctionName(portDefenition, field);
+                        String funcName = RteFunctionsGenerator_C.GenerateReadWriteFunctionName(portDefenition, field);
                         if (compDef.MultipleInstantiation == false)
                         {
                             funcName += "(_data_)";
@@ -263,7 +259,7 @@ namespace AutosarGuiEditor.Source.RteGenerator
                         }
                         rteFuncName += (portDefenition.PortType == PortType.Sender ? "Write_" : "Read_") + field.Name + "(_data_)";
 
-                        string define = RteFunctionsGenerator.CreateDefine(funcName, rteFuncName, true);
+                        string define = RteFunctionsGenerator_C.CreateDefine(funcName, rteFuncName, true);
 
                         writer.WriteLine(define);
                     }
@@ -273,9 +269,9 @@ namespace AutosarGuiEditor.Source.RteGenerator
                     ClientServerInterface csInterface = AutosarApplication.GetInstance().ClientServerInterfaces.FindObject(portDefenition.InterfaceGUID);
                     foreach (ClientServerOperation operation in csInterface.Operations)
                     {
-                        String funcName = RteFunctionsGenerator.Generate_InternalRteCall_FunctionName(portDefenition, operation);
-                        String defineArguments = RteFunctionsGenerator.GenerateClientServerInterfaceArgumentsForDefine(operation, compDef.MultipleInstantiation);
-                        String argumentsWithoutInstance = RteFunctionsGenerator.GenerateClientServerInterfaceArgumentsForDefineWithoutInstance(operation, compDef.MultipleInstantiation);
+                        String funcName = RteFunctionsGenerator_C.Generate_InternalRteCall_FunctionName(portDefenition, operation);
+                        String defineArguments = RteFunctionsGenerator_C.GenerateClientServerInterfaceArgumentsForDefine(operation, compDef.MultipleInstantiation);
+                        String argumentsWithoutInstance = RteFunctionsGenerator_C.GenerateClientServerInterfaceArgumentsForDefineWithoutInstance(operation, compDef.MultipleInstantiation);
 
                         String rteFuncName;
                         if (compDef.MultipleInstantiation == false)
@@ -288,10 +284,10 @@ namespace AutosarGuiEditor.Source.RteGenerator
                         }
                         rteFuncName += "Call_" + operation.Name + argumentsWithoutInstance;
 
-                        String funcArgument = RteFunctionsGenerator.GenerateClientServerInterfaceArguments(operation, compDef.MultipleInstantiation);
+                        String funcArgument = RteFunctionsGenerator_C.GenerateClientServerInterfaceArguments(operation, compDef.MultipleInstantiation);
 
 
-                        String define = RteFunctionsGenerator.CreateDefine(funcName + defineArguments, rteFuncName, true);
+                        String define = RteFunctionsGenerator_C.CreateDefine(funcName + defineArguments, rteFuncName, true);
                         writer.WriteLine(define);
 
                     }
@@ -306,7 +302,7 @@ namespace AutosarGuiEditor.Source.RteGenerator
  * END RTE API DEFINITIONS 
  *************************************************************/
 ");
-            RteFunctionsGenerator.CloseGuardDefine(writer);
+            RteFunctionsGenerator_C.CloseGuardDefine(writer);
             writer.Close();
         }
     }

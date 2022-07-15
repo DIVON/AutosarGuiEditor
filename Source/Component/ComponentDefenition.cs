@@ -177,5 +177,17 @@ namespace AutosarGuiEditor.Source.Component
             }
             return null;
         }
+
+        public bool IsClientServerEventSync(ClientServerEvent csEvent)
+        {
+            foreach (ClientServerEvent eventInList in this.asyncClientServerEvents)
+            {
+                if (csEvent == eventInList)
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
     }
 }

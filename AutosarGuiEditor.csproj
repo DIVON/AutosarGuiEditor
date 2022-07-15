@@ -26,6 +26,7 @@
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <Prefer32Bit>false</Prefer32Bit>
+    <CodeAnalysisRuleSet>CodingsRuleSet.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -187,8 +188,8 @@
     <Compile Include="Source\Controllers\SenderReceiverInterfaceController.cs" />
     <Compile Include="Source\DataTypes\BaseDataType\BaseDataType.cs" />
     <Compile Include="Source\Painters\TextPainter.cs" />
-    <Compile Include="Source\RteGenerator\ArrayDataTypeGenerator.cs" />
-    <Compile Include="Source\RteGenerator\BaseDataTypesCodeGenerator.cs" />
+    <Compile Include="Source\RteGenerator\CLang\ArrayDataTypeGenerator_C.cs" />
+    <Compile Include="Source\RteGenerator\CLang\BaseDataTypesCodeGenerator_C.cs" />
     <Compile Include="Source\DataTypes\BaseDataType\BaseDataTypesList.cs" />
     <Compile Include="Source\AutosarInterfaces\ClientServer\ClientServerOperationFieldsList.cs" />
     <Compile Include="Source\DataTypes\ComplexDataType\ComplexDataType.cs" />
@@ -257,18 +258,29 @@
     <Compile Include="Source\Render\Painter.cs" />
     <Compile Include="Source\Render\ResizableRectangleElement.cs" />
     <Compile Include="Source\Render\Scene.cs" />
-    <Compile Include="Source\RteGenerator\ComponentRteHeaderGenerator.cs" />
-    <Compile Include="Source\RteGenerator\ReturnCodesGenerator.cs" />
-    <Compile Include="Source\RteGenerator\RteComponentGenerator.cs" />
+    <Compile Include="Source\RteGenerator\CLang\ComponentRteHeaderGenerator_C.cs" />
+    <Compile Include="Source\RteGenerator\CLang\ReturnCodesGenerator_C.cs" />
+    <Compile Include="Source\RteGenerator\CLang\RteComponentGenerator_C.cs" />
+    <Compile Include="Source\RteGenerator\CppLang\ArrayDataTypeGenerator_Cpp.cs" />
+    <Compile Include="Source\RteGenerator\CppLang\BaseDataTypesCodeGenerator_Cpp.cs" />
+    <Compile Include="Source\RteGenerator\CppLang\ComponentRteHeaderGenerator_Cpp.cs" />
+    <Compile Include="Source\RteGenerator\CppLang\ReturnCodesGenerator_Cpp.cs" />
+    <Compile Include="Source\RteGenerator\CppLang\RteComponentGenerator_Cpp.cs" />
+    <Compile Include="Source\RteGenerator\CppLang\RteConnectionGenerator_Cpp.cs" />
+    <Compile Include="Source\RteGenerator\CppLang\RteDataTypesGenerator_Cpp.cs" />
+    <Compile Include="Source\RteGenerator\CppLang\RteFunctionsGenerator_Cpp.cs" />
+    <Compile Include="Source\RteGenerator\CppLang\RteGenerator_Cpp.cs" />
+    <Compile Include="Source\RteGenerator\CppLang\RteSchedulerGenerator_Cpp.cs" />
+    <Compile Include="Source\RteGenerator\CppLang\SystemErrorGenerator_Cpp.cs" />
     <Compile Include="Source\RteGenerator\TestGenerator\RteTestConnectionCGenerator.cs" />
-    <Compile Include="Source\RteGenerator\RteConnectionCGenerator.cs" />
-    <Compile Include="Source\RteGenerator\RteDataTypesGenerator.cs" />
-    <Compile Include="Source\RteGenerator\RteGenerator.cs" />
-    <Compile Include="Source\RteGenerator\RteFunctionsGenerator.cs" />
+    <Compile Include="Source\RteGenerator\CLang\RteConnectionGenerator_C.cs" />
+    <Compile Include="Source\RteGenerator\CLang\RteDataTypesGenerator_C.cs" />
+    <Compile Include="Source\RteGenerator\CLang\RteGenerator_C.cs" />
+    <Compile Include="Source\RteGenerator\CLang\RteFunctionsGenerator_C.cs" />
     <Compile Include="Source\RteGenerator\RteOs\RteFreeRtosGenerator.cs" />
     <Compile Include="Source\RteGenerator\RteOs\RteOsInterfaceGenerator.cs" />
-    <Compile Include="Source\RteGenerator\RteSchedulerGenerator.cs" />
-    <Compile Include="Source\RteGenerator\SystemErrorGenerator.cs" />
+    <Compile Include="Source\RteGenerator\CLang\RteSchedulerGenerator_C.cs" />
+    <Compile Include="Source\RteGenerator\CLang\SystemErrorGenerator_C.cs" />
     <Compile Include="Source\Interfaces\IGuid.cs" />
     <Compile Include="Source\RteGenerator\TestGenerator\TestRteCommonHGegenerator.cs" />
     <Compile Include="Source\RteGenerator\TestGenerator\TestRteEnvironmentGenerator.cs" />
@@ -349,6 +361,7 @@
     <EmbeddedResource Include="Source\Forms\AddPortForm.resx">
       <DependentUpon>AddPortForm.cs</DependentUpon>
     </EmbeddedResource>
+    <None Include="CodingsRuleSet.ruleset" />
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>PublicSettingsSingleFileGenerator</Generator>
@@ -382,6 +395,7 @@
       <Name>WriteableBitmapEx.Wpf</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>XCOPY "$(SolutionDir)Images" "$(TargetDir)\Images\" /S /D</PostBuildEvent>

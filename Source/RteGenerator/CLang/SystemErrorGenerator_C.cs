@@ -1,16 +1,12 @@
 ﻿using AutosarGuiEditor.Source.Autosar.SystemErrors;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace AutosarGuiEditor.Source.RteGenerator
+namespace AutosarGuiEditor.Source.RteGenerator.CLang
 {
-    public class SystemErrorGenerator
+    public class SystemErrorGenerator_C
     {
-        public SystemErrorGenerator()
+        public SystemErrorGenerator_C()
         {
         }
 
@@ -18,14 +14,14 @@ namespace AutosarGuiEditor.Source.RteGenerator
         {
             String FileName = folder + "\\" + Properties.Resources.SYSTEM_ERRORS_H_FILENAME;
             StreamWriter writer = new StreamWriter(FileName);
-            RteFunctionsGenerator.GenerateFileTitle(writer, Properties.Resources.RTE_DATATYPES_H_FILENAME, Properties.Resources.DATATYPES_H_FILE_DESCRIPTION);
-            RteFunctionsGenerator.OpenGuardDefine(writer);
+            RteFunctionsGenerator_C.GenerateFileTitle(writer, Properties.Resources.RTE_DATATYPES_H_FILENAME, Properties.Resources.DATATYPES_H_FILE_DESCRIPTION);
+            RteFunctionsGenerator_C.OpenGuardDefine(writer);
 
             writer.WriteLine("/*  System errors */");
             WriteErrorsCount(writer);
             WriteAllErrors(writer);
-            RteFunctionsGenerator.CloseGuardDefine(writer);
-            RteFunctionsGenerator.WriteEndOfFile(writer);
+            RteFunctionsGenerator_C.CloseGuardDefine(writer);
+            RteFunctionsGenerator_C.WriteEndOfFile(writer);
             writer.Close();
         }
 
@@ -33,8 +29,8 @@ namespace AutosarGuiEditor.Source.RteGenerator
         {
             int immediateSafeStateCount = AutosarApplication.GetInstance().SystemErrors.ErrorCount(SystemErrorStrictness.ImmediateSafeState);
             int totalErrorCount =  AutosarApplication.GetInstance().SystemErrors.Count;
-            writer.WriteLine(RteFunctionsGenerator.CreateDefine("SYSTEM_ERRORS_COUNT", (totalErrorCount + 1).ToString()));
-            writer.WriteLine(RteFunctionsGenerator.CreateDefine("IMMEDIATE_SAFE_STATE_ERROR_COUNT", immediateSafeStateCount.ToString()));
+            writer.WriteLine(RteFunctionsGenerator_C.CreateDefine("SYSTEM_ERRORS_COUNT", (totalErrorCount + 1).ToString()));
+            writer.WriteLine(RteFunctionsGenerator_C.CreateDefine("IMMEDIATE_SAFE_STATE_ERROR_COUNT", immediateSafeStateCount.ToString()));
             writer.WriteLine();
         }
 
@@ -54,7 +50,7 @@ namespace AutosarGuiEditor.Source.RteGenerator
 
             int errCount = 1;
 
-            writer.WriteLine(RteFunctionsGenerator.CreateDefine("ERR_ID_INCORRECT_ERROR_ID", "0u", false, maxLen));
+            writer.WriteLine(RteFunctionsGenerator_C.CreateDefine("ERR_ID_INCORRECT_ERROR_ID", "0u", false, maxLen));
             writer.WriteLine();
             writer.WriteLine("/* Immediate Safe State errors */");
             /* Write only immediate safe safe state errors */
@@ -62,7 +58,7 @@ namespace AutosarGuiEditor.Source.RteGenerator
             {
                 if (errList[i].Strictness == SystemErrorStrictness.ImmediateSafeState)
                 {
-                    writer.WriteLine(RteFunctionsGenerator.CreateDefine("ERR_ID_" + errList[i].Name, errCount.ToString() + "u", false, maxLen));
+                    writer.WriteLine(RteFunctionsGenerator_C.CreateDefine("ERR_ID_" + errList[i].Name, errCount.ToString() + "u", false, maxLen));
                     errCount++;
                 }                
             }
@@ -74,7 +70,7 @@ namespace AutosarGuiEditor.Source.RteGenerator
             {
                 if (errList[i].Strictness == SystemErrorStrictness.NoRestriction)
                 {
-                    writer.WriteLine(RteFunctionsGenerator.CreateDefine("ERR_ID_" + errList[i].Name, errCount.ToString() + "u", false, maxLen));
+                    writer.WriteLine(RteFunctionsGenerator_C.CreateDefine("ERR_ID_" + errList[i].Name, errCount.ToString() + "u", false, maxLen));
                     errCount++;
                 }
             }

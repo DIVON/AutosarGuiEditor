@@ -1,15 +1,11 @@
 ﻿using AutosarGuiEditor.Source.DataTypes.ArrayDataType;
 using AutosarGuiEditor.Source.SystemInterfaces;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace AutosarGuiEditor.Source.RteGenerator
+namespace AutosarGuiEditor.Source.RteGenerator.CLang
 {
-    public static class ArrayDataTypeGenerator
+    public static class ArrayDataTypeGenerator_C
     {
         static ArrayDataType GetArrayDatatypeForDatatype(IGUID datatype)
         {
@@ -31,7 +27,7 @@ namespace AutosarGuiEditor.Source.RteGenerator
                 {
                     /* Write array size */
                     String arraySizeNameMacro = arrayDT.Name + "_ELEMENTS_COUNT";
-                    writer.WriteLine(RteFunctionsGenerator.CreateDefine(arraySizeNameMacro, arrayDT.Size.ToString() + "U", false));
+                    writer.WriteLine(RteFunctionsGenerator_C.CreateDefine(arraySizeNameMacro, arrayDT.Size.ToString() + "U", false));
 
                     writer.WriteLine();
                     writer.WriteLine("typedef " + datatype.Name + " " + arrayDT.Name + "[" + arrayDT.Size + "];");

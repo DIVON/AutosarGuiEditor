@@ -1,14 +1,9 @@
-﻿using AutosarGuiEditor.Source.RteGenerator;
-using System;
-using System.Collections.Generic;
+﻿using AutosarGuiEditor.Source.DataTypes.BaseDataType;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace AutosarGuiEditor.Source.DataTypes.BaseDataType
+namespace AutosarGuiEditor.Source.RteGenerator.CLang
 {
-    public static class BaseDataTypesCodeGenerator
+    public static class BaseDataTypesCodeGenerator_C
     {
         public static void GenerateCode(StreamWriter writer, BaseDataTypesList baseDataTypesList)
         {
@@ -16,7 +11,7 @@ namespace AutosarGuiEditor.Source.DataTypes.BaseDataType
             {
                 writer.WriteLine("typedef  " + baseDataType.SystemName + "  " + baseDataType.Name + ";" );
 
-                ArrayDataTypeGenerator.GenerateArrayForDataType(writer, baseDataType);
+                ArrayDataTypeGenerator_C.GenerateArrayForDataType(writer, baseDataType);
             }            
         }
     }

@@ -208,4 +208,7 @@
   <data name="RTE_TASK_SCHEDULER_H_FILENAME" xml:space="preserve">
     <value>Rte_Task_Scheduler.h</value>
   </data>
+  <data name="RTE_EXTERNALS_FILENAME" xml:space="preserve">
+    <value>Rte_Externals.h</value>
+  </data>
 </root>

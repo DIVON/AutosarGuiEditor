@@ -4,7 +4,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     Title="Project Settings"
     Width="845"
-    Height="261.65"
+    Height="317"
     Icon="/AutosarGuiEditor;component/AppIcon.ico"
     WindowStartupLocation="CenterOwner">
     <Grid Margin="0,0,2,7">
@@ -107,6 +107,15 @@
                     VerticalAlignment="Top"
                     Click="OpenTestRteDirDialogButton_Click"
                     Content="..." />
+                <ComboBox
+                    x:Name="McuTypeComboBox_Copy"
+                    Margin="186,156,68,0"
+                    VerticalAlignment="Top" />
+                <Label
+                    Margin="10,152,0,0"
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Top"
+                    Content="Code generator:" />
 
             </Grid>
 

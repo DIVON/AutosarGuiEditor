@@ -38,7 +38,7 @@ using AutosarGuiEditor.Source.RteGenerator.TestGenerator;
 using AutosarGuiEditor.Source.Painters.Boundaries;
 using AutosarGuiEditor.Source.App.Settings;
 using AutosarGuiEditor.Source;
-
+using AutosarGuiEditor.Source.RteGenerator.CLang;
 
 namespace AutosarGuiEditor
 { 
@@ -869,7 +869,7 @@ namespace AutosarGuiEditor
             String testResult = writer.ToString();
             if(!tester.IsErrorExist(testResult))
             {
-                RteGenerator rteGenerator = new RteGenerator();
+                RteGenerator_C rteGenerator = new RteGenerator_C();
                 bool result = rteGenerator.Generate(); 
                 if (result == true)
                 {
@@ -1208,7 +1208,7 @@ namespace AutosarGuiEditor
                         
             }
             generator.GenerateCommonFiles(autosarApp.GenerateTestRtePath);
-            RteSchedulerGenerator rteSchedulerGenerator = new RteSchedulerGenerator();
+            RteSchedulerGenerator_C rteSchedulerGenerator = new RteSchedulerGenerator_C();
             rteSchedulerGenerator.Generate_ExternalRunnables_File(autosarApp.GenerateTestRtePath);
             MessageBox.Show("Test environment has been generated.");
         }
@@ -1286,7 +1286,7 @@ namespace AutosarGuiEditor
             String testResult = writer.ToString();
             if (!tester.IsErrorExist(testResult))
             {
-                RteGenerator rteGenerator = new RteGenerator();
+                RteGenerator_C rteGenerator = new RteGenerator_C();
                 rteGenerator.GenerateComponentsFiles();
 
                 MessageBox.Show("Skeletons has been generated");

@@ -160,16 +160,22 @@ namespace System
 
             if (!newConnection.Port2.IsDelegatePort) /* Port of component */
             {
-                ClientServerInterface csInterface = portDef2.InterfaceDatatype as ClientServerInterface;
-
-                if (csInterface.IsAsync == false)
+                if (portDef2.PortType == PortType.Client)
                 {
-                    /* Client port shall have only one connection for sync operation */
-                    if (portDef2.PortType == PortType.Client)
+                    ClientServerInterface csInterface = portDef2.InterfaceDatatype as ClientServerInterface;
+
+                    if (csInterface != null)
                     {
-                        if (IsThisPointConnectionExists(newConnection.Component2, newConnection.Port2) == true)
+                        if (csInterface.IsAsync == false)
                         {
-                            return;
+                            /* Client port shall have only one connection for sync operation */
+
+                            {
+                                if (IsThisPointConnectionExists(newConnection.Component2, newConnection.Port2) == true)
+                                {
+                                    return;
+                                }
+                            }
                         }
                     }
                 }

@@ -1,5 +1,4 @@
-﻿using AutosarGuiEditor.Source.App.Settings;
-using AutosarGuiEditor.Source.Autosar.Events;
+﻿using AutosarGuiEditor.Source.Autosar.Events;
 using AutosarGuiEditor.Source.Autosar.OsTasks;
 using AutosarGuiEditor.Source.AutosarInterfaces;
 using AutosarGuiEditor.Source.AutosarInterfaces.ClientServer;
@@ -9,22 +8,13 @@ using AutosarGuiEditor.Source.Component.CData;
 using AutosarGuiEditor.Source.Component.PerInstanceMemory;
 using AutosarGuiEditor.Source.DataTypes.Enum;
 using AutosarGuiEditor.Source.Painters;
-using AutosarGuiEditor.Source.Painters.Components.CData;
-using AutosarGuiEditor.Source.Painters.Components.PerInstance;
-using AutosarGuiEditor.Source.Painters.PortsPainters;
 using AutosarGuiEditor.Source.PortDefenitions;
-using AutosarGuiEditor.Source.Render;
-using AutosarGuiEditor.Source.SystemInterfaces;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace AutosarGuiEditor.Source.RteGenerator
+namespace AutosarGuiEditor.Source.RteGenerator.CLang
 {
-    public static class RteFunctionsGenerator
+    public static class RteFunctionsGenerator_C
     {
         public const String IncludesLine                         = "/* INCLUDES */";
         public const String EndOfIncludesLine                    = "/* END OF INCLUDES */";
@@ -143,7 +133,7 @@ namespace AutosarGuiEditor.Source.RteGenerator
             
             if (MultipleInstantiation)
             {
-                result += RteFunctionsGenerator.ComponentInstancePointerDatatype + " instance, ";
+                result += RteFunctionsGenerator_C.ComponentInstancePointerDatatype + " instance, ";
             }
 
             String dataTypeName = AutosarApplication.GetInstance().GetDataTypeName(field.BaseDataTypeGUID);
@@ -180,7 +170,7 @@ namespace AutosarGuiEditor.Source.RteGenerator
 
             if (MultipleInstantiation)
             {
-                result += RteFunctionsGenerator.ComponentInstancePointerDatatype + " instance";
+                result += RteFunctionsGenerator_C.ComponentInstancePointerDatatype + " instance";
             }
             else
             {
@@ -196,7 +186,7 @@ namespace AutosarGuiEditor.Source.RteGenerator
 
             if (MultipleInstantiation)
             {
-                result += RteFunctionsGenerator.ComponentInstancePointerDatatype + " instance";
+                result += RteFunctionsGenerator_C.ComponentInstancePointerDatatype + " instance";
                 if (operation.Fields.Count > 0)
                 {
                     result += ", ";
@@ -429,7 +419,7 @@ namespace AutosarGuiEditor.Source.RteGenerator
         {             
             if (compDefenition.MultipleInstantiation)
             {
-                String CDSName = RteFunctionsGenerator.ComponentDataStructureDefenitionName(compDefenition);
+                String CDSName = RteFunctionsGenerator_C.ComponentDataStructureDefenitionName(compDefenition);
                 if (arguments.Length == 0)
                 {
                     return returnType + " " + Generate_RunnableFunctionName(compDefenition, runnable) + "(const " + CDSName + " * const instance)";
@@ -469,12 +459,15 @@ namespace AutosarGuiEditor.Source.RteGenerator
                     {
                         ClientServerEvent csEvent = aEvent as ClientServerEvent;
 
-                        if (csEvent.SourceOperation.Fields.Count != 0)
+                        if (compDefenition.IsClientServerEventSync(csEvent))
                         {
-                            arguments = RteFunctionsGenerator.GenerateClientServerInterfaceArguments(csEvent.SourceOperation, compDefenition.MultipleInstantiation); ;
-                        }
+                            if (csEvent.SourceOperation.Fields.Count != 0)
+                            {
+                                arguments = RteFunctionsGenerator_C.GenerateClientServerInterfaceArguments(csEvent.SourceOperation, compDefenition.MultipleInstantiation); ;
+                            }
 
-                        returnType = Properties.Resources.STD_RETURN_TYPE;
+                            returnType = Properties.Resources.STD_RETURN_TYPE;
+                        }
                     }
                 }
             }
@@ -608,8 +601,8 @@ namespace AutosarGuiEditor.Source.RteGenerator
 
         public static String LinkToTheComponentInstance(ComponentInstance compInstance)
         {
-            String compName = GenerateComponentName(compInstance.Name);
-            String result = "(" + RteFunctionsGenerator.ComponentInstancePointerDatatype + ")&" + compName;
+            String compName = "Rte_Instance_" + compInstance.Name;
+            String result = "(" + RteFunctionsGenerator_C.ComponentInstancePointerDatatype + ")&" + compName;
             return result;
         }
 

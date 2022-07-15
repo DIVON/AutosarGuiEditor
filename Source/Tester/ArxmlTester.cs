@@ -14,6 +14,7 @@ using AutosarGuiEditor.Source.Interfaces;
 using AutosarGuiEditor.Source.Painters;
 using AutosarGuiEditor.Source.PortDefenitions;
 using AutosarGuiEditor.Source.RteGenerator;
+using AutosarGuiEditor.Source.RteGenerator.CLang;
 using AutosarGuiEditor.Source.SystemInterfaces;
 using System;
 using System.Collections.Generic;
@@ -66,6 +67,7 @@ namespace AutosarGuiEditor.Source.Tester
             TestServerPorts();
             TestClientServerEvents();
             TestRunnableUsing();
+            TestAllRunnablesAreUsed();
             SortText();
         }
 
@@ -151,8 +153,8 @@ namespace AutosarGuiEditor.Source.Tester
             ComplexDataTypesList allCDT = new ComplexDataTypesList();
             allCDT.Capacity = autosarApp.ComplexDataTypes.Count;
             allCDT.AddRange(autosarApp.ComplexDataTypes);
-            RteDataTypesGenerator.RemoveDataTypesWithoutDependencies(allCDT);
-            bool result = RteDataTypesGenerator.SortDependenciedCDT(allCDT);
+            RteDataTypesGenerator_C.RemoveDataTypesWithoutDependencies(allCDT);
+            bool result = RteDataTypesGenerator_C.SortDependenciedCDT(allCDT);
             if (!result)
             {
                 String strRes = "There are recursion dependencies in components: " + Environment.NewLine;
@@ -653,8 +655,68 @@ namespace AutosarGuiEditor.Source.Tester
                         AppendText("The same runnable shall not be used for periodical and client-server events : " + compDef.Name + " runnable: " + runnableDef.Name, MessageType.ERROR);
                     }
                 }
+            }
+        }
 
-                
+        void TestAllRunnablesAreUsed()
+        {
+            /* Check that each client -server event has filled runnable and source */
+            foreach (ApplicationSwComponentType compDef in autosarApp.ComponentDefenitionsList)
+            {
+                foreach (RunnableDefenition runnableDef in compDef.Runnables)
+                {
+                    Boolean runnableUsed = false;
+
+                    foreach (ClientServerEvent csEvent in compDef.SyncClientServerEvents)
+                    {
+                        if (csEvent.Runnable != null)
+                        {
+                            if (csEvent.Runnable == runnableDef)
+                            {
+                                runnableUsed = true;
+                            }
+                        }
+                    }
+
+                    foreach (ClientServerEvent csEvent in compDef.AsyncClientServerEvents)
+                    {
+                        if (csEvent.Runnable != null)
+                        {
+                            if (csEvent.Runnable == runnableDef)
+                            {
+                                runnableUsed = true;
+                            }
+                        }
+                    }
+
+                    foreach (TimingEvent timingEvent in compDef.TimingEvents)
+                    {
+                        if (timingEvent.Runnable != null)
+                        {
+                            if (timingEvent.Runnable == runnableDef)
+                            {
+                                runnableUsed = true;
+                            }
+                        }
+                    }
+
+
+                    foreach (OneTimeEvent oneTimeEvent in compDef.OneTimeEvents)
+                    {
+                        if (oneTimeEvent.Runnable != null)
+                        {
+                            if (oneTimeEvent.Runnable == runnableDef)
+                            {
+                                runnableUsed = true;
+                            }
+                        }
+                    }
+
+                    if (runnableUsed == false)
+                    {
+                        AppendText("The runnable is not used : " + compDef.Name + " runnable: " + runnableDef.Name, MessageType.WARNING);
+                    }
+                }
             }
         }
 

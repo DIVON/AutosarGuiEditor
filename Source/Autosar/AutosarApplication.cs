@@ -1274,7 +1274,7 @@ namespace System
             return FindPortDefenition(portPainter.PortDefenitionGuid);
         }
 
-        public IElementWithPorts FindComponentInstanceByEventId(Guid eventInstanceGuid)
+        public ComponentInstance FindComponentInstanceByEventId(Guid eventInstanceGuid)
         {
             foreach (CompositionInstance composition in Compositions)
             {

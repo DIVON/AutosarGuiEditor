@@ -214,10 +214,13 @@ namespace AutosarGuiEditor.Source.Autosar.Events
                 /* Find source once */
                 if (sourceOperation == null)
                 {
-                    ClientServerInterface csInterface = SourcePort.InterfaceDatatype as ClientServerInterface;
-                    if (csInterface != null)
+                    if (SourcePort != null)
                     {
-                        sourceOperation = csInterface.Operations.Find(op => op.GUID == SourceOperationGuid);
+                        ClientServerInterface csInterface = SourcePort.InterfaceDatatype as ClientServerInterface;
+                        if (csInterface != null)
+                        {
+                            sourceOperation = csInterface.Operations.Find(op => op.GUID == SourceOperationGuid);
+                        }
                     }
                 }
                 return sourceOperation;

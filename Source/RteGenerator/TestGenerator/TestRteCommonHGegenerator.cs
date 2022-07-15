@@ -2,11 +2,8 @@
 using AutosarGuiEditor.Source.Composition;
 using AutosarGuiEditor.Source.Painters;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using AutosarGuiEditor.Source.RteGenerator.CLang;
 
 namespace AutosarGuiEditor.Source.RteGenerator.TestGenerator
 {
@@ -16,21 +13,21 @@ namespace AutosarGuiEditor.Source.RteGenerator.TestGenerator
         {
             String filename = folder + "\\" + "Rte_TestCommon.h";
             StreamWriter writer = new StreamWriter(filename);
-            RteFunctionsGenerator.GenerateFileTitle(writer, filename, "Implementation for common test data");
+            RteFunctionsGenerator_C.GenerateFileTitle(writer, filename, "Implementation for common test data");
 
-            RteFunctionsGenerator.OpenGuardDefine(writer);
+            RteFunctionsGenerator_C.OpenGuardDefine(writer);
             writer.WriteLine("");
 
             /*Add #include */
-            RteFunctionsGenerator.AddInclude(writer, "<string.h>");
-            RteFunctionsGenerator.AddInclude(writer, Properties.Resources.RTE_DATATYPES_H_FILENAME);
+            RteFunctionsGenerator_C.AddInclude(writer, "<string.h>");
+            RteFunctionsGenerator_C.AddInclude(writer, Properties.Resources.RTE_DATATYPES_H_FILENAME);
             AddComponentIncludes(writer);
 
 
             GenerateTestStubRecordType(writer);
-            GenerateExternComponentInstances(writer);
+            RteConnectionGenerator_C.GenerateExternComponentInstances(writer);
 
-            RteFunctionsGenerator.CloseGuardDefine(writer);
+            RteFunctionsGenerator_C.CloseGuardDefine(writer);
             writer.Close();
         }
 
@@ -38,7 +35,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.TestGenerator
         {
             foreach (ApplicationSwComponentType compDef in AutosarApplication.GetInstance().ComponentDefenitionsList)
             {
-                RteFunctionsGenerator.AddInclude(writer, "<" + compDef.Name + "_TestRte.h>");
+                RteFunctionsGenerator_C.AddInclude(writer, "<" + compDef.Name + "_TestRte.h>");
             }
             writer.WriteLine("");
         }
@@ -59,20 +56,6 @@ namespace AutosarGuiEditor.Source.RteGenerator.TestGenerator
             writer.WriteLine("} TEST_STUB_RECORD_TYPE;");
             writer.WriteLine("");
             writer.WriteLine("extern TEST_STUB_RECORD_TYPE TEST_STUB_RECORD;");
-            writer.WriteLine("");
-        }
-
-        void GenerateExternComponentInstances(StreamWriter writer)
-        {
-            foreach (CompositionInstance composition in AutosarApplication.GetInstance().Compositions)
-            {
-                foreach (ComponentInstance component in composition.ComponentInstances)
-                {
-                    ApplicationSwComponentType compDef = component.ComponentDefenition;
-                    String CDSname = RteFunctionsGenerator.ComponentDataStructureDefenitionName(compDef);
-                    writer.WriteLine("extern const " + CDSname + " Rte_Instance_" + component.Name + ";");                    
-                }
-            }
             writer.WriteLine("");
         }
     }

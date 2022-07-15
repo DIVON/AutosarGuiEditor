@@ -153,6 +153,15 @@ namespace AutosarGuiEditor.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Rte_Externals.h.
+        /// </summary>
+        internal static string RTE_EXTERNALS_FILENAME {
+            get {
+                return ResourceManager.GetString("RTE_EXTERNALS_FILENAME", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на RTE.
         /// </summary>
         internal static string RTE_FOLDER {
