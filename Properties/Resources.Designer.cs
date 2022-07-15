@@ -108,11 +108,38 @@ namespace AutosarGuiEditor.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Rte_Connections.cpp.
+        /// </summary>
+        internal static string RTE_CONNECTIONS_CPP_FILENAME {
+            get {
+                return ResourceManager.GetString("RTE_CONNECTIONS_CPP_FILENAME", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Rte_Constructors.cpp.
+        /// </summary>
+        internal static string RTE_CONSTRUCTORS_CPP_FILENAME {
+            get {
+                return ResourceManager.GetString("RTE_CONSTRUCTORS_CPP_FILENAME", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Rte_DataTypes.h.
         /// </summary>
         internal static string RTE_DATATYPES_H_FILENAME {
             get {
                 return ResourceManager.GetString("RTE_DATATYPES_H_FILENAME", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Rte_DataTypes.hpp.
+        /// </summary>
+        internal static string RTE_DATATYPES_HPP_FILENAME {
+            get {
+                return ResourceManager.GetString("RTE_DATATYPES_HPP_FILENAME", resourceCulture);
             }
         }
         
@@ -171,11 +198,29 @@ namespace AutosarGuiEditor.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Rte_PortInterfaces.hpp.
+        /// </summary>
+        internal static string RTE_PORT_INTERFACES_HPP_FILENAME {
+            get {
+                return ResourceManager.GetString("RTE_PORT_INTERFACES_HPP_FILENAME", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Rte_ReturnCodes.h.
         /// </summary>
         internal static string RTE_RETURN_CODES_FILENAME {
             get {
                 return ResourceManager.GetString("RTE_RETURN_CODES_FILENAME", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Rte_ReturnCodes.hpp.
+        /// </summary>
+        internal static string RTE_RETURN_CODES_HPP_FILENAME {
+            get {
+                return ResourceManager.GetString("RTE_RETURN_CODES_HPP_FILENAME", resourceCulture);
             }
         }
         
@@ -285,6 +330,15 @@ namespace AutosarGuiEditor.Properties {
         internal static string SYSTEM_ERRORS_H_FILENAME {
             get {
                 return ResourceManager.GetString("SYSTEM_ERRORS_H_FILENAME", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на SystemErrors.hpp.
+        /// </summary>
+        internal static string SYSTEM_ERRORS_HPP_FILENAME {
+            get {
+                return ResourceManager.GetString("SYSTEM_ERRORS_HPP_FILENAME", resourceCulture);
             }
         }
         

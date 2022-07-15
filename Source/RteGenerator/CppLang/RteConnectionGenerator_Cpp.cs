@@ -21,25 +21,35 @@ namespace AutosarGuiEditor.Source.RteGenerator.CppLang
     {
         public void GenerateConnections(String folder)
         {
-            String filename = folder + "\\" + Properties.Resources.RTE_CONNECTIONS_C_FILENAME;
+            String filename = folder + "\\" + Properties.Resources.RTE_CONNECTIONS_CPP_FILENAME;
             StreamWriter writer = new StreamWriter(filename);
             RteFunctionsGenerator_Cpp.GenerateFileTitle(writer, filename, "Implementation for RTE connections source file");
 
             /*Add #include */
             RteFunctionsGenerator_Cpp.AddInclude(writer, "<string.h>");
-            RteFunctionsGenerator_Cpp.AddInclude(writer, Properties.Resources.RTE_DATATYPES_H_FILENAME);
-            RteFunctionsGenerator_Cpp.AddInclude(writer, Properties.Resources.SYSTEM_ERRORS_H_FILENAME);
+            RteFunctionsGenerator_Cpp.AddInclude(writer, Properties.Resources.RTE_DATATYPES_HPP_FILENAME);
+            RteFunctionsGenerator_Cpp.AddInclude(writer, Properties.Resources.SYSTEM_ERRORS_HPP_FILENAME);
             AddComponentIncludes(writer);
 
             /* Include */
-            writer.WriteLine("");
-
+            writer.WriteLine(
+@"
+/*************************************************************
+ * BEGIN RTE buffers
+ *************************************************************/
+");
             GenerateAllPimBuffers(writer);
             GenerateAllCDataBuffers(writer);
             GenerateAllWriteDataBuffers(writer);
             GenerateAllAsyncServerNotificators(writer);
-
             GenerateQueuedDataBuffers(writer);
+
+            writer.WriteLine(
+@"/*************************************************************
+ * END RTE buffers
+ *************************************************************/
+");
+
             GenerateWriteFunctions(writer);
             GenerateReadFunctions(writer);
             GenerateSendFunctions(writer);
@@ -47,17 +57,21 @@ namespace AutosarGuiEditor.Source.RteGenerator.CppLang
             GenerateCallFunctions(writer);
             GenerateCDataFunctions(writer);
 
+            GenerateAllRteComponentInstances(writer);
             GenerateAllComponentInstances(writer);
-
             writer.Close();
+
+
+            RtePortInterfaceGenerator portInterfaceGenerator = new RtePortInterfaceGenerator();
+            portInterfaceGenerator.GeneratePortInterfaces(folder);
         }
 
-        void AddComponentIncludes(StreamWriter writer)
+        public void AddComponentIncludes(StreamWriter writer)
         {
             writer.WriteLine("#define RTE_C");
             foreach(ApplicationSwComponentType compDef in AutosarApplication.GetInstance().ComponentDefenitionsList)
             {
-                RteFunctionsGenerator_Cpp.AddInclude(writer, "<Rte_" + compDef.Name + ".h>");
+                RteFunctionsGenerator_Cpp.AddInclude(writer, "<Rte_" + compDef.Name + ".hpp>");
             }
             writer.WriteLine("#undef RTE_C");
         }
@@ -121,9 +135,8 @@ namespace AutosarGuiEditor.Source.RteGenerator.CppLang
                                         /* Get assigned event */
                                         ClientServerEvent csEvent = oppositCompInstance.ComponentDefenition.GetEventsWithServerOperation(operation);
                                         
-                                        String functionName = RteFunctionsGenerator_Cpp.Generate_RteCall_FunctionName(oppositCompInstance.ComponentDefenition, csEvent.Runnable);
                                         String arguments = RteFunctionsGenerator_Cpp.Generate_ClientServerPort_Arguments(oppositCompInstance, operation, oppositCompInstance.ComponentDefenition.MultipleInstantiation);
-                                        writer.WriteLine("    return " + functionName + arguments + ";");
+                                        writer.WriteLine("    return " + oppositCompInstance.Name +"." + csEvent.Runnable.Name + arguments + ";");
                                     }
                                     else
                                     {
@@ -293,6 +306,11 @@ namespace AutosarGuiEditor.Source.RteGenerator.CppLang
 
         void GenerateWriteFunctions(StreamWriter writer)
         {
+            writer.WriteLine(
+@"/*************************************************************
+ * BEGIN RTE Write operation handlers
+ *************************************************************/
+");
             foreach (CompositionInstance composition in AutosarApplication.GetInstance().Compositions)
             {
                 foreach (ComponentInstance component in composition.ComponentInstances)
@@ -316,7 +334,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CppLang
                                 String writeFieldName = "Rte_DataBuffer_" + component.Name + "_" + portDef.Name + "_" + field.Name;
                                 if (field.IsPointer == false)
                                 {
-                                    writer.WriteLine("    " + writeFieldName + " = (*data);");
+                                    writer.WriteLine("    " + writeFieldName + " = data;");
                                 }
                                 else
                                 {
@@ -331,10 +349,20 @@ namespace AutosarGuiEditor.Source.RteGenerator.CppLang
                     }
                 }
             }
+            writer.WriteLine(
+@"/*************************************************************
+ * END RTE Write operation handlers
+ *************************************************************/
+");
         }
 
         void GenerateReadFunctions(StreamWriter writer)
         {
+            writer.WriteLine(
+@"/*************************************************************
+ * BEGIN RTE Read operation handlers
+ *************************************************************/
+");
             foreach (CompositionInstance composition in AutosarApplication.GetInstance().Compositions)
             {
                 foreach (ComponentInstance component in composition.ComponentInstances)
@@ -364,7 +392,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CppLang
                                 {
                                     String copyFromField = "Rte_DataBuffer_" + oppositCompInstance.Name + "_" + oppositePort.PortDefenition.Name + "_" + field.Name;
 
-                                    writer.WriteLine("    *data = " + copyFromField + ";");
+                                    writer.WriteLine("    data = " + copyFromField + ";");
                                     writer.WriteLine("    return " + Properties.Resources.RTE_E_OK + ";");
                                 }
                                 else
@@ -380,10 +408,17 @@ namespace AutosarGuiEditor.Source.RteGenerator.CppLang
                     }
                 }
             }
+            writer.WriteLine(
+@"/*************************************************************
+ * END RTE Read operation handlers
+ *************************************************************/
+");
         }
 
         void GenerateAllWriteDataBuffers(StreamWriter writer)
         {
+            Boolean lineAdded = false;
+
             foreach (CompositionInstance composition in AutosarApplication.GetInstance().Compositions)
             {
                 foreach (ComponentInstance component in composition.ComponentInstances)
@@ -407,16 +442,23 @@ namespace AutosarGuiEditor.Source.RteGenerator.CppLang
                                     String fieldData = field.DataTypeName + " * Rte_DataBuffer_" + component.Name + "_" + portDef.Name + "_" + field.Name + ";";
                                     writer.WriteLine(fieldData);
                                 }
+
+                                lineAdded = true;
                             }
                         }
                     }
                 }
             }
-            writer.WriteLine("");
+            if (lineAdded)
+            {
+                writer.WriteLine("");
+            }
         }
 
         public static void GenerateAllAsyncServerNotificators(StreamWriter writer, Boolean isExtern = false)
         {
+            Boolean lineAdded = false;
+
             foreach (CompositionInstance composition in AutosarApplication.GetInstance().Compositions)
             {
                 foreach (ComponentInstance component in composition.ComponentInstances)
@@ -437,12 +479,17 @@ namespace AutosarGuiEditor.Source.RteGenerator.CppLang
                                     asyncField = "extern " + asyncField;
                                 }
                                 writer.WriteLine(asyncField);
+
+                                lineAdded = true;
                             }
                         }
                     }
                 }
             }
-            writer.WriteLine("");
+            if (lineAdded)
+            {
+                writer.WriteLine("");
+            }
         }
 
         public static void GenerateExternComponentInstances(StreamWriter writer)
@@ -452,7 +499,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CppLang
                 foreach (ComponentInstance component in composition.ComponentInstances)
                 {
                     ApplicationSwComponentType compDef = component.ComponentDefenition;
-                    String CDSname = RteFunctionsGenerator_Cpp.ComponentDataStructureDefenitionName(compDef);
+                    String CDSname = RteFunctionsGenerator_Cpp.ComponentRteDataStructureDefenitionName(compDef);
                     writer.WriteLine("extern const " + CDSname + " Rte_Instance_" + component.Name + ";");
                 }  
             }
@@ -461,6 +508,8 @@ namespace AutosarGuiEditor.Source.RteGenerator.CppLang
 
         void GenerateQueuedDataBuffers(StreamWriter writer)
         {
+            Boolean lineAdded = false;
+
             foreach (CompositionInstance composition in AutosarApplication.GetInstance().Compositions)
             {
                 foreach (ComponentInstance component in composition.ComponentInstances)
@@ -477,16 +526,22 @@ namespace AutosarGuiEditor.Source.RteGenerator.CppLang
                                 String datatype = field.QueuedInterfaceName(srInterface.Name);
                                 String varName  = "Rte_ReceiveBuffer_" + component.Name + "_" + portDef.Name + "_" + field.Name + ";";
                                 writer.WriteLine(datatype + " " + varName);
+                                lineAdded = true;
                             }
                         }
                     }
                 }
             }
-            writer.WriteLine("");
+            if (lineAdded)
+            {
+                writer.WriteLine("");
+            }
         }
 
         void GenerateAllPimBuffers(StreamWriter writer)
         {
+            Boolean lineAdded = false;
+
             foreach (CompositionInstance composition in AutosarApplication.GetInstance().Compositions)
             {
                 foreach (ComponentInstance component in composition.ComponentInstances)
@@ -506,14 +561,21 @@ namespace AutosarGuiEditor.Source.RteGenerator.CppLang
                             pimName += ";";
                         }
                         writer.WriteLine(pimName);
+
+                        lineAdded = true;
                     }
                 }
             }
-            writer.WriteLine("");
+            if (lineAdded)
+            {
+                writer.WriteLine("");
+            }
         }
 
         void GenerateAllCDataBuffers(StreamWriter writer)
         {
+            Boolean lineAdded = false;
+
             /* Without multiple instantiation */
             foreach (CompositionInstance composition in AutosarApplication.GetInstance().Compositions)
             {
@@ -526,22 +588,33 @@ namespace AutosarGuiEditor.Source.RteGenerator.CppLang
                         String cdataName = "Rte_CDataBuffer_" + component.Name + "_" + cdata.Name;
                         String defValue = cdata.GetDefaultValue();
                         String writeString = "const " + cdata.Defenition.DataTypeName + " " + cdataName + " = " + defValue + ";";
-                        writer.WriteLine(writeString);                        
+                        writer.WriteLine(writeString);
+
+                        lineAdded = true;
                     }
                 }
             }
-            writer.WriteLine("");
+            if (lineAdded)
+            {
+                writer.WriteLine("");
+            }
         }
 
-        void GenerateAllComponentInstances(StreamWriter writer)
+        void GenerateAllRteComponentInstances(StreamWriter writer)
         {
+            writer.WriteLine(
+@"/*************************************************************
+ * BEGIN RTE Communication Objects
+ *************************************************************/
+");
+
             foreach (CompositionInstance composition in AutosarApplication.GetInstance().Compositions)
             {
                 foreach (ComponentInstance component in composition.ComponentInstances)
                 {
                     ApplicationSwComponentType compDef = component.ComponentDefenition;
-                    String CDSname = RteFunctionsGenerator_Cpp.ComponentDataStructureDefenitionName(compDef);
-                    writer.WriteLine("const " + CDSname + " Rte_Instance_" + component.Name + " = ");
+                    String CDSname = RteFunctionsGenerator_Cpp.ComponentRteDataStructureDefenitionName(compDef);
+                    writer.WriteLine("const " + CDSname + " Rte_CO_" + component.Name + " = ");
                     writer.WriteLine("{");
 
                     /* write pims first */
@@ -603,6 +676,39 @@ namespace AutosarGuiEditor.Source.RteGenerator.CppLang
                     writer.WriteLine("");
                 }
             }
+
+            writer.WriteLine(
+@"/*************************************************************
+ * END RTE Communication Objects
+ *************************************************************/
+");
+        }
+
+        void GenerateAllComponentInstances(StreamWriter writer)
+        {
+            writer.WriteLine(
+@"/*************************************************************
+ * BEGIN Component Instances
+ *************************************************************/
+");
+
+            foreach (CompositionInstance composition in AutosarApplication.GetInstance().Compositions)
+            {
+                foreach (ComponentInstance component in composition.ComponentInstances)
+                {
+                    ApplicationSwComponentType compDef = component.ComponentDefenition;
+                    String CDSname = RteFunctionsGenerator_Cpp.ComponentRteDataStructureDefenitionName(compDef);
+                    String rteCommunicationObject = "Rte_CO_" + compDef.Name;
+                    writer.WriteLine(CDSname + " Rte_CI_" + component.Name + "(" + rteCommunicationObject + ");");
+                }                
+            }
+
+            writer.WriteLine(
+@"
+/*************************************************************
+ * END Component Instances
+ *************************************************************/
+");
         }
     }
 }

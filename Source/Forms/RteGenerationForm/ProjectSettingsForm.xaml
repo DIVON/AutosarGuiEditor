@@ -108,7 +108,7 @@
                     Click="OpenTestRteDirDialogButton_Click"
                     Content="..." />
                 <ComboBox
-                    x:Name="McuTypeComboBox_Copy"
+                    x:Name="ProgramLanguageComboBox"
                     Margin="186,156,68,0"
                     VerticalAlignment="Top" />
                 <Label

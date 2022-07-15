@@ -211,4 +211,22 @@
   <data name="RTE_EXTERNALS_FILENAME" xml:space="preserve">
     <value>Rte_Externals.h</value>
   </data>
+  <data name="RTE_DATATYPES_HPP_FILENAME" xml:space="preserve">
+    <value>Rte_DataTypes.hpp</value>
+  </data>
+  <data name="RTE_PORT_INTERFACES_HPP_FILENAME" xml:space="preserve">
+    <value>Rte_PortInterfaces.hpp</value>
+  </data>
+  <data name="RTE_RETURN_CODES_HPP_FILENAME" xml:space="preserve">
+    <value>Rte_ReturnCodes.hpp</value>
+  </data>
+  <data name="RTE_CONNECTIONS_CPP_FILENAME" xml:space="preserve">
+    <value>Rte_Connections.cpp</value>
+  </data>
+  <data name="RTE_CONSTRUCTORS_CPP_FILENAME" xml:space="preserve">
+    <value>Rte_Constructors.cpp</value>
+  </data>
+  <data name="SYSTEM_ERRORS_HPP_FILENAME" xml:space="preserve">
+    <value>SystemErrors.hpp</value>
+  </data>
 </root>

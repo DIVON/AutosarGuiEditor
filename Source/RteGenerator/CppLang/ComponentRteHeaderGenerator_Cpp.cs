@@ -22,8 +22,8 @@ namespace AutosarGuiEditor.Source.RteGenerator.CppLang
             RteFunctionsGenerator_Cpp.OpenGuardDefine(writer);
 
 
-            writer.WriteLine(@"
-#ifndef RTE_C
+            
+writer.WriteLine(@"#ifndef RTE_C
     #ifdef RTE_APP_HEADER_FILE
         #error Multiple application header files included.
     #else
@@ -31,88 +31,19 @@ namespace AutosarGuiEditor.Source.RteGenerator.CppLang
     #endif
 #endif
 
-#include <Rte_DataTypes.h>
-#include <" + RteFunctionsGenerator_Cpp.GenerateComponentHeaderFile(compDef) + @">
+#include <Rte_DataTypes.hpp>
+#include <" + Properties.Resources.RTE_PORT_INTERFACES_HPP_FILENAME + @">
 
-
-#define RTE_DEFINED
-
-/*************************************************************
- * BEGIN Port Data Structure Definitions
- *************************************************************/
-");
-            SenderReceiverInterfacesList usedRPinterfaces = compDef.Ports.UsedReceiverProviderInterfaces();
-            PortDefenitionsList rpPorts = compDef.Ports.PortsWithSenderReceiverInterface();
-            List<String> createdInterfaces = new List<string>();
-
-            foreach (PortDefenition portDef in rpPorts)
-            {
-                SenderReceiverInterface srInterface = portDef.InterfaceDatatype as SenderReceiverInterface;
-
-                String portDataStructureName = RteFunctionsGenerator_Cpp.GeneratePortDataStructureDefenition(compDef, srInterface, portDef.PortType);
-
-                if (!createdInterfaces.Contains(portDataStructureName))
-                {
-                    createdInterfaces.Add(portDataStructureName);
-
-                    writer.WriteLine("typedef struct " + portDataStructureName + " {");
-                    foreach (SenderReceiverInterfaceField field in srInterface.Fields)
-                    {
-                        string data = "    Std_ReturnType (*";
-                        data += (portDef.PortType == PortType.Sender) ? "Write_" : "Read_";
-                        data += field.Name + ")";
-                        String fieldVariable = RteFunctionsGenerator_Cpp.GenerateSenderReceiverInterfaceArguments(field, portDef.PortType, false);
-                        data += fieldVariable + ";";
-                        writer.WriteLine(data);
-                    }
-                    writer.WriteLine("} " + portDataStructureName + ";");
-                    writer.WriteLine();
-                }
-            }
-
-
-
-            ClientServerInterfacesList usedCinterfaces = compDef.Ports.UsedClientInterfaces();
-            PortDefenitionsList clientPorts = compDef.Ports.PortsWithClientInterface();
-            List<String> createdClientInterfaces = new List<string>();
-            foreach (PortDefenition portDef in clientPorts)
-            {
-                ClientServerInterface csInterface = portDef.InterfaceDatatype as ClientServerInterface;
-
-                if (portDef.PortType == PortType.Client)
-                {
-                    String portDataStructureName = RteFunctionsGenerator_Cpp.GeneratePortDataStructureDefenition(compDef, csInterface);
-
-                    if (!createdClientInterfaces.Contains(portDataStructureName))
-                    {
-                        createdClientInterfaces.Add(portDataStructureName);
-
-                        writer.WriteLine("typedef struct " + portDataStructureName + " {");
-                        foreach (ClientServerOperation operation in csInterface.Operations)
-                        {
-                            string data = "    Std_ReturnType (*";
-                            data += "Call_";
-                            data += operation.Name + ")(" + RteFunctionsGenerator_Cpp.GenerateClientServerInterfaceArguments(operation, false) + ");";
-                            writer.WriteLine(data);
-                        }
-                        writer.WriteLine("} " + portDataStructureName + ";");
-                        writer.WriteLine();
-                    }
-                }
-            }
-
+#define RTE_DEFINED");
             writer.WriteLine(
-@"/*************************************************************
- * END Port Data Structure Definitions
- *************************************************************/
-
+@"
 /*************************************************************
- * BEGIN Component Data Structure Definitions
+ * BEGIN RTE Component Data Structure Definition
  *************************************************************/
-
 ");
-            String CDSname = RteFunctionsGenerator_Cpp.ComponentDataStructureDefenitionName(compDef);
-            writer.WriteLine("typedef struct " + CDSname + " {");
+            String rteStructureName = RteFunctionsGenerator_Cpp.ComponentRteDataStructureDefenitionName(compDef);
+
+            writer.WriteLine("struct " + rteStructureName + " {");
             writer.WriteLine("    /* Per Instance Memory Section */");
             foreach (PimDefenition pim in compDef.PerInstanceMemoryList)
             {
@@ -126,7 +57,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CppLang
                 if (portDef.InterfaceDatatype is SenderReceiverInterface)
                 {
                     SenderReceiverInterface srInterface = portDef.InterfaceDatatype as SenderReceiverInterface;
-                    String portDatatype = RteFunctionsGenerator_Cpp.GeneratePortDataStructureDefenition(compDef, srInterface, portDef.PortType);
+                    String portDatatype = RteFunctionsGenerator_Cpp.GeneratePortDataStructureDefenition(srInterface, portDef.PortType);
                     writer.WriteLine("    " + portDatatype + " " + portDef.Name + ";");
                 }
                 else if (portDef.InterfaceDatatype is ClientServerInterface)
@@ -134,7 +65,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CppLang
                     ClientServerInterface csInterface = portDef.InterfaceDatatype as ClientServerInterface;
                     if (portDef.PortType == PortType.Client)
                     {
-                        String portDatatype = RteFunctionsGenerator_Cpp.GeneratePortDataStructureDefenition(compDef, csInterface);
+                        String portDatatype = RteFunctionsGenerator_Cpp.GeneratePortDataStructureDefenition(csInterface);
                         writer.WriteLine("    " + portDatatype + " " + portDef.Name + ";");
                     }
                 }
@@ -147,159 +78,47 @@ namespace AutosarGuiEditor.Source.RteGenerator.CppLang
             }
 
 
-            writer.WriteLine("} " + CDSname + ";");
+            writer.WriteLine("};");
 
             writer.WriteLine(
 @"
 /*************************************************************
- * END Component Data Structure Definitions
- *************************************************************/
-
-
-/*************************************************************
- * BEGIN Component Instance Handle
+ * END RTE Component Data Structure Definition
  *************************************************************/
 ");
-            String singleComponentInstanceVariableName = "Rte_Instance_" + compDef.Name;
-            if (compDef.MultipleInstantiation == false)
-            {
-                writer.WriteLine("extern const " + CDSname + " " + singleComponentInstanceVariableName + ";");
-            }
 
-            writer.WriteLine(@"
+            writer.WriteLine(
+@"
 /*************************************************************
- * END Component Instance Handle
- *************************************************************/
-
-/*************************************************************
- * BEGIN Runnable Entity
+ * BEGIN Component Base Class Definition
  *************************************************************/
 ");
-            RteComponentGenerator_Cpp.WriteAllFunctionWhichComponentCouldUse(compDef, writer);
+            String baseClassName = RteFunctionsGenerator_Cpp.ComponentBaseClassDefenitionName(compDef);
 
+
+            writer.WriteLine("class " + baseClassName);
+            writer.WriteLine("{");
+            writer.WriteLine("public:");
+
+            writer.WriteLine("    /* Constructor */");
+            writer.WriteLine("    " + baseClassName + "(const " + rteStructureName + " &Rte);");
+            writer.WriteLine("");
+
+            writer.WriteLine("    /* Abstract component's runnables */");
             foreach (RunnableDefenition runnable in compDef.Runnables)
             {
-                writer.WriteLine(RteFunctionsGenerator_Cpp.Generate_RunnableDeclaration(compDef, runnable) + ";");
+                String runnableName = RteFunctionsGenerator_Cpp.Generate_RunnableDeclaration(compDef, runnable, false);
+                writer.WriteLine("    virtual " + runnableName + " = 0;");
             }
-
-            writer.WriteLine();
+            writer.WriteLine("protected:");
+            writer.WriteLine("    const Rte_" + compDef.Name + " &Rte;");
+            writer.WriteLine("private:");
+            writer.WriteLine("};");            
 
             writer.WriteLine(
 @"
 /*************************************************************
- * END Runnable Entity
- *************************************************************/
-
-/*************************************************************
- * BEGIN RTE API DEFINITIONS 
- *************************************************************/
-#ifndef RTE_C
-");
-
-            /* Write all cdata */
-            foreach (CDataDefenition cdata in compDef.CDataDefenitions)
-            {
-                String define;
-                if (compDef.MultipleInstantiation == false)
-                {
-                    define = RteFunctionsGenerator_Cpp.CreateDefine(RteFunctionsGenerator_Cpp.GenerateShortCDataFunctionName(cdata) + "()", singleComponentInstanceVariableName + ".CData_" + cdata.Name + "()", true);
-                }
-                else
-                {
-                    define = RteFunctionsGenerator_Cpp.CreateDefine(RteFunctionsGenerator_Cpp.GenerateShortCDataFunctionName(cdata) + "(instance)", "(instance)->CData_" + cdata.Name + "()", true);
-                }
-
-                writer.WriteLine(define);
-            }
-
-
-            /* Write all pims */
-            foreach (PimDefenition pim in compDef.PerInstanceMemoryList)
-            {
-                String define;
-                if (compDef.MultipleInstantiation == false)
-                {
-                    define = RteFunctionsGenerator_Cpp.CreateDefine(RteFunctionsGenerator_Cpp.GenerateShortPimFunctionName(pim) + "()", singleComponentInstanceVariableName + ".Pim_" + pim.Name, true);
-                }
-                else
-                {
-                    define = RteFunctionsGenerator_Cpp.CreateDefine(RteFunctionsGenerator_Cpp.GenerateShortPimFunctionName(pim) + "(instance)", "(instance)->Pim_" + pim.Name, true);
-                }
-
-
-                writer.WriteLine(define);
-            }
-
-            /* Add defines for all ports */
-            foreach (PortDefenition portDefenition in compDef.Ports)
-            {
-                if ((portDefenition.PortType == PortType.Sender) || (portDefenition.PortType == PortType.Receiver))
-                {
-                    SenderReceiverInterface srInterface = AutosarApplication.GetInstance().SenderReceiverInterfaces.FindObject(portDefenition.InterfaceGUID);
-                    foreach (SenderReceiverInterfaceField field in srInterface.Fields)
-                    {
-                        String funcName = RteFunctionsGenerator_Cpp.GenerateReadWriteFunctionName(portDefenition, field);
-                        if (compDef.MultipleInstantiation == false)
-                        {
-                            funcName += "(_data_)";
-                        }
-                        else
-                        {
-                            funcName += "(instance, _data_)";
-                        }
-
-                        String rteFuncName;
-                        if (compDef.MultipleInstantiation == false)
-                        {
-                            rteFuncName = singleComponentInstanceVariableName + "." + portDefenition.Name + ".";
-                        }
-                        else
-                        {
-                            rteFuncName = "(instance)->" + portDefenition.Name + ".";
-                        }
-                        rteFuncName += (portDefenition.PortType == PortType.Sender ? "Write_" : "Read_") + field.Name + "(_data_)";
-
-                        string define = RteFunctionsGenerator_Cpp.CreateDefine(funcName, rteFuncName, true);
-
-                        writer.WriteLine(define);
-                    }
-                }
-                else if (portDefenition.PortType == PortType.Client)
-                {
-                    ClientServerInterface csInterface = AutosarApplication.GetInstance().ClientServerInterfaces.FindObject(portDefenition.InterfaceGUID);
-                    foreach (ClientServerOperation operation in csInterface.Operations)
-                    {
-                        String funcName = RteFunctionsGenerator_Cpp.Generate_InternalRteCall_FunctionName(portDefenition, operation);
-                        String defineArguments = RteFunctionsGenerator_Cpp.GenerateClientServerInterfaceArgumentsForDefine(operation, compDef.MultipleInstantiation);
-                        String argumentsWithoutInstance = RteFunctionsGenerator_Cpp.GenerateClientServerInterfaceArgumentsForDefineWithoutInstance(operation, compDef.MultipleInstantiation);
-
-                        String rteFuncName;
-                        if (compDef.MultipleInstantiation == false)
-                        {
-                            rteFuncName = singleComponentInstanceVariableName + "." + portDefenition.Name + ".";
-                        }
-                        else
-                        {
-                            rteFuncName = "(instance)->" + portDefenition.Name + ".";
-                        }
-                        rteFuncName += "Call_" + operation.Name + argumentsWithoutInstance;
-
-                        String funcArgument = RteFunctionsGenerator_Cpp.GenerateClientServerInterfaceArguments(operation, compDef.MultipleInstantiation);
-
-
-                        String define = RteFunctionsGenerator_Cpp.CreateDefine(funcName + defineArguments, rteFuncName, true);
-                        writer.WriteLine(define);
-
-                    }
-                }
-            }
-
-            writer.WriteLine(
-@"
-#endif /* RTE_C */
-
-/*************************************************************
- * END RTE API DEFINITIONS 
+ * END Component Base Class Definition
  *************************************************************/
 ");
             RteFunctionsGenerator_Cpp.CloseGuardDefine(writer);

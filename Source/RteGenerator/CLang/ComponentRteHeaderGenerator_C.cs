@@ -23,7 +23,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLang
 
 
             writer.WriteLine(@"
-#ifndef RTE_C
+#ifndef RTE_CPP
     #ifdef RTE_APP_HEADER_FILE
         #error Multiple application header files included.
     #else
@@ -32,8 +32,6 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLang
 #endif
 
 #include <Rte_DataTypes.h>
-#include <" + RteFunctionsGenerator_C.GenerateComponentHeaderFile(compDef) + @">
-
 
 #define RTE_DEFINED
 
@@ -69,8 +67,6 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLang
                     writer.WriteLine();
                 }
             }
-
-
 
             ClientServerInterfacesList usedCinterfaces = compDef.Ports.UsedClientInterfaces();
             PortDefenitionsList clientPorts = compDef.Ports.PortsWithClientInterface();

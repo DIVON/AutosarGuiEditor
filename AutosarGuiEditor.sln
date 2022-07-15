@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.40629.0
+# Visual Studio Version 17
+VisualStudioVersion = 17.1.32407.343
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AutosarGuiEditor", "AutosarGuiEditor.csproj", "{C87CB053-50A4-454E-9436-6B0A96AF2FA3}"
 	ProjectSection(ProjectDependencies) = postProject
@@ -14,6 +14,7 @@ Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		RegenRTE|Any CPU = RegenRTE|Any CPU
+		RegenSkeleton|Any CPU = RegenSkeleton|Any CPU
 		RegenTestRte|Any CPU = RegenTestRte|Any CPU
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
@@ -22,6 +23,8 @@ Global
 		{C87CB053-50A4-454E-9436-6B0A96AF2FA3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C87CB053-50A4-454E-9436-6B0A96AF2FA3}.RegenRTE|Any CPU.ActiveCfg = RegenRTE|Any CPU
 		{C87CB053-50A4-454E-9436-6B0A96AF2FA3}.RegenRTE|Any CPU.Build.0 = RegenRTE|Any CPU
+		{C87CB053-50A4-454E-9436-6B0A96AF2FA3}.RegenSkeleton|Any CPU.ActiveCfg = RegenSkeleton|Any CPU
+		{C87CB053-50A4-454E-9436-6B0A96AF2FA3}.RegenSkeleton|Any CPU.Build.0 = RegenSkeleton|Any CPU
 		{C87CB053-50A4-454E-9436-6B0A96AF2FA3}.RegenTestRte|Any CPU.ActiveCfg = RegenTestRte|Any CPU
 		{C87CB053-50A4-454E-9436-6B0A96AF2FA3}.RegenTestRte|Any CPU.Build.0 = RegenTestRte|Any CPU
 		{C87CB053-50A4-454E-9436-6B0A96AF2FA3}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -30,6 +33,8 @@ Global
 		{B0AA6A94-6784-4221-81F0-244A68C374C0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B0AA6A94-6784-4221-81F0-244A68C374C0}.RegenRTE|Any CPU.ActiveCfg = Debug|Any CPU
 		{B0AA6A94-6784-4221-81F0-244A68C374C0}.RegenRTE|Any CPU.Build.0 = Debug|Any CPU
+		{B0AA6A94-6784-4221-81F0-244A68C374C0}.RegenSkeleton|Any CPU.ActiveCfg = RegenSkeleton|Any CPU
+		{B0AA6A94-6784-4221-81F0-244A68C374C0}.RegenSkeleton|Any CPU.Build.0 = RegenSkeleton|Any CPU
 		{B0AA6A94-6784-4221-81F0-244A68C374C0}.RegenTestRte|Any CPU.ActiveCfg = Debug|Any CPU
 		{B0AA6A94-6784-4221-81F0-244A68C374C0}.RegenTestRte|Any CPU.Build.0 = Debug|Any CPU
 		{B0AA6A94-6784-4221-81F0-244A68C374C0}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -37,5 +42,8 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {9A945E71-865C-463B-844D-4CA086F3D546}
 	EndGlobalSection
 EndGlobal

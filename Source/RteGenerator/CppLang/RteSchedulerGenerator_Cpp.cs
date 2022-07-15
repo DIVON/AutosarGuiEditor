@@ -387,7 +387,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CppLang
             RteFunctionsGenerator_Cpp.GenerateFileTitle(writer, FileName, Properties.Resources.RTE_EXTERNAL_RUNNABLES_FILE_DESCRIPTION);
             RteFunctionsGenerator_Cpp.OpenGuardDefine(writer);
 
-            RteFunctionsGenerator_Cpp.AddInclude(writer, Properties.Resources.RTE_DATATYPES_H_FILENAME);
+            RteFunctionsGenerator_Cpp.AddInclude(writer, Properties.Resources.RTE_DATATYPES_HPP_FILENAME);
 
             writer.WriteLine();
             writer.WriteLine("/* Declaration of all component's runnables */");
@@ -396,7 +396,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CppLang
             {
                 foreach (RunnableDefenition runnable in compDefinition.Runnables)
                 {
-                    writer.WriteLine(RteFunctionsGenerator_Cpp.Generate_RunnableDeclaration(compDefinition, runnable) + ";");
+                    writer.WriteLine(RteFunctionsGenerator_Cpp.Generate_RunnableDeclaration(compDefinition, runnable, true) + ";");
                 }
             }
 
@@ -417,7 +417,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CppLang
             RteFunctionsGenerator_Cpp.GenerateFileTitle(writer, FileName, "This file contains all externals required for scheduling");
             RteFunctionsGenerator_Cpp.OpenGuardDefine(writer);
 
-            RteFunctionsGenerator_Cpp.AddInclude(writer, Properties.Resources.RTE_DATATYPES_H_FILENAME);
+            RteFunctionsGenerator_Cpp.AddInclude(writer, Properties.Resources.RTE_DATATYPES_HPP_FILENAME);
 
             writer.WriteLine();
             writer.WriteLine("/* Declaration of all async events  */");
@@ -447,7 +447,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CppLang
             RteFunctionsGenerator_Cpp.GenerateFileTitle(writer, FileName, Properties.Resources.RTE_TASK_SCHEDULER_FILE_DESCRIPTION);
             RteFunctionsGenerator_Cpp.OpenGuardDefine(writer);
 
-            RteFunctionsGenerator_Cpp.AddInclude(writer, Properties.Resources.RTE_DATATYPES_H_FILENAME);
+            RteFunctionsGenerator_Cpp.AddInclude(writer, Properties.Resources.RTE_DATATYPES_HPP_FILENAME);
 
             writer.WriteLine();
 

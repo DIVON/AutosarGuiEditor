@@ -12,9 +12,9 @@ namespace AutosarGuiEditor.Source.RteGenerator.CppLang
 
         public void GenerateSystemErrorsFile(String folder)
         {
-            String FileName = folder + "\\" + Properties.Resources.SYSTEM_ERRORS_H_FILENAME;
+            String FileName = folder + "\\" + Properties.Resources.SYSTEM_ERRORS_HPP_FILENAME;
             StreamWriter writer = new StreamWriter(FileName);
-            RteFunctionsGenerator_Cpp.GenerateFileTitle(writer, Properties.Resources.RTE_DATATYPES_H_FILENAME, Properties.Resources.DATATYPES_H_FILE_DESCRIPTION);
+            RteFunctionsGenerator_Cpp.GenerateFileTitle(writer, Properties.Resources.RTE_DATATYPES_HPP_FILENAME, Properties.Resources.DATATYPES_H_FILE_DESCRIPTION);
             RteFunctionsGenerator_Cpp.OpenGuardDefine(writer);
 
             writer.WriteLine("/*  System errors */");

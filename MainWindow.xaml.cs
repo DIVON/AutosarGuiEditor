@@ -39,6 +39,7 @@ using AutosarGuiEditor.Source.Painters.Boundaries;
 using AutosarGuiEditor.Source.App.Settings;
 using AutosarGuiEditor.Source;
 using AutosarGuiEditor.Source.RteGenerator.CLang;
+using AutosarGuiEditor.Source.RteGenerator.CppLang;
 
 namespace AutosarGuiEditor
 { 
@@ -849,6 +850,7 @@ namespace AutosarGuiEditor
             projectSettingsForm.ComponentGenerationPath = autosarApp.GenerateComponentsPath;
             projectSettingsForm.Frequency = autosarApp.SystickFrequencyHz;
             projectSettingsForm.McuTypeComboBox.SelectedIndex = autosarApp.MCUType.ToInt();
+            projectSettingsForm.ProgramLanguageComboBox.SelectedIndex = autosarApp.ProgramLanguage.ToInt();
             projectSettingsForm.ShowDialog();
             if (projectSettingsForm.DialogResult == true)
             {
@@ -857,6 +859,7 @@ namespace AutosarGuiEditor
                 autosarApp.GenerateRtePath = projectSettingsForm.RteGenerationPath;
                 autosarApp.GenerateComponentsPath = projectSettingsForm.ComponentGenerationPath;
                 autosarApp.MCUType.Type = (MCUTypeDef)projectSettingsForm.McuTypeComboBox.SelectedIndex;
+                autosarApp.ProgramLanguage.Type = (ProgrammingLanguageTypeDef)projectSettingsForm.ProgramLanguageComboBox.SelectedIndex;
             }
         }
 
@@ -1286,8 +1289,17 @@ namespace AutosarGuiEditor
             String testResult = writer.ToString();
             if (!tester.IsErrorExist(testResult))
             {
-                RteGenerator_C rteGenerator = new RteGenerator_C();
-                rteGenerator.GenerateComponentsFiles();
+                if (autosarApp.ProgramLanguage.Type == ProgrammingLanguageTypeDef.C)
+                {
+                    RteGenerator_C rteGenerator = new RteGenerator_C();
+                    rteGenerator.GenerateComponentsFiles();
+                }
+                else if (autosarApp.ProgramLanguage.Type == ProgrammingLanguageTypeDef.Cpp)
+                {
+                    RteGenerator_Cpp rteGenerator = new RteGenerator_Cpp();
+                    rteGenerator.GenerateComponentsFiles();
+                }
+
 
                 MessageBox.Show("Skeletons has been generated");
             }

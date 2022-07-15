@@ -15,13 +15,13 @@ namespace AutosarGuiEditor.Source.RteGenerator.CppLang
     {
         public void GenerateDataTypesFile(String folder)
         {
-            String FileName = folder + "\\" + Properties.Resources.RTE_DATATYPES_H_FILENAME;
+            String FileName = folder + "\\" + Properties.Resources.RTE_DATATYPES_HPP_FILENAME;
             StreamWriter writer = new StreamWriter(FileName);
-            RteFunctionsGenerator_Cpp.GenerateFileTitle(writer, Properties.Resources.RTE_DATATYPES_H_FILENAME, Properties.Resources.DATATYPES_H_FILE_DESCRIPTION);
+            RteFunctionsGenerator_Cpp.GenerateFileTitle(writer, Properties.Resources.RTE_DATATYPES_HPP_FILENAME, Properties.Resources.DATATYPES_H_FILE_DESCRIPTION);
             RteFunctionsGenerator_Cpp.OpenGuardDefine(writer);
 
             writer.WriteLine();
-            RteFunctionsGenerator_Cpp.AddInclude(writer, Properties.Resources.RTE_RETURN_CODES_FILENAME);
+            RteFunctionsGenerator_Cpp.AddInclude(writer, Properties.Resources.RTE_RETURN_CODES_HPP_FILENAME);
             writer.WriteLine();
 
             WriteStaticGlobal(writer);
@@ -34,7 +34,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CppLang
 
             GenerateQueuedSenderReceiverFieldsDataTypes(writer);
 
-            GenerateComponentsDataTypes(writer);
+           // GenerateComponentsDataTypes(writer);
 
             RteFunctionsGenerator_Cpp.CloseGuardDefine(writer);
             writer.Close();
@@ -65,13 +65,13 @@ namespace AutosarGuiEditor.Source.RteGenerator.CppLang
                     writer.WriteLine("/* Datatypes for queued " + srInterface.Name + " fields */");
                     foreach (SenderReceiverInterfaceField field in srInterface.Fields)
                     {
-                        writer.WriteLine("typedef struct");
+                        writer.WriteLine("struct " + field.QueuedInterfaceName(srInterface.Name));
                         writer.WriteLine("{");
                         writer.WriteLine("    uint32 head;");
                         writer.WriteLine("    uint32 tail;");
                         writer.WriteLine("    " + field.DataTypeName + " elements[" + srInterface.QueueSize.ToString() + "];");
                         writer.WriteLine("    Std_ReturnType overlayError;");
-                        writer.WriteLine("} " + field.QueuedInterfaceName(srInterface.Name) + ";");
+                        writer.WriteLine("};");
                         writer.WriteLine();
                     }
                 }
@@ -84,7 +84,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CppLang
             foreach (ApplicationSwComponentType compDef in AutosarApplication.GetInstance().ComponentDefenitionsList)
             {
                 writer.WriteLine("/* Datatype for " + compDef.Name  + " */");
-                writer.WriteLine("typedef struct");
+                writer.WriteLine("struct " + compDef.Name); 
                 writer.WriteLine("{");
                 
                 /* Create index for components with multipleinstantiation */
@@ -136,7 +136,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CppLang
                     }
                 }
 
-                writer.WriteLine("} " + compDef.Name + ";"); 
+                writer.WriteLine("};"); 
                 writer.WriteLine();
             }
         }
@@ -291,7 +291,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CppLang
         public void WriteComplexDataType(StreamWriter writer, ComplexDataType datatype)
         {
             writer.WriteLine("/* Complex datatype : " + datatype.Name + " */");
-            writer.WriteLine("typedef struct");
+            writer.WriteLine("struct " + datatype.Name); 
             writer.WriteLine("{");
             foreach (ComplexDataTypeField field in datatype.Fields)
             {
@@ -304,7 +304,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CppLang
                     writer.WriteLine("    " + field.DataTypeName + " *" + field.Name + ";");
                 }
             }
-            writer.WriteLine("} " + datatype.Name + ";");
+            writer.WriteLine("};");
             writer.WriteLine("");
 
             /* Generate an array if it existis*/
@@ -325,8 +325,6 @@ namespace AutosarGuiEditor.Source.RteGenerator.CppLang
             BaseDataTypesCodeGenerator_Cpp.GenerateCode(writer, AutosarApplication.GetInstance().BaseDataTypes);
 
             writer.WriteLine("");
-            writer.WriteLine("/* Rte data types */");
-            writer.WriteLine("typedef uint16               Std_ReturnType;");
             writer.WriteLine("typedef void    *" + RteFunctionsGenerator_Cpp.ComponentInstancePointerDatatype + ";");
             writer.WriteLine("");
         }
@@ -406,7 +404,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CppLang
             writer.WriteLine("/* Enum Datatype : " + datatype.Name + " */");
 
             /* Write datatype */            
-            writer.WriteLine("typedef enum ");
+            writer.WriteLine("enum class " + datatype.Name); 
             writer.WriteLine("{");
 
             /* Write values */
@@ -419,7 +417,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CppLang
             /* Write elements count */
             //writer.WriteLine("    " + datatype.Name + "_ELEMENTS_COUNT");
 
-            writer.WriteLine("} " + datatype.Name + ";");
+            writer.WriteLine("};");
             writer.WriteLine("");
 
             int minLimit = datatype.GetLimit(LimitType.ltLowerLimit);

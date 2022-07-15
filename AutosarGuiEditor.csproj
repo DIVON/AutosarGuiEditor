@@ -64,6 +64,18 @@
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'RegenSkeleton|AnyCPU'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\RegenSkeleton\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <DebugType>full</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <LangVersion>7.3</LangVersion>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>true</Prefer32Bit>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="Ookii.Dialogs.Wpf, Version=1.0.0.0, Culture=neutral, PublicKeyToken=0c15020868fd6249, processorArchitecture=MSIL">
       <HintPath>packages\Ookii.Dialogs.1.0\lib\net35\Ookii.Dialogs.Wpf.dll</HintPath>
@@ -270,8 +282,11 @@
     <Compile Include="Source\RteGenerator\CppLang\RteDataTypesGenerator_Cpp.cs" />
     <Compile Include="Source\RteGenerator\CppLang\RteFunctionsGenerator_Cpp.cs" />
     <Compile Include="Source\RteGenerator\CppLang\RteGenerator_Cpp.cs" />
+    <Compile Include="Source\RteGenerator\CppLang\RteObjectConstructorGenerator_Cpp.cs" />
+    <Compile Include="Source\RteGenerator\CppLang\RtePortInterfaceGenerator.cs" />
     <Compile Include="Source\RteGenerator\CppLang\RteSchedulerGenerator_Cpp.cs" />
     <Compile Include="Source\RteGenerator\CppLang\SystemErrorGenerator_Cpp.cs" />
+    <Compile Include="Source\RteGenerator\ProgrammingLanguage.cs" />
     <Compile Include="Source\RteGenerator\TestGenerator\RteTestConnectionCGenerator.cs" />
     <Compile Include="Source\RteGenerator\CLang\RteConnectionGenerator_C.cs" />
     <Compile Include="Source\RteGenerator\CLang\RteDataTypesGenerator_C.cs" />

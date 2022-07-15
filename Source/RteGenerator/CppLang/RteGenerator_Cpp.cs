@@ -18,6 +18,9 @@ namespace AutosarGuiEditor.Source.RteGenerator.CppLang
             ReturnCodesGenerator_Cpp returnCodesGenerator = new ReturnCodesGenerator_Cpp();
             returnCodesGenerator.GenerateReturnCodesFile(RteFunctionsGenerator_Cpp.GetRteFolder());
 
+            RteObjectConstructorGenerator_Cpp constructorsGenerator = new RteObjectConstructorGenerator_Cpp();
+            constructorsGenerator.GenerateConstructosFile(RteFunctionsGenerator_Cpp.GetRteFolder());
+
             /* Create system errors file */
             SystemErrorGenerator_Cpp systemErrorGenerator = new SystemErrorGenerator_Cpp();
             systemErrorGenerator.GenerateSystemErrorsFile(RteFunctionsGenerator_Cpp.GetRteFolder());

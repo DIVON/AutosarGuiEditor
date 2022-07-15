@@ -37,7 +37,7 @@ using AutosarGuiEditor.Source.Render;
 using AutosarGuiEditor.Source.DataTypes.ArrayDataType;
 using AutosarGuiEditor.Source;
 using AutosarGuiEditor.Source.Autosar.Events;
-
+using AutosarGuiEditor.Source.RteGenerator;
 
 namespace System 
 {
@@ -152,6 +152,15 @@ namespace System
             }
         }
 
+        ProgrammingLanguage programLanguage = new ProgrammingLanguage();
+        public ProgrammingLanguage ProgramLanguage
+        {
+            get
+            {
+                return programLanguage;
+            }
+        }
+
         public uint SystickFrequencyHz = 1000;
         public String GenerateRtePath = "";
         public String GenerateTestRtePath = "";
@@ -229,6 +238,7 @@ namespace System
                 OsTasks.LoadFromXML(xroot);
                 arrayDataTypes.LoadFromXML(xroot);
                 MCUType.LoadFromXML(xroot);
+                programLanguage.LoadFromXML(xroot);
                 BaseDataTypes.CheckBaseDataTypes();
                 SyncronizeEvents(null, true);
                 UpdateConnections();
@@ -335,6 +345,7 @@ namespace System
             OsTasks.WriteToXML(root);
             Compositions.WriteToXML(root);
             MCUType.WriteToXML(root);
+            programLanguage.WriteToXML(root);
             xdoc.Save(filename);
             FileName = filename;
             return true;

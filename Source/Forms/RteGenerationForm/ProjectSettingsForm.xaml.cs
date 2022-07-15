@@ -1,4 +1,5 @@
-﻿using System;
+﻿using AutosarGuiEditor.Source.RteGenerator;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -27,6 +28,12 @@ namespace AutosarGuiEditor.Source.Forms
             foreach (var mcuType in mcuTypes)
             {
                 McuTypeComboBox.Items.Add(mcuType.ToString());
+            }
+
+            var programmingLanguages = Enum.GetValues(typeof(ProgrammingLanguageTypeDef));
+            foreach (var pl in programmingLanguages)
+            {
+                ProgramLanguageComboBox.Items.Add(pl.ToString());
             }
         }
 

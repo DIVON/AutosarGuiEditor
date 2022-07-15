@@ -12,6 +12,7 @@ using System.IO;
 using AutosarGuiEditor.Source.RteGenerator.TestGenerator;
 using AutosarGuiEditor.Source.Component;
 using AutosarGuiEditor.Source.RteGenerator.CLang;
+using AutosarGuiEditor.Source.RteGenerator.CppLang;
 
 namespace AutosarGuiEditor
 {
@@ -39,8 +40,19 @@ namespace AutosarGuiEditor
                     String testResult = writer.ToString();
                     if (!tester.IsErrorExist(testResult))
                     {
-                        RteGenerator_C rteGenerator = new RteGenerator_C();
-                        bool result = rteGenerator.Generate();
+                        bool result = false;
+                        if (app.ProgramLanguage.Type == ProgrammingLanguageTypeDef.C)
+                        {
+                            RteGenerator_C rteGenerator = new RteGenerator_C();
+                            result = rteGenerator.Generate();
+                        }
+                        else if (app.ProgramLanguage.Type == ProgrammingLanguageTypeDef.Cpp)
+                        {
+                            RteGenerator_Cpp rteGenerator = new RteGenerator_Cpp();
+                            result = rteGenerator.Generate();
+                        }
+
+
                         if (result == true)
                         {
                             Console.WriteLine("RTE has been generated.");
@@ -49,6 +61,39 @@ namespace AutosarGuiEditor
                         {
                             Console.WriteLine("There is a problem with RTE generation.");
                         }
+                    }
+                    else
+                    {
+                        Console.WriteLine("There are errors in the project. RTE generation is impossible. Check project for errors.");
+                    }
+
+                    Environment.Exit(0);
+                }
+
+                if (e.Args[0] == "-SkeletonRegen")
+                {
+                    AutosarApplication app = AutosarApplication.GetInstance();
+                    String file = e.Args[1].Replace("\"", "");
+                    app.LoadFromFile(file);
+                    StringWriter writer = new StringWriter();
+
+                    ArxmlTester tester = new ArxmlTester(app, writer);
+                    tester.Test();
+                    String testResult = writer.ToString();
+                    if (!tester.IsErrorExist(testResult))
+                    {
+                        if (app.ProgramLanguage.Type == ProgrammingLanguageTypeDef.C)
+                        {
+                            RteGenerator_C rteGenerator = new RteGenerator_C();
+                            rteGenerator.GenerateComponentsFiles();
+                        }
+                        else if (app.ProgramLanguage.Type == ProgrammingLanguageTypeDef.Cpp)
+                        {
+                            RteGenerator_Cpp rteGenerator = new RteGenerator_Cpp();
+                            rteGenerator.GenerateComponentsFiles();
+                        }
+
+                        Console.WriteLine("RTE has been generated.");
                     }
                     else
                     {

@@ -44,9 +44,9 @@ namespace AutosarGuiEditor.Source.RteGenerator.CppLang
                 string arguments = "";
                 string returnType = "void";
 
-                String runnableDefenitionLine = RteFunctionsGenerator_Cpp.Generate_RunnableDeclaration(component, runnable);
+                String runnableDefenitionLine = RteFunctionsGenerator_Cpp.Generate_RunnableDeclaration(component, runnable, true);
                 
-                CreateRunnable(srcDir, component, runnable, runnableDefenitionLine, arguments, returnType);
+                CreateRunnableFile(srcDir, component, runnable, runnableDefenitionLine, arguments, returnType);
             }
 
 
@@ -58,7 +58,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CppLang
 
         void CreateComponentIncludes(String dir, ApplicationSwComponentType componentDefenition)
         {
-            String filename = dir + componentDefenition.Name + ".h";
+            String filename = dir + componentDefenition.Name + ".hpp";
             StreamWriter writer = new StreamWriter(filename);
             RteFunctionsGenerator_Cpp.GenerateFileTitle(writer, filename, "Implementation for header of " + componentDefenition.Name);
             RteFunctionsGenerator_Cpp.OpenGuardDefine(writer);
@@ -66,7 +66,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CppLang
             writer.WriteLine("");
             writer.WriteLine(RteFunctionsGenerator_Cpp.IncludesLine);
             writer.WriteLine("");
-            RteFunctionsGenerator_Cpp.AddInclude(writer, "Rte_" + componentDefenition.Name + ".h");
+            RteFunctionsGenerator_Cpp.AddInclude(writer, "Rte_" + componentDefenition.Name + ".hpp");
             writer.WriteLine("");
             writer.WriteLine(RteFunctionsGenerator_Cpp.EndOfIncludesLine);
             writer.WriteLine("");
@@ -80,6 +80,10 @@ namespace AutosarGuiEditor.Source.RteGenerator.CppLang
             writer.WriteLine("");
             writer.WriteLine(RteFunctionsGenerator_Cpp.TypeDefenitionsLine);
             writer.WriteLine("");
+            
+            WriteComponentClass(writer, componentDefenition);
+            
+
             writer.WriteLine(RteFunctionsGenerator_Cpp.EndOfTypeDefenitionsLine);
             writer.WriteLine("");
 
@@ -99,16 +103,44 @@ namespace AutosarGuiEditor.Source.RteGenerator.CppLang
             writer.Close();
         }
 
-        void CreateRunnable(String dir, ApplicationSwComponentType compDefenition, RunnableDefenition runnable, String runnableDefenitionLine, String arguments, String returnType)
+        void WriteComponentClass(StreamWriter writer, ApplicationSwComponentType compDefenition)
         {
-            String filename = dir + compDefenition.Name + "_ru" + runnable.Name + ".c";
+            String rteStructureName = RteFunctionsGenerator_Cpp.ComponentRteDataStructureDefenitionName(compDefenition);
+            String baseClassName    = RteFunctionsGenerator_Cpp.ComponentBaseClassDefenitionName(compDefenition);
+
+            writer.WriteLine("class " + compDefenition.Name + " final: private " + baseClassName);
+            writer.WriteLine("{");
+            writer.WriteLine("public:");
+
+            writer.WriteLine("    /* Constructor */");
+            writer.WriteLine("    " + compDefenition.Name + "(const " + rteStructureName + " &Rte);");
+            writer.WriteLine("");
+
+            writer.WriteLine("    /* Component runnables */");
+            foreach (RunnableDefenition runnable in compDefenition.Runnables)
+            {
+                String runnableName = RteFunctionsGenerator_Cpp.Generate_RunnableDeclaration(compDefenition, runnable, false);
+                writer.WriteLine("    " + runnableName + ";");
+            }
+            writer.WriteLine("");
+            writer.WriteLine("protected:");
+            writer.WriteLine("    /* Make other functions here */ ");
+            writer.WriteLine("private:");
+            writer.WriteLine("");
+            writer.WriteLine("};");
+            writer.WriteLine("");
+        }
+
+        void CreateRunnableFile(String dir, ApplicationSwComponentType compDefenition, RunnableDefenition runnable, String runnableDefenitionLine, String arguments, String returnType)
+        {
+            String filename = dir + compDefenition.Name + "_ru" + runnable.Name + ".cpp";
             StreamWriter writer = new StreamWriter(filename);
             RteFunctionsGenerator_Cpp.GenerateFileTitle(writer, filename, "Implementation for " + compDefenition.Name + "_" + runnable.Name);
 
             writer.WriteLine("");
             writer.WriteLine(RteFunctionsGenerator_Cpp.IncludesLine);
             writer.WriteLine("");
-            RteFunctionsGenerator_Cpp.AddInclude(writer, compDefenition.Name + ".h");
+            RteFunctionsGenerator_Cpp.AddInclude(writer, compDefenition.Name + ".hpp");
             writer.WriteLine("");
             writer.WriteLine(RteFunctionsGenerator_Cpp.EndOfIncludesLine);
             writer.WriteLine("");
@@ -144,14 +176,20 @@ namespace AutosarGuiEditor.Source.RteGenerator.CppLang
             writer.WriteLine("");
 
             writer.WriteLine("");
-            writer.WriteLine(RteFunctionsGenerator_Cpp.GlobalFunctionsDefenitionsLine);
+            writer.WriteLine(RteFunctionsGenerator_Cpp.PrivateFunctionsDefenitionsLine);
+            writer.WriteLine("");
+            writer.WriteLine(RteFunctionsGenerator_Cpp.EndOfPrivateFunctionsDefenitionsLine);
             writer.WriteLine("");
 
+            writer.WriteLine("");
+            writer.WriteLine(RteFunctionsGenerator_Cpp.ProtectedFunctionsDefenitionsLine);
+            writer.WriteLine("");
+            writer.WriteLine(RteFunctionsGenerator_Cpp.EndOfProtectedFunctionsDefenitionsLine);
+            writer.WriteLine("");
 
-            
-            
-            /* Fill all function names which component could use*/
-            WriteAllFunctionWhichComponentCouldUse(compDefenition, writer);
+            writer.WriteLine("");
+            writer.WriteLine(RteFunctionsGenerator_Cpp.PublicFunctionsDefenitionsLine);
+            writer.WriteLine("");
 
             writer.WriteLine(runnableDefenitionLine);
             writer.WriteLine("{");
@@ -167,74 +205,11 @@ namespace AutosarGuiEditor.Source.RteGenerator.CppLang
             writer.WriteLine("}");
             writer.WriteLine("");
 
-            writer.WriteLine(RteFunctionsGenerator_Cpp.EndOfGlobalFunctionsDefenitionsLine);
+            writer.WriteLine(RteFunctionsGenerator_Cpp.EndOfPublicFunctionsDefenitionsLine);
             writer.WriteLine("");
 
             RteFunctionsGenerator_Cpp.WriteEndOfFile(writer);
             writer.Close();
-        }
-
-        public static void WriteAllFunctionWhichComponentCouldUse(ApplicationSwComponentType compDefenition, StreamWriter writer)
-        {
-            List<String> lines = new List<string>();
-
-            /* Write function name and its body */
-            
-            foreach (PimDefenition pimDefenition in compDefenition.PerInstanceMemoryList)
-            {
-                lines.Add(" *  " + RteFunctionsGenerator_Cpp.GenerateShortPimFunctionName(pimDefenition));
-            }
-            foreach (CDataDefenition cdataDefenition in compDefenition.CDataDefenitions)
-            {
-                lines.Add(" *  " + RteFunctionsGenerator_Cpp.GenerateShortCDataFunctionName(cdataDefenition));
-            }
-
-            foreach (PortDefenition port in compDefenition.Ports)
-            {
-                if (port.PortType == PortType.Receiver)
-                {
-                    SenderReceiverInterface srInterface = AutosarApplication.GetInstance().SenderReceiverInterfaces.FindObject(port.InterfaceGUID);
-                    foreach (SenderReceiverInterfaceField field in srInterface.Fields)
-                    {
-                        lines.Add(" *  " + RteFunctionsGenerator_Cpp.GenerateReadWriteFunctionName(port, field));
-                    }
-                }
-            }
-
-            foreach (PortDefenition port in compDefenition.Ports)
-            {
-                if (port.PortType == PortType.Sender)
-                {
-                    SenderReceiverInterface srInterface = AutosarApplication.GetInstance().SenderReceiverInterfaces.FindObject(port.InterfaceGUID);
-                    foreach (SenderReceiverInterfaceField field in srInterface.Fields)
-                    {
-                        lines.Add(" *  " + RteFunctionsGenerator_Cpp.GenerateReadWriteFunctionName(port, field));
-                    }
-                }
-            }
-
-            foreach (PortDefenition port in compDefenition.Ports)
-            {
-                if (port.PortType == PortType.Client)
-                {
-                    ClientServerInterface csInterface = AutosarApplication.GetInstance().ClientServerInterfaces.FindObject(port.InterfaceGUID);
-                    foreach (ClientServerOperation operation in csInterface.Operations)
-                    {
-                        lines.Add(" *  " + RteFunctionsGenerator_Cpp.Generate_InternalRteCall_FunctionName(port, operation));
-                    }
-                }
-            }
-
-            if (lines.Count > 0)
-            {
-                writer.WriteLine("/* ");
-                writer.WriteLine(" *  This RTE functions could be used: ");
-                foreach(String str in lines)
-                {
-                    writer.WriteLine(str);
-                }
-                writer.WriteLine(" */");
-            }
         }
     }
 }
