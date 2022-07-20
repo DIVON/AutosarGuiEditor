@@ -329,13 +329,16 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLang
             RteFunctionsGenerator_C.OpenGuardDefine(writer);
 
             writer.WriteLine();
-            writer.WriteLine("#define RTE_C");
+            //writer.WriteLine("#define RTE_C");
             foreach (ApplicationSwComponentType compDef in AutosarApplication.GetInstance().ComponentDefenitionsList)
             {
-                RteFunctionsGenerator_C.AddInclude(writer, "Rte_" + compDef.Name + ".h");
+                //RteFunctionsGenerator_C.AddInclude(writer, "Rte_" + compDef.Name + ".h");
             }
-            writer.WriteLine("#undef RTE_C");
-
+            //writer.WriteLine("#undef RTE_C");
+           
+            writer.WriteLine("#ifdef __cplusplus");
+            writer.WriteLine("extern \"C\" {");            
+            writer.WriteLine("#endif");
             writer.WriteLine();
 
             writer.WriteLine("/* Time periods */");
@@ -372,10 +375,14 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLang
             }
 
             writer.WriteLine();
-            RteFunctionsGenerator_C.CloseGuardDefine(writer);
+            writer.WriteLine("#ifdef __cplusplus");
+            writer.WriteLine("}");
+            writer.WriteLine("#endif");
+            writer.WriteLine();
 
             writer.WriteLine();
-            RteFunctionsGenerator_C.WriteEndOfFile(writer);
+            RteFunctionsGenerator_C.CloseGuardDefine(writer);
+            
             writer.Close();
         }
 
@@ -389,9 +396,18 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLang
 
             RteFunctionsGenerator_C.AddInclude(writer, Properties.Resources.RTE_DATATYPES_H_FILENAME);
 
+            RteConnectionGenerator_C.AddComponentIncludes(writer);
+
             writer.WriteLine();
             writer.WriteLine("/* Declaration of all component's runnables */");
             writer.WriteLine();
+
+            //writer.WriteLine("#ifdef __cplusplus");
+            //writer.WriteLine("extern \"C\"");
+            //writer.WriteLine("{");
+            //writer.WriteLine("#endif");
+           // writer.WriteLine();
+
             foreach (ApplicationSwComponentType compDefinition in AutosarApplication.GetInstance().ComponentDefenitionsList)
             {
                 foreach (RunnableDefenition runnable in compDefinition.Runnables)
@@ -399,6 +415,10 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLang
                     writer.WriteLine(RteFunctionsGenerator_C.Generate_RunnableDeclaration(compDefinition, runnable) + ";");
                 }
             }
+
+            //writer.WriteLine("#ifdef __cplusplus");
+            //writer.WriteLine("}");
+            //writer.WriteLine("#endif");
 
             writer.WriteLine();
             RteFunctionsGenerator_C.CloseGuardDefine(writer);
@@ -418,6 +438,14 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLang
             RteFunctionsGenerator_C.OpenGuardDefine(writer);
 
             RteFunctionsGenerator_C.AddInclude(writer, Properties.Resources.RTE_DATATYPES_H_FILENAME);
+
+            writer.WriteLine();
+            writer.WriteLine("#define RTE_C");
+            foreach (ApplicationSwComponentType compDef in AutosarApplication.GetInstance().ComponentDefenitionsList)
+            {
+                RteFunctionsGenerator_C.AddInclude(writer, "Rte_" + compDef.Name + ".h");
+            }
+            writer.WriteLine("#undef RTE_C");
 
             writer.WriteLine();
             writer.WriteLine("/* Declaration of all async events  */");
@@ -451,11 +479,17 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLang
 
             writer.WriteLine();
 
-            writer.WriteLine("extern volatile boolean timeEventOccured;");
-
+            writer.WriteLine("#ifdef __cplusplus");
+            writer.WriteLine("extern \"C\" {");
+            writer.WriteLine("#endif");
             writer.WriteLine();
 
             writer.WriteLine("void DoScheduling(void);");
+            
+            writer.WriteLine();
+            writer.WriteLine("#ifdef __cplusplus");
+            writer.WriteLine("}");
+            writer.WriteLine("#endif");
 
             writer.WriteLine();
             RteFunctionsGenerator_C.CloseGuardDefine(writer);
@@ -477,6 +511,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLang
 
             writer.WriteLine();
             RteFunctionsGenerator_C.AddInclude(writer, Properties.Resources.RTE_RUNTIME_ENVIRONMENT_H_FILENAME);
+            RteFunctionsGenerator_C.AddInclude(writer, Properties.Resources.RTE_DATATYPES_H_FILENAME);
             writer.WriteLine();
 
             

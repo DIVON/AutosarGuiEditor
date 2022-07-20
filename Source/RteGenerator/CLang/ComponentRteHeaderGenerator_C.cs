@@ -21,9 +21,13 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLang
             RteFunctionsGenerator_C.GenerateFileTitle(writer, filename, "Implementation for " + compDef.Name + " header file");
             RteFunctionsGenerator_C.OpenGuardDefine(writer);
 
+            //writer.WriteLine("#ifdef __cplusplus");
+            //writer.WriteLine("extern \"C\"");
+            //writer.WriteLine("{");
+            //writer.WriteLine("#endif");
 
             writer.WriteLine(@"
-#ifndef RTE_CPP
+#ifndef RTE_C
     #ifdef RTE_APP_HEADER_FILE
         #error Multiple application header files included.
     #else
@@ -171,6 +175,12 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLang
  * BEGIN Runnable Entity
  *************************************************************/
 ");
+
+            writer.WriteLine("#ifdef __cplusplus");
+            writer.WriteLine("extern \"C\" {");
+            writer.WriteLine("#endif");
+            writer.WriteLine();            
+
             RteComponentGenerator_C.WriteAllFunctionWhichComponentCouldUse(compDef, writer);
 
             foreach (RunnableDefenition runnable in compDef.Runnables)
@@ -179,6 +189,9 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLang
             }
 
             writer.WriteLine();
+            writer.WriteLine("#ifdef __cplusplus");
+            writer.WriteLine("}");
+            writer.WriteLine("#endif");
 
             writer.WriteLine(
 @"
@@ -298,6 +311,11 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLang
  * END RTE API DEFINITIONS 
  *************************************************************/
 ");
+
+            //writer.WriteLine("#ifdef __cplusplus");            
+            //writer.WriteLine("}");
+            //writer.WriteLine("#endif");
+
             RteFunctionsGenerator_C.CloseGuardDefine(writer);
             writer.Close();
         }

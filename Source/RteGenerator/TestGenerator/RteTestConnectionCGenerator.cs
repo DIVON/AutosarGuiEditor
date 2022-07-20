@@ -48,7 +48,7 @@ namespace AutosarGuiEditor.Source.RteGenerator
             GenerateReceiveFunctions(writer);
             GenerateCallFunctions(writer);
             GenerateCDataFunctions(writer);
-
+            GenerateAllAsyncServerNotificators(writer, false);
             GenerateAllComponentInstances(writer);
 
             writer.Close();
@@ -57,6 +57,36 @@ namespace AutosarGuiEditor.Source.RteGenerator
         void GenerateTestStubRecord(StreamWriter writer)
         {
             writer.WriteLine("TEST_STUB_RECORD_TYPE TEST_STUB_RECORD;");
+            writer.WriteLine("");
+        }
+
+        public static void GenerateAllAsyncServerNotificators(StreamWriter writer, Boolean isExtern = false)
+        {
+            foreach (CompositionInstance composition in AutosarApplication.GetInstance().Compositions)
+            {
+                foreach (ComponentInstance component in composition.ComponentInstances)
+                {
+                    ApplicationSwComponentType compDef = component.ComponentDefenition;
+
+                    foreach (PortDefenition portDef in compDef.Ports)
+                    {
+                        if ((portDef.PortType == PortType.Server) && ((portDef.InterfaceDatatype as ClientServerInterface).IsAsync == true))
+                        {
+                            ClientServerInterface csInterface = (portDef.InterfaceDatatype as ClientServerInterface);
+
+                            foreach (ClientServerOperation operation in csInterface.Operations)
+                            {
+                                String asyncField = "boolean Rte_AsyncCall_" + component.Name + "_" + portDef.Name + "_" + operation.Name + ";";
+                                if (isExtern)
+                                {
+                                    asyncField = "extern " + asyncField;
+                                }
+                                writer.WriteLine(asyncField);
+                            }
+                        }
+                    }
+                }
+            }
             writer.WriteLine("");
         }
 
@@ -130,7 +160,16 @@ namespace AutosarGuiEditor.Source.RteGenerator
                                     String functionName = RteFunctionsGenerator_C.Generate_RteCall_FunctionName(oppositCompInstance.ComponentDefenition, csEvent.Runnable);
 
                                     String arguments = RteFunctionsGenerator_C.Generate_ClientServerPort_Arguments(oppositCompInstance, operation, oppositCompInstance.ComponentDefenition.MultipleInstantiation);
-                                    writer.WriteLine("    return " + functionName + arguments + ";");
+
+                                    if (csInterface.IsAsync == false)
+                                    {
+                                        writer.WriteLine("    return " + functionName + arguments + ";");
+                                    }
+                                    else
+                                    {
+                                        writer.WriteLine("    " + functionName + arguments + ";");
+                                        writer.WriteLine("    return RTE_E_OK;");
+                                    }
                                 }
                                 else
                                 {

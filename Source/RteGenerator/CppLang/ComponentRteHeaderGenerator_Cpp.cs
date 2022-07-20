@@ -23,7 +23,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CppLang
 
 
             
-writer.WriteLine(@"#ifndef RTE_C
+writer.WriteLine(@"#ifndef RTE_CPP
     #ifdef RTE_APP_HEADER_FILE
         #error Multiple application header files included.
     #else

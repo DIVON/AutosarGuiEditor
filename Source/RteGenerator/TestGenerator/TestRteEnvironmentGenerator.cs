@@ -23,16 +23,17 @@ namespace AutosarGuiEditor.Source.RteGenerator.TestGenerator
     {
         public String TestRte_c_filename = "";
 
-        public void GenerateRteEnvironment(ApplicationSwComponentType compDef, String outputDir)
+        public void GenerateRteEnvironment(String outputDir)
         {
             /* Generate Rte_<ComponentName>.h file */
             RteComponentGenerator_C compGenerator = new RteComponentGenerator_C();
-            //compGenerator.CreateRteIncludes(outputDir, compDef);
 
-            GenerateTestRteHFile(compDef, outputDir);
-
-            ComponentRteHeaderGenerator_C.GenerateHeader(outputDir, compDef);
-            //GenerateTestRteCFile(compDef, outputDir);
+            foreach (ApplicationSwComponentType compDef in AutosarApplication.GetInstance().ComponentDefenitionsList)
+            {
+                GenerateTestRteHFile(compDef, outputDir);
+                ComponentRteHeaderGenerator_C.GenerateHeader(outputDir, compDef);
+            }
+            
 
             RteTestConnectionCGenerator rteConnectionsGenerator = new RteTestConnectionCGenerator();
             rteConnectionsGenerator.GenerateConnections(outputDir);

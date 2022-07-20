@@ -52,7 +52,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLang
             writer.Close();
         }
 
-        void AddComponentIncludes(StreamWriter writer)
+        public static void AddComponentIncludes(StreamWriter writer)
         {
             writer.WriteLine("#define RTE_C");
             foreach(ApplicationSwComponentType compDef in AutosarApplication.GetInstance().ComponentDefenitionsList)

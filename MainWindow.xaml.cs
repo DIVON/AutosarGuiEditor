@@ -1205,11 +1205,8 @@ namespace AutosarGuiEditor
         private void GenerateTestEnvironment_Click(object sender, RoutedEventArgs e)
         {
             TestRteEnvironmentGenerator generator = new TestRteEnvironmentGenerator();
-            foreach (ApplicationSwComponentType compDefenition in AutosarApplication.GetInstance().ComponentDefenitionsList)
-            {
-                generator.GenerateRteEnvironment(compDefenition, autosarApp.GenerateTestRtePath);
-                        
-            }
+            
+            generator.GenerateRteEnvironment(autosarApp.GenerateTestRtePath);
             generator.GenerateCommonFiles(autosarApp.GenerateTestRtePath);
             RteSchedulerGenerator_C rteSchedulerGenerator = new RteSchedulerGenerator_C();
             rteSchedulerGenerator.Generate_ExternalRunnables_File(autosarApp.GenerateTestRtePath);
