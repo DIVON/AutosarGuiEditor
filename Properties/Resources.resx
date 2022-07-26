@@ -229,4 +229,7 @@
   <data name="SYSTEM_ERRORS_HPP_FILENAME" xml:space="preserve">
     <value>SystemErrors.hpp</value>
   </data>
+  <data name="RTE_PERIODS_H_FILENAME" xml:space="preserve">
+    <value>Rte_Periods.h</value>
+  </data>
 </root>

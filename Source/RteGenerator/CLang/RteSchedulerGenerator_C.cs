@@ -18,10 +18,48 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLang
             Generate_RunTimeEnvironment_Source_File(dir);
             Generate_RteTaskScheduler_Header_File(dir);
             Generate_RteTaskScheduler_Source_File(dir);
+            Generate_RtePeriods(dir);
         }
 
-        public RteSchedulerGenerator_C()
+        void Generate_RtePeriods(String dir)
         {
+            String FileName = dir + "\\" + Properties.Resources.RTE_PERIODS_H_FILENAME;
+            StreamWriter writer = new StreamWriter(FileName);
+
+            RteFunctionsGenerator_C.GenerateFileTitle(writer, FileName, Properties.Resources.RTE_PERIODS_H_FILENAME);
+            RteFunctionsGenerator_C.OpenGuardDefine(writer);
+
+            writer.WriteLine();
+
+            writer.WriteLine("#ifdef __cplusplus");
+            writer.WriteLine("extern \"C\" {");
+            writer.WriteLine("#endif");
+            writer.WriteLine();
+
+            writer.WriteLine("/* Time periods */");
+
+            foreach (ApplicationSwComponentType compDef in AutosarApplication.GetInstance().ComponentDefenitionsList)
+            {
+                foreach (TimingEvent tEvent in compDef.TimingEvents)
+                {
+                    String periodName = "Rte_Period_" + compDef.Name + "_ru" + tEvent.RunnableName;
+                    String period = (tEvent.PeriodMs * 1000).ToString() + "UL";
+                    String define = RteFunctionsGenerator_C.CreateDefine(periodName, period, false);
+                        
+                    writer.WriteLine(define);
+                }
+            }
+
+            writer.WriteLine();
+            writer.WriteLine("#ifdef __cplusplus");
+            writer.WriteLine("}");
+            writer.WriteLine("#endif");
+            writer.WriteLine();
+
+            writer.WriteLine();
+            RteFunctionsGenerator_C.CloseGuardDefine(writer);
+
+            writer.Close();
         }
 
         void Generate_RunTimeEnvironment_Source_File(String dir)

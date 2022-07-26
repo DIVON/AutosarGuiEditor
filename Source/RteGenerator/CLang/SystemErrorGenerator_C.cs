@@ -14,7 +14,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLang
         {
             String FileName = folder + "\\" + Properties.Resources.SYSTEM_ERRORS_H_FILENAME;
             StreamWriter writer = new StreamWriter(FileName);
-            RteFunctionsGenerator_C.GenerateFileTitle(writer, Properties.Resources.RTE_DATATYPES_H_FILENAME, Properties.Resources.DATATYPES_H_FILE_DESCRIPTION);
+            RteFunctionsGenerator_C.GenerateFileTitle(writer, Properties.Resources.SYSTEM_ERRORS_H_FILENAME, "This file contains all defined system error IDs");
             RteFunctionsGenerator_C.OpenGuardDefine(writer);
 
             writer.WriteLine("/*  System errors */");

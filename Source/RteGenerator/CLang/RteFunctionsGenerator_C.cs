@@ -533,7 +533,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLang
         }
 
         
-        public static String GenerateDefineFromString(String data)
+        public static String GenerateDefineFromString(String data, Boolean toUpper = true)
         {
             for (int i = data.Length - 1; i > 0; i--)
             {
@@ -542,7 +542,10 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLang
                     data = data.Insert(i, "_");
                 }
             }
-            data = data.ToUpper();
+            if (toUpper)
+            {
+                data = data.ToUpper();
+            }
             return data;
         }
 

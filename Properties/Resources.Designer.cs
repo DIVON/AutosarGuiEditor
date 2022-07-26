@@ -198,6 +198,15 @@ namespace AutosarGuiEditor.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Rte_Periods.h.
+        /// </summary>
+        internal static string RTE_PERIODS_H_FILENAME {
+            get {
+                return ResourceManager.GetString("RTE_PERIODS_H_FILENAME", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Rte_PortInterfaces.hpp.
         /// </summary>
         internal static string RTE_PORT_INTERFACES_HPP_FILENAME {
