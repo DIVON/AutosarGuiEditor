@@ -42,9 +42,9 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLang
             foreach (RunnableDefenition runnable in component.Runnables)
             {
                 string arguments = "";
-                string returnType = "void";
+                string returnType;
 
-                String runnableDefenitionLine = RteFunctionsGenerator_C.Generate_RunnableDeclaration(component, runnable);
+                String runnableDefenitionLine = RteFunctionsGenerator_C.Generate_RunnableDeclaration(component, runnable, out returnType);
                 
                 CreateRunnable(srcDir, component, runnable, runnableDefenitionLine, arguments, returnType);
             }

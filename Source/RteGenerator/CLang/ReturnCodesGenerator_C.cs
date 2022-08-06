@@ -20,7 +20,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLang
             writer.WriteLine(RteFunctionsGenerator_C.CreateDefine("RTE_E_UNCONNECTED", "134u"));
             writer.WriteLine(RteFunctionsGenerator_C.CreateDefine("RTE_E_OUT_OF_RANGE", "137u"));
             writer.WriteLine(RteFunctionsGenerator_C.CreateDefine("RTE_E_LIMIT", "138u"));
-
+            writer.WriteLine(RteFunctionsGenerator_C.CreateDefine("RTE_E_ERROR", "139u"));
             writer.WriteLine();
 
             RteFunctionsGenerator_C.CloseGuardDefine(writer);

@@ -43,15 +43,29 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLang
         void WriteStaticGlobal(StreamWriter writer)
         {
             writer.WriteLine("#ifdef TEST_RTE");
-            writer.WriteLine("#define STATIC");
-            writer.WriteLine("#define STATIC_CONST const");
-            writer.WriteLine("#define CONST_VOLATILE volatile");
-            writer.WriteLine("#define ALWAYS_INLINE");
+
+            writer.WriteLine("    #define STATIC");
+            writer.WriteLine("    #define VOLATILE volatile");
+            writer.WriteLine("    #define STATIC_CONST const");
+            writer.WriteLine("    #define CONST_VOLATILE volatile");
+            writer.WriteLine("    #define ALWAYS_INLINE");
+
+            writer.WriteLine("    #define ALIGNED_32 __attribute__ ((aligned (32)))");
+            writer.WriteLine("    #define ALIGNED_16 __attribute__ ((aligned (16)))");
+            writer.WriteLine("    #define ALIGNED_8  __attribute__ ((aligned (8)))");
+
             writer.WriteLine("#else");
-            writer.WriteLine("#define STATIC static");
-            writer.WriteLine("#define STATIC_CONST static const");
-            writer.WriteLine("#define CONST_VOLATILE const volatile");
-            writer.WriteLine("#define ALWAYS_INLINE  inline __attribute__((always_inline))");
+
+            writer.WriteLine("    #define STATIC static");
+            writer.WriteLine("    #define VOLATILE volatile");
+            writer.WriteLine("    #define STATIC_CONST static const");
+            writer.WriteLine("    #define CONST_VOLATILE const volatile");
+            writer.WriteLine("    #define ALWAYS_INLINE  inline __attribute__((always_inline))");
+
+            writer.WriteLine("    #define ALIGNED_32 __attribute__ ((aligned (32)))");
+            writer.WriteLine("    #define ALIGNED_16 __attribute__ ((aligned (16)))");
+            writer.WriteLine("    #define ALIGNED_8  __attribute__ ((aligned (8)))");
+
             writer.WriteLine("#endif");
             writer.WriteLine();
         }

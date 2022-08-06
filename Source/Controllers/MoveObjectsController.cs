@@ -19,9 +19,13 @@ namespace AutosarGuiEditor.Source.Controllers
         private Point previousPosition;
         public object SelectedObject;
         private bool leftMouseDown = false;
+        
+        Point cummulatedShift = new Point(0, 0);
 
         public void Viewport_MouseLeftButtonDown(Point sceneCoordinates)
         {
+            cummulatedShift = new Point(0, 0);
+
             AutosarApplication.GetInstance().UnselectComponents();
 
             if (AutosarApplication.GetInstance().ActiveComposition != null)
@@ -64,6 +68,10 @@ namespace AutosarGuiEditor.Source.Controllers
                     {
                         double translateX = (sceneCoordinates.X - previousPosition.X);
                         double translateY = (sceneCoordinates.Y - previousPosition.Y);
+
+                        cummulatedShift.X += translateX;
+                        cummulatedShift.Y += translateY;
+
                         if (SelectedObject is ResizableRectangleElement)
                         {
                             ResizableRectangleElement componentPainter = (ResizableRectangleElement)SelectedObject;
@@ -122,7 +130,7 @@ namespace AutosarGuiEditor.Source.Controllers
                         if ((worldCordinates.Y >= Owner.Painter.Top) && (worldCordinates.Y <= Owner.Painter.Bottom))
                         {
                             double newPos = portPainter.Painter.Top + deltaY;
-                            newPos = Math.Round(newPos / 5) * 5;
+                            //newPos = Math.Round(newPos / 5) * 5;
                             if ((newPos >= Owner.Painter.Top) && (newPos <= Owner.Painter.Bottom))
                             {
                                 portPainter.Painter.Top = newPos;
@@ -144,7 +152,7 @@ namespace AutosarGuiEditor.Source.Controllers
                         if ((worldCordinates.X >= Owner.Painter.Left) && (worldCordinates.X <= Owner.Painter.Right))
                         {
                             double newPos = portPainter.Painter.Left + deltaX;
-                            newPos = Math.Round(newPos / 5) * 5;
+                            //newPos = Math.Round(newPos / 5) * 5;
                             if ((newPos >= Owner.Painter.Left - portPainter.Painter.Width / 2) && (newPos <= Owner.Painter.Right - portPainter.Painter.Width / 2))
                             {
                                 portPainter.Painter.Left = newPos;

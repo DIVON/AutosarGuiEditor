@@ -450,7 +450,8 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLang
             {
                 foreach (RunnableDefenition runnable in compDefinition.Runnables)
                 {
-                    writer.WriteLine(RteFunctionsGenerator_C.Generate_RunnableDeclaration(compDefinition, runnable) + ";");
+                    string returnType;
+                    writer.WriteLine(RteFunctionsGenerator_C.Generate_RunnableDeclaration(compDefinition, runnable, out returnType) + ";");
                 }
             }
 

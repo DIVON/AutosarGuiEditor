@@ -443,10 +443,10 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLang
             }
         }
 
-        public static String Generate_RunnableDeclaration(ApplicationSwComponentType compDefenition, RunnableDefenition runnable)
+        public static String Generate_RunnableDeclaration(ApplicationSwComponentType compDefenition, RunnableDefenition runnable, out string returnType)
         {
             string arguments = "";
-            string returnType = "void";
+            returnType = "void";
 
             AutosarEventsList aevents = compDefenition.GetEventsWithTheRunnable(runnable);
 

@@ -185,7 +185,8 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLang
 
             foreach (RunnableDefenition runnable in compDef.Runnables)
             {
-                writer.WriteLine(RteFunctionsGenerator_C.Generate_RunnableDeclaration(compDef, runnable) + ";");
+                String returnType;
+                writer.WriteLine(RteFunctionsGenerator_C.Generate_RunnableDeclaration(compDef, runnable, out returnType) + ";");
             }
 
             writer.WriteLine();
