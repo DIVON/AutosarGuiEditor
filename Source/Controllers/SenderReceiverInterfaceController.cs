@@ -21,8 +21,8 @@ namespace AutosarGuiEditor.Source.Controllers
         TextBox nameTextBox;
         CheckBox isQueueCB;
         TextBox queueSizeTB;
-
-        public SenderReceiverInterfaceController(AutosarTreeViewControl AutosarTree, DataGrid grid, TextBox nameTextBox, CheckBox isQueueCB, TextBox queueSizeTB)
+        CheckBox isThreadIrqProtectedCB;
+        public SenderReceiverInterfaceController(AutosarTreeViewControl AutosarTree, DataGrid grid, TextBox nameTextBox, CheckBox isQueueCB, TextBox queueSizeTB, CheckBox isThreadIrqProtectedCB)
         {
             this.tree = AutosarTree;
             this.grid = grid;
@@ -36,6 +36,15 @@ namespace AutosarGuiEditor.Source.Controllers
             this.queueSizeTB = queueSizeTB;
             this.queueSizeTB.TextChanged += queueSizeTB_TextChanged;
             this.queueSizeTB.PreviewTextInput += queueSizeTB_PreviewTextInput;
+
+            this.isThreadIrqProtectedCB = isThreadIrqProtectedCB;
+            this.isThreadIrqProtectedCB.Checked += IsThreadIrqProtectedCB_Checked;
+            this.isThreadIrqProtectedCB.Unchecked += IsThreadIrqProtectedCB_Checked;
+        }
+
+        private void IsThreadIrqProtectedCB_Checked(object sender, System.Windows.RoutedEventArgs e)
+        {
+            srInterface.IsThreadIrqProtected = isThreadIrqProtectedCB.IsChecked.Value;
         }
 
         void queueSizeTB_PreviewTextInput(object sender, System.Windows.Input.TextCompositionEventArgs e)
@@ -116,6 +125,7 @@ namespace AutosarGuiEditor.Source.Controllers
                 isQueueCB.IsChecked = _srInterface.IsQueued;
                 queueSizeTB.Text = _srInterface.QueueSize.ToString();
                 queueSizeTB.IsEnabled = _srInterface.IsQueued;
+                isThreadIrqProtectedCB.IsChecked = _srInterface.IsThreadIrqProtected;
                 RefreshGridView();
                 allowUpdater.AllowUpdate();
             }

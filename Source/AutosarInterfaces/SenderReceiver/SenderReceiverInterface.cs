@@ -32,6 +32,7 @@ namespace AutosarGuiEditor.Source.AutosarInterfaces.SenderReceiver
                 xmldatatype.Add(new XElement("IsQueued", IsQueued.ToString()));
                 xmldatatype.Add(new XElement("QueueSize", QueueSize.ToString()));
             }
+            xmldatatype.Add(new XElement("IsThreadIrqProtected", IsThreadIrqProtected.ToString()));
             xml.Add(xmldatatype);
         }
 
@@ -41,6 +42,7 @@ namespace AutosarGuiEditor.Source.AutosarInterfaces.SenderReceiver
             Fields.LoadFromXML(xml);
             IsQueued = XmlUtilits.GetBooleanValue(xml, "IsQueued", false);
             QueueSize = XmlUtilits.GetIntegerValue(xml, "QueueSize", 0);
+            IsThreadIrqProtected = XmlUtilits.GetBooleanValue(xml, "IsThreadIrqProtected", false);
         }
 
         public override List<IAutosarTreeList> GetLists()
@@ -61,6 +63,12 @@ namespace AutosarGuiEditor.Source.AutosarInterfaces.SenderReceiver
             set;
             get;
         }
-       
+
+        public Boolean IsThreadIrqProtected
+        {
+            set;
+            get;
+        }
+
     }  
 }

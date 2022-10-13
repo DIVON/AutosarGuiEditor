@@ -20,11 +20,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLang
             StreamWriter writer = new StreamWriter(filename);
             RteFunctionsGenerator_C.GenerateFileTitle(writer, filename, "Implementation for " + compDef.Name + " header file");
             RteFunctionsGenerator_C.OpenGuardDefine(writer);
-
-            //writer.WriteLine("#ifdef __cplusplus");
-            //writer.WriteLine("extern \"C\"");
-            //writer.WriteLine("{");
-            //writer.WriteLine("#endif");
+            RteFunctionsGenerator_C.OpenCGuardDefine(writer);
 
             writer.WriteLine(@"
 #ifndef RTE_C
@@ -175,12 +171,6 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLang
  * BEGIN Runnable Entity
  *************************************************************/
 ");
-
-            writer.WriteLine("#ifdef __cplusplus");
-            writer.WriteLine("extern \"C\" {");
-            writer.WriteLine("#endif");
-            writer.WriteLine();            
-
             RteComponentGenerator_C.WriteAllFunctionWhichComponentCouldUse(compDef, writer);
 
             foreach (RunnableDefenition runnable in compDef.Runnables)
@@ -188,11 +178,6 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLang
                 String returnType;
                 writer.WriteLine(RteFunctionsGenerator_C.Generate_RunnableDeclaration(compDef, runnable, out returnType) + ";");
             }
-
-            writer.WriteLine();
-            writer.WriteLine("#ifdef __cplusplus");
-            writer.WriteLine("}");
-            writer.WriteLine("#endif");
 
             writer.WriteLine(
 @"
@@ -313,10 +298,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLang
  *************************************************************/
 ");
 
-            //writer.WriteLine("#ifdef __cplusplus");            
-            //writer.WriteLine("}");
-            //writer.WriteLine("#endif");
-
+            RteFunctionsGenerator_C.CloseCGuardDefine(writer);
             RteFunctionsGenerator_C.CloseGuardDefine(writer);
             writer.Close();
         }

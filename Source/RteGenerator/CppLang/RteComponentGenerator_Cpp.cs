@@ -73,7 +73,6 @@ namespace AutosarGuiEditor.Source.RteGenerator.CppLang
 
             writer.WriteLine("");
             writer.WriteLine(RteFunctionsGenerator_Cpp.MacrosLine);
-            writer.WriteLine("");
             writer.WriteLine(RteFunctionsGenerator_Cpp.EndOfMacrosLine);
             writer.WriteLine("");
 
@@ -89,13 +88,11 @@ namespace AutosarGuiEditor.Source.RteGenerator.CppLang
 
             writer.WriteLine("");
             writer.WriteLine(RteFunctionsGenerator_Cpp.ExternalVariablesLine);
-            writer.WriteLine("");
             writer.WriteLine(RteFunctionsGenerator_Cpp.EndOfExternalVariableLine);
             writer.WriteLine("");
 
             writer.WriteLine("");
             writer.WriteLine(RteFunctionsGenerator_Cpp.GlobalFunctionsDeclarationLine);
-            writer.WriteLine("");
             writer.WriteLine(RteFunctionsGenerator_Cpp.EndOfGlobalFunctionsDeclarationLine);
             writer.WriteLine("");
 
@@ -147,43 +144,36 @@ namespace AutosarGuiEditor.Source.RteGenerator.CppLang
 
             writer.WriteLine("");
             writer.WriteLine(RteFunctionsGenerator_Cpp.MacrosLine);
-            writer.WriteLine("");
             writer.WriteLine(RteFunctionsGenerator_Cpp.EndOfMacrosLine);
             writer.WriteLine("");
 
             writer.WriteLine("");
             writer.WriteLine(RteFunctionsGenerator_Cpp.TypeDefenitionsLine);
-            writer.WriteLine("");
             writer.WriteLine(RteFunctionsGenerator_Cpp.EndOfTypeDefenitionsLine);
             writer.WriteLine("");
 
             writer.WriteLine("");
             writer.WriteLine(RteFunctionsGenerator_Cpp.VariablesLine);
-            writer.WriteLine("");
             writer.WriteLine(RteFunctionsGenerator_Cpp.EndOfVariableLine);
             writer.WriteLine("");
 
             writer.WriteLine("");
             writer.WriteLine(RteFunctionsGenerator_Cpp.LocalFunctionsDeclarationLine);
-            writer.WriteLine("");
             writer.WriteLine(RteFunctionsGenerator_Cpp.EndOfLocalFunctionsDeclarationLine);
             writer.WriteLine("");
 
             writer.WriteLine("");
             writer.WriteLine(RteFunctionsGenerator_Cpp.LocalFunctionsDefenitionsLine);
-            writer.WriteLine("");
             writer.WriteLine(RteFunctionsGenerator_Cpp.EndOfLocalFunctionsDefenitionsLine);
             writer.WriteLine("");
 
             writer.WriteLine("");
             writer.WriteLine(RteFunctionsGenerator_Cpp.PrivateFunctionsDefenitionsLine);
-            writer.WriteLine("");
             writer.WriteLine(RteFunctionsGenerator_Cpp.EndOfPrivateFunctionsDefenitionsLine);
             writer.WriteLine("");
 
             writer.WriteLine("");
             writer.WriteLine(RteFunctionsGenerator_Cpp.ProtectedFunctionsDefenitionsLine);
-            writer.WriteLine("");
             writer.WriteLine(RteFunctionsGenerator_Cpp.EndOfProtectedFunctionsDefenitionsLine);
             writer.WriteLine("");
 

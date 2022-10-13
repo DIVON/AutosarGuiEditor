@@ -29,6 +29,8 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLang
             RteFunctionsGenerator_C.AddInclude(writer, "<string.h>");
             RteFunctionsGenerator_C.AddInclude(writer, Properties.Resources.RTE_DATATYPES_H_FILENAME);
             RteFunctionsGenerator_C.AddInclude(writer, Properties.Resources.SYSTEM_ERRORS_H_FILENAME);
+            RteFunctionsGenerator_C.AddInclude(writer, Properties.Resources.RTE_THREAD_PROTECTION_H_FILENAME);
+
             AddComponentIncludes(writer);
 
             /* Include */
@@ -199,6 +201,11 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLang
                                 writer.WriteLine(returnValue + " " + RteFuncName + fieldVariable);
                                 writer.WriteLine("{");
 
+                                if (srInterface.IsThreadIrqProtected == true)
+                                {
+                                    writer.WriteLine("    OnBefore_" + RteFuncName + "();");
+                                }
+
                                 int queueSize = srInterface.QueueSize;
 
                                 String copyFromField = "Rte_ReceiveBuffer_" + component.Name + "_" + portDef.Name + "_" + field.Name;
@@ -216,6 +223,12 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLang
                                 writer.WriteLine("        " + copyFromField + ".overlayError = RTE_E_OK;");
                                 writer.WriteLine("    }");
                                 writer.WriteLine("");
+
+                                if (srInterface.IsThreadIrqProtected == true)
+                                {
+                                    writer.WriteLine("    OnAfter_" + RteFuncName + "();");
+                                }
+
                                 writer.WriteLine("    return _returnValue;");  
 
                                 writer.WriteLine("}");
@@ -249,6 +262,11 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLang
                                 writer.WriteLine(returnValue + " " + RteFuncName + fieldVariable);
                                 writer.WriteLine("{");
 
+                                if (srInterface.IsThreadIrqProtected == true)
+                                {
+                                    writer.WriteLine("    OnBefore_" + RteFuncName + "();");
+                                }
+
                                 PortPainter portPainter = component.Ports.FindPortByItsDefenition(portDef);
                                 ComponentInstance oppositCompInstance;
                                 PortPainter oppositePort;
@@ -275,11 +293,23 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLang
                                     writer.WriteLine("        _returnValue = RTE_E_LIMIT;");
                                     writer.WriteLine("    }");  
                                     writer.WriteLine("");
+
+                                    if (srInterface.IsThreadIrqProtected == true)
+                                    {
+                                        writer.WriteLine("    OnAfter_" + RteFuncName + "();");
+                                    }
+
                                     writer.WriteLine("    return _returnValue;");  
                                 }
                                 else
                                 {
                                     writer.WriteLine("    memset(data, 0, sizeof(" + field.DataTypeName + "));");
+
+                                    if (srInterface.IsThreadIrqProtected == true)
+                                    {
+                                        writer.WriteLine("    OnAfter_" + RteFuncName + "();");
+                                    }
+
                                     writer.WriteLine("    return " + Properties.Resources.RTE_E_UNCONNECTED + ";");
                                 }
                                 writer.WriteLine("}");
@@ -313,6 +343,11 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLang
                                 writer.WriteLine(returnValue + " " + RteFuncName + fieldVariable);
                                 writer.WriteLine("{");
 
+                                if (srInterface.IsThreadIrqProtected == true)
+                                {
+                                    writer.WriteLine("    OnBefore_" + RteFuncName + "();");
+                                }
+
                                 String writeFieldName = "Rte_DataBuffer_" + component.Name + "_" + portDef.Name + "_" + field.Name;
                                 if (field.IsPointer == false)
                                 {
@@ -321,6 +356,11 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLang
                                 else
                                 {
                                     writer.WriteLine("    " + writeFieldName + " = data;");
+                                }
+
+                                if (srInterface.IsThreadIrqProtected == true)
+                                {
+                                    writer.WriteLine("    OnAfter_" + RteFuncName + "();");
                                 }
 
                                 writer.WriteLine("    return " + Properties.Resources.RTE_E_OK + ";");
@@ -355,21 +395,33 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLang
                                 writer.WriteLine(returnValue + " " + RteFuncName + fieldVariable);
                                 writer.WriteLine("{");
 
-
+                                if (srInterface.IsThreadIrqProtected == true)
+                                {
+                                    writer.WriteLine("    OnBefore_" + RteFuncName + "();");
+                                }
                                 PortPainter portPainter = component.Ports.FindPortByItsDefenition(portDef);
                                 ComponentInstance oppositCompInstance;
                                 PortPainter oppositePort;
                                 AutosarApplication.GetInstance().GetOppositePortAndComponent(portPainter, out oppositCompInstance, out oppositePort);
+                                
                                 if (oppositCompInstance != null)
                                 {
                                     String copyFromField = "Rte_DataBuffer_" + oppositCompInstance.Name + "_" + oppositePort.PortDefenition.Name + "_" + field.Name;
 
                                     writer.WriteLine("    *data = " + copyFromField + ";");
+                                    if (srInterface.IsThreadIrqProtected == true)
+                                    {
+                                        writer.WriteLine("    OnAfter_" + RteFuncName + "();");
+                                    }
                                     writer.WriteLine("    return " + Properties.Resources.RTE_E_OK + ";");
                                 }
                                 else
                                 {
                                     writer.WriteLine("    memset(data, " + "0, sizeof(" + field.DataTypeName + "));");
+                                    if (srInterface.IsThreadIrqProtected == true)
+                                    {
+                                        writer.WriteLine("    OnAfter_" + RteFuncName + "();");
+                                    }
                                     writer.WriteLine("    return " + Properties.Resources.RTE_E_UNCONNECTED + ";");
                                 }
 

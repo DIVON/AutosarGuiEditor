@@ -18,6 +18,8 @@ namespace AutosarGuiEditor.Source.RteGenerator.TestGenerator
             RteFunctionsGenerator_C.OpenGuardDefine(writer);
             writer.WriteLine("");
 
+            RteFunctionsGenerator_C.OpenCGuardDefine(writer);
+
             /*Add #include */
             RteFunctionsGenerator_C.AddInclude(writer, "<string.h>");
             RteFunctionsGenerator_C.AddInclude(writer, Properties.Resources.RTE_DATATYPES_H_FILENAME);
@@ -27,6 +29,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.TestGenerator
             GenerateTestStubRecordType(writer);
             RteConnectionGenerator_C.GenerateExternComponentInstances(writer);
 
+            RteFunctionsGenerator_C.CloseCGuardDefine(writer);
             RteFunctionsGenerator_C.CloseGuardDefine(writer);
             writer.Close();
         }
@@ -48,9 +51,16 @@ namespace AutosarGuiEditor.Source.RteGenerator.TestGenerator
             {
                 foreach (ComponentInstance component in composition.ComponentInstances)
                 {
-                    ApplicationSwComponentType compDef = component.ComponentDefenition;
-                    String compDataType = TestRteEnvironmentGenerator.TestArtefactsStructureDataType(compDef);
-                    writer.WriteLine("    " + compDataType + " " + component.Name + ";");
+                    if (component.ComponentDefenition.IsComponentGenerable())
+                    {
+                        ApplicationSwComponentType compDef = component.ComponentDefenition;
+                        String compDataType = TestRteEnvironmentGenerator.TestArtefactsStructureDataType(compDef);
+                        writer.WriteLine("    " + compDataType + " " + component.Name + ";");
+                    }
+                    else
+                    {
+                        writer.WriteLine("/* " + component.Name + " instance is empty. Nothing to generate. */");
+                    }
                 }
             }
             writer.WriteLine("} TEST_STUB_RECORD_TYPE;");

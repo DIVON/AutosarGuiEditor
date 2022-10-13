@@ -22,6 +22,9 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLang
             SystemErrorGenerator_C systemErrorGenerator = new SystemErrorGenerator_C();
             systemErrorGenerator.GenerateSystemErrorsFile(RteFunctionsGenerator_C.GetRteFolder());
 
+            Rte_OnBeforeAfterThreadProtectionGenerator_C interruptProtectionGenerator = new Rte_OnBeforeAfterThreadProtectionGenerator_C();
+            interruptProtectionGenerator.GenerateThreadProtectionFunctions(RteFunctionsGenerator_C.GetRteFolder());
+
             GenerateComponentsFiles();
             
             return true;

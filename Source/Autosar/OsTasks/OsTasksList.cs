@@ -100,6 +100,32 @@ namespace AutosarGuiEditor.Source.Autosar.OsTasks
             return GetTaskByName("Init");
         }
 
+        public OsTasksList GetZeroFrequencyTasks()
+        {
+            OsTasksList list = new OsTasksList();
+            foreach (OsTask task in this)
+            {
+                if (task.PeriodMs == 0)
+                {
+                    list.Add(task);
+                }
+            }
+            return list;
+        }
+
+        public OsTasksList GetTasksWithNonZeroFrequency()
+        {
+            OsTasksList list = new OsTasksList();
+            foreach (OsTask task in this)
+            {
+                if (task.PeriodMs != 0)
+                {
+                    list.Add(task);
+                }
+            }
+            return list;
+        }
+
         public OsTask GetTaskByName(String taskName)
         {
             foreach (OsTask task in this)

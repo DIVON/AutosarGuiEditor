@@ -86,7 +86,7 @@ namespace AutosarGuiEditor
 
             complexDataTypeMenu = new ComplexDataTypeMenu(AutosarTree, ComplexDataTypeGridView, ComplexDataType_NameTextBox);
             enumsMenu = new EnumsMenu(AutosarTree, Enums_GridView, EnumDataType_NameEdit);
-            senderReceiverInterfaceController = new SenderReceiverInterfaceController(AutosarTree, SenderReceiver_GridView, SenderReceiver_NameTextBox, SenderReceiver_IsQueuedCheckBox, SenderReceiver_QueueSizeTB);
+            senderReceiverInterfaceController = new SenderReceiverInterfaceController(AutosarTree, SenderReceiver_GridView, SenderReceiver_NameTextBox, SenderReceiver_IsQueuedCheckBox, SenderReceiver_QueueSizeTB, SenderReceiver_IsThreadProtected);
             clientServerInterfaceController = new ClientServerInterfaceController(AutosarTree, ClientServer_GridView, ClientServer_NameTextBox, AsyncCallCheckBox);
 
             componentDefenitionViewController = new ComponentDefenitionController(
@@ -1441,6 +1441,15 @@ namespace AutosarGuiEditor
             autosarApp.SyncronizePerInstanceMemory(null, true);
             autosarApp.SyncronizePimNames(null, true);
             autosarApp.SyncronizeCDataNames(null, true);
+        }
+
+        private void ConnectionLine_RemoveAnchors_Click(object sender, RoutedEventArgs e)
+        {
+            if (moveObjectsController.SelectedObject is PortConnection)
+            {
+                (moveObjectsController.SelectedObject as PortConnection).RemoveAllAnchors();
+                Render(null, null);
+            }
         }
     }
 

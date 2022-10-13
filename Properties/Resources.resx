@@ -232,4 +232,7 @@
   <data name="RTE_PERIODS_H_FILENAME" xml:space="preserve">
     <value>Rte_Periods.h</value>
   </data>
+  <data name="RTE_THREAD_PROTECTION_H_FILENAME" xml:space="preserve">
+    <value>Rte_ThreadProtection.h</value>
+  </data>
 </root>

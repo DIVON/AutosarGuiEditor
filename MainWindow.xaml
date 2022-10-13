@@ -168,6 +168,7 @@
                                 <MenuItem Click="ConnectionPointMenu_DeleteClick" Header="Delete" />
                                 <MenuItem Click="HideConnectionLine_Click" Header="Hide" />
                                 <MenuItem Click="ShowConnectionLinePermanent_Click" Header="Show permanent" />
+                                <MenuItem Click="ConnectionLine_RemoveAnchors_Click" Header="Remove anchors" />
                             </ContextMenu>
 
                         </Image.ContextMenu>
@@ -1051,6 +1052,7 @@
                         HorizontalAlignment="Left"
                         VerticalAlignment="Top"
                         Content="Queue size:" />
+                    <CheckBox Content="Interrupt\thread protection" HorizontalAlignment="Left" Margin="370,69,0,0" Name="SenderReceiver_IsThreadProtected" VerticalAlignment="Top"/>
 
                 </Grid>
             </TabItem>

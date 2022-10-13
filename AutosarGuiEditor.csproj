@@ -273,6 +273,7 @@
     <Compile Include="Source\RteGenerator\CLang\ComponentRteHeaderGenerator_C.cs" />
     <Compile Include="Source\RteGenerator\CLang\ReturnCodesGenerator_C.cs" />
     <Compile Include="Source\RteGenerator\CLang\RteComponentGenerator_C.cs" />
+    <Compile Include="Source\RteGenerator\CLang\Rte_OnBeforeAfterThreadProtectionGenerator_C.cs" />
     <Compile Include="Source\RteGenerator\CppLang\ArrayDataTypeGenerator_Cpp.cs" />
     <Compile Include="Source\RteGenerator\CppLang\BaseDataTypesCodeGenerator_Cpp.cs" />
     <Compile Include="Source\RteGenerator\CppLang\ComponentRteHeaderGenerator_Cpp.cs" />

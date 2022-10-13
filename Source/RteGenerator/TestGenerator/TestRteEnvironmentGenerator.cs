@@ -68,6 +68,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.TestGenerator
             StreamWriter writer = new StreamWriter(FileName);
             RteFunctionsGenerator_C.GenerateFileTitle(writer, Properties.Resources.TEST_RTE_H_FILENAME, "This file contains structure for provide test environment.");
             RteFunctionsGenerator_C.OpenGuardDefine(writer);
+            RteFunctionsGenerator_C.OpenCGuardDefine(writer);
 
             /* Add includes */
             RteFunctionsGenerator_C.AddInclude(writer, Properties.Resources.RTE_DATATYPES_H_FILENAME);
@@ -80,10 +81,18 @@ namespace AutosarGuiEditor.Source.RteGenerator.TestGenerator
             writer.WriteLine();
 
             /* Create structure */
-            CreateTestArtefactStructure(writer, compDef);
+            if (compDef.IsComponentGenerable())
+            {
+                CreateTestArtefactStructure(writer, compDef);
+            }
+            else
+            {
+                writer.WriteLine("/* " + compDef.Name + " is empty. Nothing to generate. */");
+            }
 
             writer.WriteLine();
 
+            RteFunctionsGenerator_C.CloseCGuardDefine(writer);
             RteFunctionsGenerator_C.CloseGuardDefine(writer);
             writer.Close();
         }
@@ -189,25 +198,30 @@ namespace AutosarGuiEditor.Source.RteGenerator.TestGenerator
                         writer.WriteLine("    {");
                         writer.WriteLine("        uint32 CallCount;");
                         writer.WriteLine("        Std_ReturnType ReturnValue;");
-                        writer.WriteLine("        struct");
-                        writer.WriteLine("        {");
-                        foreach (var field in csOperation.Fields)
+
+                        if (csOperation.Fields.Count > 0)
                         {
-                            string fieldDataType = "";
-
-                            switch (field.Direction)
+                            writer.WriteLine("        struct");
+                            writer.WriteLine("        {");
+                            foreach (var field in csOperation.Fields)
                             {
-                                case ClientServerOperationDirection.VALUE: fieldDataType = field.DataTypeName; break;
-                                case ClientServerOperationDirection.CONST_VALUE: fieldDataType = field.DataTypeName; break;
-                                case ClientServerOperationDirection.VAL_REF: fieldDataType = field.DataTypeName + " *"; break;
-                                case ClientServerOperationDirection.CONST_VAL_REF: fieldDataType = "const " + field.DataTypeName + " *"; break;
-                                case ClientServerOperationDirection.VAL_CONST_REF: fieldDataType = field.DataTypeName + " *"; break;
-                                case ClientServerOperationDirection.CONST_VAL_CONST_REF: fieldDataType = "const " + field.DataTypeName + " *"; break;
-                            }
+                                string fieldDataType = "";
 
-                            writer.WriteLine("            " + fieldDataType + " " + field.Name + ";");
+                                switch (field.Direction)
+                                {
+                                    case ClientServerOperationDirection.VALUE: fieldDataType = field.DataTypeName; break;
+                                    case ClientServerOperationDirection.CONST_VALUE: fieldDataType = field.DataTypeName; break;
+                                    case ClientServerOperationDirection.VAL_REF: fieldDataType = field.DataTypeName + " *"; break;
+                                    case ClientServerOperationDirection.CONST_VAL_REF: fieldDataType = "const " + field.DataTypeName + " *"; break;
+                                    case ClientServerOperationDirection.VAL_CONST_REF: fieldDataType = field.DataTypeName + " *"; break;
+                                    case ClientServerOperationDirection.CONST_VAL_CONST_REF: fieldDataType = "const " + field.DataTypeName + " *"; break;
+                                }
+
+                                writer.WriteLine("            " + fieldDataType + " " + field.Name + ";");
+                            }
+                        
+                            writer.WriteLine("        } Arguments;");
                         }
-                        writer.WriteLine("        } Arguments;");
                         writer.WriteLine("        Std_ReturnType (*redirection)(" + RteFunctionsGenerator_C.GenerateClientServerInterfaceArguments(csOperation, compDef.MultipleInstantiation) + ");");
                         writer.WriteLine("        Std_ReturnType (*hook)(" + RteFunctionsGenerator_C.GenerateClientServerInterfaceArguments(csOperation, compDef.MultipleInstantiation) + ");");
                         String operationName = RteFunctionsGenerator_C.Generate_InternalRteCall_FunctionName(portDef, csOperation);

@@ -19,6 +19,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLang
             StreamWriter writer = new StreamWriter(FileName);
             RteFunctionsGenerator_C.GenerateFileTitle(writer, Properties.Resources.RTE_DATATYPES_H_FILENAME, Properties.Resources.DATATYPES_H_FILE_DESCRIPTION);
             RteFunctionsGenerator_C.OpenGuardDefine(writer);
+            RteFunctionsGenerator_C.OpenCGuardDefine(writer);
 
             writer.WriteLine();
             RteFunctionsGenerator_C.AddInclude(writer, Properties.Resources.RTE_RETURN_CODES_FILENAME);
@@ -36,6 +37,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLang
 
             GenerateComponentsDataTypes(writer);
 
+            RteFunctionsGenerator_C.CloseCGuardDefine(writer);
             RteFunctionsGenerator_C.CloseGuardDefine(writer);
             writer.Close();
         }

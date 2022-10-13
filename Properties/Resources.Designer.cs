@@ -315,6 +315,15 @@ namespace AutosarGuiEditor.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Rte_ThreadProtection.h.
+        /// </summary>
+        internal static string RTE_THREAD_PROTECTION_H_FILENAME {
+            get {
+                return ResourceManager.GetString("RTE_THREAD_PROTECTION_H_FILENAME", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Поиск локализованного ресурса типа System.Drawing.Bitmap.
         /// </summary>
         internal static System.Drawing.Bitmap ServerPort {

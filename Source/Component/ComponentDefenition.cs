@@ -189,5 +189,11 @@ namespace AutosarGuiEditor.Source.Component
             }
             return true;
         }
+
+        public bool IsComponentGenerable()
+        {
+            bool generable = Ports.Count > 0 | CDataDefenitions.Count > 0 | PerInstanceMemoryList.Count > 0;
+            return generable;
+        }
     }
 }

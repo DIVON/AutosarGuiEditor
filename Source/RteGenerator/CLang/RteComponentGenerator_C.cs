@@ -73,25 +73,21 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLang
 
             writer.WriteLine("");
             writer.WriteLine(RteFunctionsGenerator_C.MacrosLine);
-            writer.WriteLine("");
             writer.WriteLine(RteFunctionsGenerator_C.EndOfMacrosLine);
             writer.WriteLine("");
 
             writer.WriteLine("");
             writer.WriteLine(RteFunctionsGenerator_C.TypeDefenitionsLine);
-            writer.WriteLine("");
             writer.WriteLine(RteFunctionsGenerator_C.EndOfTypeDefenitionsLine);
             writer.WriteLine("");
 
             writer.WriteLine("");
             writer.WriteLine(RteFunctionsGenerator_C.ExternalVariablesLine);
-            writer.WriteLine("");
             writer.WriteLine(RteFunctionsGenerator_C.EndOfExternalVariableLine);
             writer.WriteLine("");
 
             writer.WriteLine("");
             writer.WriteLine(RteFunctionsGenerator_C.GlobalFunctionsDeclarationLine);
-            writer.WriteLine("");
             writer.WriteLine(RteFunctionsGenerator_C.EndOfGlobalFunctionsDeclarationLine);
             writer.WriteLine("");
 
@@ -115,31 +111,26 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLang
 
             writer.WriteLine("");
             writer.WriteLine(RteFunctionsGenerator_C.MacrosLine);
-            writer.WriteLine("");
             writer.WriteLine(RteFunctionsGenerator_C.EndOfMacrosLine);
             writer.WriteLine("");
 
             writer.WriteLine("");
             writer.WriteLine(RteFunctionsGenerator_C.TypeDefenitionsLine);
-            writer.WriteLine("");
             writer.WriteLine(RteFunctionsGenerator_C.EndOfTypeDefenitionsLine);
             writer.WriteLine("");
 
             writer.WriteLine("");
             writer.WriteLine(RteFunctionsGenerator_C.VariablesLine);
-            writer.WriteLine("");
             writer.WriteLine(RteFunctionsGenerator_C.EndOfVariableLine);
             writer.WriteLine("");
 
             writer.WriteLine("");
             writer.WriteLine(RteFunctionsGenerator_C.LocalFunctionsDeclarationLine);
-            writer.WriteLine("");
             writer.WriteLine(RteFunctionsGenerator_C.EndOfLocalFunctionsDeclarationLine);
             writer.WriteLine("");
 
             writer.WriteLine("");
             writer.WriteLine(RteFunctionsGenerator_C.LocalFunctionsDefenitionsLine);
-            writer.WriteLine("");
             writer.WriteLine(RteFunctionsGenerator_C.EndOfLocalFunctionsDefenitionsLine);
             writer.WriteLine("");
 

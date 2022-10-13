@@ -50,6 +50,17 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLang
 
         /**** LOCAL FUNCTION DECLARATIONS ****************************************************************/
 
+
+        public static String DisableIRQ()
+        {
+            return "__disable_irq();";
+        }
+
+        public static String EnableIRQ()
+        {
+            return "__enable_irq();";
+        }
+
         public static String GenerateComponentName(String compName)
         {
             return "cin" + compName;
@@ -524,7 +535,24 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLang
         {
             String define = GenerateFileNameDefine(((FileStream)(writer.BaseStream)).Name);
             writer.WriteLine("#endif /* " + define + " */");
+            writer.WriteLine("");
+        }
 
+
+        public static void OpenCGuardDefine(StreamWriter writer)
+        {
+            writer.WriteLine("#ifdef __cplusplus");
+            writer.WriteLine("extern \"C\" {");
+            writer.WriteLine("#endif");
+            writer.WriteLine();
+        }
+
+        public static void CloseCGuardDefine(StreamWriter writer)
+        {
+            writer.WriteLine("#ifdef __cplusplus");
+            writer.WriteLine("}");
+            writer.WriteLine("#endif");
+            writer.WriteLine();
         }
 
         public static void WriteEndOfFile(StreamWriter writer)

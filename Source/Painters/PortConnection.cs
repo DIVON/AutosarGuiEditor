@@ -192,11 +192,15 @@ namespace System
 
         public bool IsClicked(Point point, out Object clickedObject, Boolean checkAnchors)
         {
-            
+            clickedObject = null;
+
+            if (!Visible)
+            {
+                return false;
+            }
+
             Point startPoint = Port1.GetConnectionPoint();
             Point endPoint = Port2.GetConnectionPoint();
-
-            clickedObject = null;
 
             if (checkAnchors)
             {
@@ -342,6 +346,18 @@ namespace System
         void Anchor_OnMove(object sender, Point translate)
         {
             UpdateLines();
+        }
+
+        public void RemoveAllAnchors()
+        {
+            if (anchors.Count == 0)
+            {
+                return;
+            }
+
+            anchors.Clear();
+
+            RecreateLines();
         }
 
         public void DeleteAnchor(Point closestPoint)

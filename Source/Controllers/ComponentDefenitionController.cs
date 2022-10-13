@@ -416,7 +416,7 @@ namespace AutosarGuiEditor.Source.Controllers
 
         public void AddRunnableButton_Click()
         {
-            RunnableDefenition runnable = ComponentFabric.GetInstance().CreateRunnableDefenition("Refresh");
+            RunnableDefenition runnable = ComponentFabric.GetInstance().CreateRunnableDefenition("NewRunnable");
             _componentDefenition.Runnables.Add(runnable);
             _componentDefenition.Runnables.DoSort();
             AutosarApplication.GetInstance().SyncronizeEvents(_componentDefenition);

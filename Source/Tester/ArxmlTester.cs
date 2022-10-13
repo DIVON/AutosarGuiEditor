@@ -68,6 +68,7 @@ namespace AutosarGuiEditor.Source.Tester
             TestClientServerEvents();
             TestRunnableUsing();
             TestAllRunnablesAreUsed();
+            TestRunnableNames();
             SortText();
         }
 
@@ -518,6 +519,7 @@ namespace AutosarGuiEditor.Source.Tester
 
         protected void TestOsTasks()
         {
+#if false
             OsTask initTask = autosarApp.OsTasks.GetInitTask();
             for (int i = 0; i < autosarApp.OsTasks.Count; i++)
             {
@@ -530,6 +532,7 @@ namespace AutosarGuiEditor.Source.Tester
                     }
                 }
             }
+#endif
         }
 
         protected void TestTimingEvents()
@@ -653,6 +656,21 @@ namespace AutosarGuiEditor.Source.Tester
                     if (runnableUsedInPeriodicEvents && runnableUsedInClientServerEvents)
                     {
                         AppendText("The same runnable shall not be used for periodical and client-server events : " + compDef.Name + " runnable: " + runnableDef.Name, MessageType.ERROR);
+                    }
+                }
+            }
+        }
+
+        void TestRunnableNames()
+        {
+            /* Check that each client -server event has filled runnable and source */
+            foreach (ApplicationSwComponentType compDef in autosarApp.ComponentDefenitionsList)
+            {
+                foreach (RunnableDefenition runnableDef in compDef.Runnables)
+                {
+                    if (runnableDef.Name.Length < 2)
+                    {
+                        AppendText("The runnable has incorrect name : " + compDef.Name + " runnable: " + runnableDef.Name, MessageType.ERROR);
                     }
                 }
             }
