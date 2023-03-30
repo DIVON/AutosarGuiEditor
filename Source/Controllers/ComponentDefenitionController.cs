@@ -224,7 +224,7 @@ namespace AutosarGuiEditor.Source.Controllers
                     {
                         _componentDefenition.CDataDefenitions[index].Name = newName;
                         AutosarApplication.GetInstance().SyncronizeCDataNames(_componentDefenition);
-                        tree.UpdateAutosarTreeView(tree.SelectedItem);
+                        //tree.UpdateAutosarTreeView(tree.SelectedItem);
                     }
                 }
             }
@@ -273,7 +273,7 @@ namespace AutosarGuiEditor.Source.Controllers
                 {
                     _componentDefenition.PerInstanceMemoryList.Remove(piDef);
                     AutosarApplication.GetInstance().SyncronizePerInstanceMemory(_componentDefenition);
-                    tree.UpdateAutosarTreeView(tree.SelectedItem);
+                    //tree.UpdateAutosarTreeView(tree.SelectedItem);
                     UpdatePerInstanceMemoryGrid();
                 }
             }
@@ -290,7 +290,7 @@ namespace AutosarGuiEditor.Source.Controllers
                 {
                     _componentDefenition.CDataDefenitions.Remove(cdataDef);
                     AutosarApplication.GetInstance().SyncronizeCData(_componentDefenition);
-                    tree.UpdateAutosarTreeView(tree.SelectedItem);
+                    //tree.UpdateAutosarTreeView(tree.SelectedItem);
                     UpdateCDataGrid();
                 }
             }
@@ -371,7 +371,7 @@ namespace AutosarGuiEditor.Source.Controllers
                 {
                     _componentDefenition.Ports.Remove(portDef);
                     AutosarApplication.GetInstance().UpdatePortsInComponentInstances();
-                    tree.UpdateAutosarTreeView(tree.SelectedItem);
+                    //tree.UpdateAutosarTreeView(tree.SelectedItem);
                     RefreshGridViews();
                     result = true;
                 }             
@@ -390,7 +390,7 @@ namespace AutosarGuiEditor.Source.Controllers
                 {
                     _componentDefenition.Runnables.RemoveAt(index);
                     AutosarApplication.GetInstance().SyncronizeEvents(_componentDefenition);
-                    tree.UpdateAutosarTreeView(tree.SelectedItem);
+                    //tree.UpdateAutosarTreeView(tree.SelectedItem);
                     RefreshGridViews();
                     result = true;
                 }
@@ -408,7 +408,7 @@ namespace AutosarGuiEditor.Source.Controllers
                     if (NameUtils.CheckComponentName(newName))
                     {
                         _componentDefenition.Ports[index].Name = newName;
-                        tree.UpdateAutosarTreeView(tree.SelectedItem);
+                       // tree.UpdateAutosarTreeView(tree.SelectedItem);
                     }
                 }
             }
@@ -421,7 +421,7 @@ namespace AutosarGuiEditor.Source.Controllers
             _componentDefenition.Runnables.DoSort();
             AutosarApplication.GetInstance().SyncronizeEvents(_componentDefenition);
             RefreshGridViews();
-            tree.UpdateAutosarTreeView(tree.SelectedItem);
+            //tree.UpdateAutosarTreeView(tree.SelectedItem);
         }
 
         public void RenameRunnable_TextEdit(string newName)
@@ -435,7 +435,7 @@ namespace AutosarGuiEditor.Source.Controllers
                     {
                         _componentDefenition.Runnables[index].Name = newName;
                         AutosarApplication.GetInstance().SyncronizeEvents(_componentDefenition);
-                        tree.UpdateAutosarTreeView(tree.SelectedItem);
+                        //tree.UpdateAutosarTreeView(tree.SelectedItem);
                     }
                 }
             }
@@ -451,11 +451,24 @@ namespace AutosarGuiEditor.Source.Controllers
                     ComponentDefenition.Ports.DoSort();
                     AutosarApplication.GetInstance().UpdatePortsInComponentInstances();
                     RefreshGridViews();
-                    tree.UpdateAutosarTreeView(tree.SelectedItem);
+                    //tree.UpdateAutosarTreeView(tree.SelectedItem);
                     return true;
                 }
             }
             return false;
+        }
+
+
+        public void ThreadProtection_Click(object sender, RoutedEventArgs e)
+        {
+            if (allowUpdater.IsUpdateAllowed)
+            {
+                int index = perInstanceGrid.SelectedIndex;
+                if ((index >= 0) && (index < perInstanceGrid.Items.Count))
+                {
+                    _componentDefenition.PerInstanceMemoryList[index].IsThreadProtected = (sender as CheckBox).IsChecked.Value;
+                }
+            }
         }
     }
 }

@@ -218,8 +218,8 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLang
 
             if (lines.Count > 0)
             {
-                writer.WriteLine("/* ");
-                writer.WriteLine(" *  This RTE functions could be used: ");
+                writer.WriteLine("/*");
+                writer.WriteLine(" *  This RTE functions could be used:");
                 foreach(String str in lines)
                 {
                     writer.WriteLine(str);

@@ -1,4 +1,5 @@
 ﻿using AutosarGuiEditor.Source.Interfaces;
+using AutosarGuiEditor.Source.Painters;
 using AutosarGuiEditor.Source.Render;
 using AutosarGuiEditor.Source.SystemInterfaces;
 using AutosarGuiEditor.Source.Utility;
@@ -10,7 +11,7 @@ namespace AutosarGuiEditor.Source.Autosar.Events
 {
     public class AutosarEventInstance:IGUID
     {
-        public String FullName
+        public String InstanceName
         {
             get
             {
@@ -19,13 +20,51 @@ namespace AutosarGuiEditor.Source.Autosar.Events
 
                 if (Defenition != null)
                 {
-                    fullName = compInstance.Name + "_" + Defenition.Name;
+                    fullName = compInstance.Name;
                 }
                 else
                 {
                     fullName = compInstance.Name + "_ERROR";
                 }
                 return fullName;
+            }
+        }
+
+        public String EventName
+        {
+            get
+            {
+                String fullName;
+                IElementWithPorts compInstance = AutosarApplication.GetInstance().FindComponentInstanceByEventId(this.GUID);
+
+                if (Defenition != null)
+                {
+                    fullName = Defenition.Name;
+                }
+                else
+                {
+                    fullName = "ERROR";
+                }
+                return fullName;
+            }
+        }
+
+        public String ComponentName
+        {
+            get
+            {
+                String componentName;
+                ComponentInstance compInstance = AutosarApplication.GetInstance().FindComponentInstanceByEventId(this.GUID) as ComponentInstance;
+
+                if (Defenition != null)
+                {
+                    componentName = compInstance.ComponentDefenition.Name;
+                }
+                else
+                {
+                    componentName = "ERROR";
+                }
+                return componentName;
             }
         }
 
@@ -190,7 +229,7 @@ namespace AutosarGuiEditor.Source.Autosar.Events
 
         public void SortByName()
         {
-            base.SortByField("FullName");
+            base.SortByField("EventName");
         }
     }
 }

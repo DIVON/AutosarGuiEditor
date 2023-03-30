@@ -11,6 +11,7 @@ using AutosarGuiEditor.Source.Painters.Components.CData;
 using AutosarGuiEditor.Source.Painters.Components.PerInstance;
 using AutosarGuiEditor.Source.Painters.PortsPainters;
 using AutosarGuiEditor.Source.PortDefenitions;
+using AutosarGuiEditor.Source.RteGenerator.CppLang;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -31,7 +32,8 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLang
             RteFunctionsGenerator_C.AddInclude(writer, Properties.Resources.SYSTEM_ERRORS_H_FILENAME);
             RteFunctionsGenerator_C.AddInclude(writer, Properties.Resources.RTE_THREAD_PROTECTION_H_FILENAME);
 
-            AddComponentIncludes(writer);
+            RteFunctionsGenerator_Cpp.AddInclude(writer, Properties.Resources.RTE_EXTERNALS_FILENAME);
+            //AddComponentIncludes(writer);
 
             /* Include */
             writer.WriteLine("");
@@ -129,6 +131,11 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLang
                                     }
                                     else
                                     {
+                                        /* Mark all parameters unused */
+                                        foreach (ClientServerOperationField field in operation.Fields )
+                                        {
+                                            writer.WriteLine("    (void)" + field.Name + ";");
+                                        }
                                         writer.WriteLine("    return " + Properties.Resources.RTE_E_UNCONNECTED + ";");
                                     }
 
@@ -166,6 +173,11 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLang
                                     }
                                     else
                                     {
+                                        /* Mark all parameters unused */
+                                        foreach (ClientServerOperationField field in operation.Fields)
+                                        {
+                                            writer.WriteLine("    (void)" + field.Name + ";");
+                                        }
                                         writer.WriteLine("    return " + Properties.Resources.RTE_E_UNCONNECTED + ";");
                                     }
 
@@ -262,54 +274,82 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLang
                                 writer.WriteLine(returnValue + " " + RteFuncName + fieldVariable);
                                 writer.WriteLine("{");
 
-                                if (srInterface.IsThreadIrqProtected == true)
-                                {
-                                    writer.WriteLine("    OnBefore_" + RteFuncName + "();");
-                                }
-
                                 PortPainter portPainter = component.Ports.FindPortByItsDefenition(portDef);
-                                ComponentInstance oppositCompInstance;
-                                PortPainter oppositePort;
-                                AutosarApplication.GetInstance().GetOppositePortAndComponent(portPainter, out oppositCompInstance, out oppositePort);
-                                if (oppositCompInstance != null)
-                                {                        
-                                    int queueSize = srInterface.QueueSize;
 
-                                    String copyFromField = "Rte_ReceiveBuffer_" + oppositCompInstance.Name + "_" + oppositePort.PortDefenition.Name + "_" + field.Name;
+                                List<PortPainter> oppositePorts = new List<PortPainter>();
 
-                                    writer.WriteLine("    Std_ReturnType _returnValue = RTE_E_OK;");
-                                    writer.WriteLine("");
-                                    writer.WriteLine("    uint32 head = " + copyFromField + ".head;");  
-                                    writer.WriteLine("    uint32 tail = " + copyFromField + ".tail;");
-                                    writer.WriteLine("");
-                                    writer.WriteLine("    if ((head == tail) || ((head % " +queueSize.ToString() + "U) != (tail % "+queueSize.ToString()+"U)))");
-                                    writer.WriteLine("    {");  
-                                    writer.WriteLine("        " + copyFromField + ".elements[tail % " + queueSize.ToString() + "U] = (*data);");  
-                                    writer.WriteLine("        " + copyFromField + ".tail = (tail + 1U) % " + (queueSize * 2).ToString() + "U;");  
-                                    writer.WriteLine("    }");  
-                                    writer.WriteLine("    else"); 
-                                    writer.WriteLine("    {");  
-                                    writer.WriteLine("        " + copyFromField + ".overlayError = RTE_E_LOST_DATA;");  
-                                    writer.WriteLine("        _returnValue = RTE_E_LIMIT;");
-                                    writer.WriteLine("    }");  
-                                    writer.WriteLine("");
-
-                                    if (srInterface.IsThreadIrqProtected == true)
+                                AutosarApplication.GetInstance().GetOppositeComponentPorts(portPainter, oppositePorts);
+                                bool connected = false;
+                                if (oppositePorts.Count != 0)
+                                {
+                                    foreach (PortPainter oppositePort in oppositePorts)
                                     {
-                                        writer.WriteLine("    OnAfter_" + RteFuncName + "();");
-                                    }
+                                        ComponentInstance oppositCompInstance = AutosarApplication.GetInstance().FindComponentInstanceByPort(oppositePort) as ComponentInstance;
 
-                                    writer.WriteLine("    return _returnValue;");  
+                                        if (oppositCompInstance != null)
+                                        {
+                                            if (connected == false)
+                                            {
+                                                if (srInterface.IsThreadIrqProtected == true)
+                                                {
+                                                    writer.WriteLine("    OnBefore_" + RteFuncName + "();");
+                                                }
+                                                writer.WriteLine();
+                                                writer.WriteLine("    uint32 head;");
+                                                writer.WriteLine("    uint32 tail;");
+                                                writer.WriteLine("    Std_ReturnType _returnValue = RTE_E_OK;");
+                                                
+                                                connected = true;
+                                            }
+                                            
+                                            int queueSize = srInterface.QueueSize;
+
+                                            String copyFromField = "Rte_ReceiveBuffer_" + oppositCompInstance.Name + "_" + oppositePort.PortDefenition.Name + "_" + field.Name;
+
+                                            writer.WriteLine("");
+                                            writer.WriteLine("    head = " + copyFromField + ".head;");
+                                            writer.WriteLine("    tail = " + copyFromField + ".tail;");
+                                            writer.WriteLine("");
+                                            writer.WriteLine("    if ((head == tail) || ((head % " + queueSize.ToString() + "U) != (tail % " + queueSize.ToString() + "U)))");
+                                            writer.WriteLine("    {");
+                                            writer.WriteLine("        " + copyFromField + ".elements[tail % " + queueSize.ToString() + "U] = (*data);");
+                                            writer.WriteLine("        " + copyFromField + ".tail = (tail + 1U) % " + (queueSize * 2).ToString() + "U;");
+                                            writer.WriteLine("    }");
+                                            writer.WriteLine("    else");
+                                            writer.WriteLine("    {");
+                                            writer.WriteLine("        " + copyFromField + ".overlayError = RTE_E_LOST_DATA;");
+                                            writer.WriteLine("        _returnValue = RTE_E_LIMIT;");
+                                            writer.WriteLine("    }");
+                                        }
+                                    }
+                                    if (connected)
+                                    {
+                                        if (srInterface.IsThreadIrqProtected == true)
+                                        {
+                                            writer.WriteLine();
+                                            writer.WriteLine("    OnAfter_" + RteFuncName + "();");
+                                        }
+
+                                        writer.WriteLine();
+                                        writer.WriteLine("    return _returnValue;"); 
+                                    }
+                                    else
+                                    {
+                                        /* Mark all parameters unused */
+                                        writer.WriteLine("    (void)data;");
+                                        writer.WriteLine("    return " + Properties.Resources.RTE_E_UNCONNECTED + ";");
+                                    }
                                 }
                                 else
                                 {
-                                    writer.WriteLine("    memset(data, 0, sizeof(" + field.DataTypeName + "));");
+                                    //writer.WriteLine("    memset(data, 0, sizeof(" + field.DataTypeName + "));");
 
                                     if (srInterface.IsThreadIrqProtected == true)
                                     {
                                         writer.WriteLine("    OnAfter_" + RteFuncName + "();");
                                     }
 
+                                    writer.WriteLine("    (void)data;");
                                     writer.WriteLine("    return " + Properties.Resources.RTE_E_UNCONNECTED + ";");
                                 }
                                 writer.WriteLine("}");

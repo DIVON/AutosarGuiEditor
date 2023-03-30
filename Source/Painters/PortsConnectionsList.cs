@@ -119,6 +119,7 @@ namespace System
                     }
                 }
 
+
                 /* Receiver without queue shall have only one connection */
                 if (portDef1.PortType == PortType.Receiver)
                 {
@@ -132,6 +133,7 @@ namespace System
                     }
                 }
 
+#if false
                 /* Queued Sender shall have only one connection */
                 if ((portDef1.PortType == PortType.Sender) && ((portDef1.InterfaceDatatype as SenderReceiverInterface).IsQueued == true))
                 {
@@ -140,6 +142,7 @@ namespace System
                         return;
                     }
                 }
+#endif
             }
             else /* Port of composition */
             {

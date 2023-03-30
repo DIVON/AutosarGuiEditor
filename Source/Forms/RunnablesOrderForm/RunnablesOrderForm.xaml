@@ -45,8 +45,18 @@
                                 IsReadOnly="True" />
                             <DataGridTextColumn
                                 Width="250"
-                                Binding="{Binding FullName}"
-                                Header="Runnable name"
+                                Binding="{Binding ComponentName}"
+                                Header="Component"
+                                IsReadOnly="True" />
+                            <DataGridTextColumn
+                                Width="250"
+                                Binding="{Binding InstanceName}"
+                                Header="Instance"
+                                IsReadOnly="True" />
+                            <DataGridTextColumn
+                                Width="250"
+                                Binding="{Binding EventName}"
+                                Header="Event"
                                 IsReadOnly="True" />
                             <DataGridTextColumn
                                 Width="100"
@@ -86,13 +96,23 @@
                         <DataGrid.Columns>
                             <DataGridTextColumn
                                 Width="250"
-                                Binding="{Binding FullName}"
-                                Header="Runnable name"
+                                Binding="{Binding ComponentName}"
+                                Header="Component"
+                                IsReadOnly="True" />
+                            <DataGridTextColumn
+                                Width="250"
+                                Binding="{Binding InstanceName}"
+                                Header="Instance"
+                                IsReadOnly="True" />
+                            <DataGridTextColumn
+                                Width="250"
+                                Binding="{Binding EventName}"
+                                Header="Event"
                                 IsReadOnly="True" />
                             <DataGridTextColumn
                                 Width="100"
                                 Binding="{Binding PeriodMs}"
-                                Header="Period, ms"
+                                Header="Peroiod, ms"
                                 IsReadOnly="True" />
 
                         </DataGrid.Columns>

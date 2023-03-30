@@ -67,8 +67,23 @@ namespace System
             {
                 Point center = new Point((TopLeft.X + BottomRight.X) / 2, (TopLeft.Y + BottomRight.Y) / 2);
                 return center;
-            }
+            }         
         }
+
+        public void SetXCenter(double x)
+        {
+            double prevWidth = Width;
+            TopLeft.X = x - prevWidth / 2;
+            BottomRight.X = x + prevWidth / 2; ;
+        }
+
+        public void SetYCenter(double y)
+        {
+            double prevHeight = Height;
+            TopLeft.Y = y - prevHeight / 2;
+            BottomRight.Y = y + prevHeight / 2;
+        }
+
         public double Height
         {
             get
@@ -109,7 +124,7 @@ namespace System
             }
         }
 
-		public Color BackgroundColor = Colors.White;
+        public Color BackgroundColor = Colors.White;
 
         public Color BorderColor = Colors.Black;
 

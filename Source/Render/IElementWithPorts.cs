@@ -51,11 +51,11 @@ namespace AutosarGuiEditor.Source.Render
                 {
                     if (portPainter.ConnectionPortLocation == RectangleSide.Bottom)
                     {
-                        portPainter.Translate(0, translate.Y);
+                        portPainter.Painter.SetYCenter(anchorPoint.Position.Y);
                     }
                     if (portPainter.ConnectionPortLocation == RectangleSide.Right)
-                    {
-                        portPainter.Translate(translate.X, 0);
+                    {                        
+                        portPainter.Painter.SetXCenter(anchorPoint.Position.X);
                     }
                 }
             }
@@ -69,11 +69,11 @@ namespace AutosarGuiEditor.Source.Render
                 {
                     if (portPainter.ConnectionPortLocation == RectangleSide.Bottom)
                     {
-                        portPainter.Translate(0, translate.Y);
+                        portPainter.Painter.SetYCenter(anchorPoint.Position.Y);
                     }
                     if (portPainter.ConnectionPortLocation == RectangleSide.Left)
                     {
-                        portPainter.Translate(translate.X, 0);
+                        portPainter.Painter.SetXCenter(anchorPoint.Position.X);
                     }
                 }
             }
@@ -87,11 +87,11 @@ namespace AutosarGuiEditor.Source.Render
                 {
                     if (portPainter.ConnectionPortLocation == RectangleSide.Top)
                     {
-                        portPainter.Translate(0, translate.Y);
+                        portPainter.Painter.SetYCenter(anchorPoint.Position.Y);
                     }
                     if (portPainter.ConnectionPortLocation == RectangleSide.Right)
                     {
-                        portPainter.Translate(translate.X, 0);
+                        portPainter.Painter.SetXCenter(anchorPoint.Position.X);
                     }
                 }
             }
@@ -105,11 +105,11 @@ namespace AutosarGuiEditor.Source.Render
                 {
                     if (portPainter.ConnectionPortLocation == RectangleSide.Top)
                     {
-                        portPainter.Translate(0, translate.Y);
+                        portPainter.Painter.SetYCenter(anchorPoint.Position.Y);
                     }
                     if (portPainter.ConnectionPortLocation == RectangleSide.Left)
                     {
-                        portPainter.Translate(translate.X, 0);
+                        portPainter.Painter.SetXCenter(anchorPoint.Position.X);
                     }
                 }
             }

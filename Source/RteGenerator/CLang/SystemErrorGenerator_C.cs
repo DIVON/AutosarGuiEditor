@@ -25,6 +25,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLang
             writer.Close();
         }
 
+        
         void WriteErrorsCount(StreamWriter writer)
         {
             int immediateSafeStateCount = AutosarApplication.GetInstance().SystemErrors.ErrorCount(SystemErrorStrictness.ImmediateSafeState);
@@ -75,6 +76,42 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLang
                 }
             }
             writer.WriteLine();
+        }
+
+        public void GenerateSystemsErrorsDescriptionFile(String folder)
+        {
+            String FileName = folder + "\\ErrorDescription.txt";
+            StreamWriter writer = new StreamWriter(FileName);
+
+            WriteErrorsDescriptionFile(writer);
+            writer.Close();
+        }
+
+        void WriteErrorsDescriptionFile(StreamWriter writer)
+        {
+            SystemErrorsList errList = AutosarApplication.GetInstance().SystemErrors;
+
+            writer.WriteLine("0 ERR_ID_INCORRECT_ERROR_ID");
+            int errCount = 1;
+
+            for (int i = 0; i < errList.Count; i++)
+            {
+                if (errList[i].Strictness == SystemErrorStrictness.ImmediateSafeState)
+                {
+                    writer.WriteLine(errCount.ToString() + " ERR_ID_" + errList[i].Name);
+                    errCount++;
+                }
+            }
+
+            /* Write left errors */
+            for (int i = 0; i < errList.Count; i++)
+            {
+                if (errList[i].Strictness == SystemErrorStrictness.NoRestriction)
+                {
+                    writer.WriteLine(errCount.ToString() + " ERR_ID_" + errList[i].Name);
+                    errCount++;
+                }
+            }
         }
     }
 }

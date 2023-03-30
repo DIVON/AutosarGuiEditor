@@ -529,7 +529,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CppLang
             writer.WriteLine(" * $Date: $");
             writer.WriteLine(" * $Revision: $");
             writer.WriteLine(" *");
-            writer.WriteLine(" * " + AutosarApplication.GetInstance().Signature);
+            writer.WriteLine(" *" + AutosarApplication.GetInstance().Signature);
             writer.WriteLine(" */");
         }
 

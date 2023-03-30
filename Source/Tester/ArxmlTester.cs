@@ -69,7 +69,176 @@ namespace AutosarGuiEditor.Source.Tester
             TestRunnableUsing();
             TestAllRunnablesAreUsed();
             TestRunnableNames();
+            TestRunnableFrequenciesInTasks();
+            TestUnusedDataTypes();
+            TestUsingSenderReceiverInterfaces();
+            TestUsingClientServerInterfaces();
             SortText();
+        }
+
+        void TestUsingSenderReceiverInterfaces()
+        {
+            foreach(var srInterface in autosarApp.SenderReceiverInterfaces)
+            {
+                bool used = false;
+                foreach (var comp in autosarApp.ComponentDefenitionsList)
+                {
+                    foreach (var port in comp.Ports)
+                    {
+                        if (port.InterfaceDatatype == srInterface)
+                        {
+                            used = true;
+                        }
+                    }
+                }
+                if (!used)
+                {
+                    AppendText("Sender-Receiver interface is not used:  " + srInterface.Name, MessageType.WARNING);
+                }
+            }
+        }
+
+        void TestUsingClientServerInterfaces()
+        {
+            foreach (var csInterface in autosarApp.ClientServerInterfaces)
+            {
+                bool used = false;
+                foreach (var comp in autosarApp.ComponentDefenitionsList)
+                {
+                    foreach (var port in comp.Ports)
+                    {
+                        if (port.InterfaceDatatype == csInterface)
+                        {
+                            used = true;
+                        }
+                    }
+                }
+                if (!used)
+                {
+                    AppendText("Client-Server interface is not used:  " + csInterface.Name, MessageType.WARNING);
+                }
+            }
+        }
+
+
+            void TestUnusedDataTypes()
+        {
+            /* Check that each client -server event has filled runnable and source */
+            foreach (SimpleDataType sdt in autosarApp.SimpleDataTypes)
+            {
+                bool used = false;
+
+                /* Searching in complex datatypes */
+                foreach (ComplexDataType cdt in autosarApp.ComplexDataTypes)
+                {
+                    foreach (ComplexDataTypeField field in cdt.Fields)
+                    {
+                        if (field.DataTypeGUID.Equals(sdt.GUID))
+                        {
+                            used = true;
+                        }
+                    }
+                }
+
+                /* Searching in client-server operations*/
+                foreach(ClientServerInterface csi in autosarApp.ClientServerInterfaces)
+                {
+                    foreach(ClientServerOperation csiop in csi.Operations)
+                    {
+                        foreach(ClientServerOperationField field in csiop.Fields)
+                        {
+                            if (field.BaseDataTypeGUID.Equals(sdt.GUID))
+                            {
+                                used = true;
+                            }
+                        }
+                    }
+                }
+
+                /* Searching in sender-receiver interfaces */
+                foreach(SenderReceiverInterface sri in autosarApp.SenderReceiverInterfaces)
+                {
+                    foreach (SenderReceiverInterfaceField field in sri.Fields)
+                    {
+                        if (field.BaseDataTypeGUID.Equals(sdt.GUID))
+                        {
+                            used = true;
+                        }
+                    }
+                }
+
+                foreach(ArrayDataType arr in autosarApp.ArrayDataTypes)
+                {
+                    if (arr.DataTypeGUID.Equals(sdt.GUID))
+                    {
+                        used = true;
+                    }
+                }
+
+                if (used == false)
+                {
+                    AppendText("Simple datatype is not used:  " + sdt.Name, MessageType.WARNING);
+                }
+            }
+
+
+            /* Check that each client -server event has filled runnable and source */
+            foreach (ComplexDataType cdt in autosarApp.ComplexDataTypes)
+            {
+                bool used = false;
+
+                /* Searching in complex datatypes */
+                foreach (ComplexDataType fcdt in autosarApp.ComplexDataTypes)
+                {
+                    foreach (ComplexDataTypeField field in fcdt.Fields)
+                    {
+                        if (field.DataTypeGUID.Equals(cdt.GUID))
+                        {
+                            used = true;
+                        }
+                    }
+                }
+
+                /* Searching in client-server operations*/
+                foreach (ClientServerInterface csi in autosarApp.ClientServerInterfaces)
+                {
+                    foreach (ClientServerOperation csiop in csi.Operations)
+                    {
+                        foreach (ClientServerOperationField field in csiop.Fields)
+                        {
+                            if (field.BaseDataTypeGUID.Equals(cdt.GUID))
+                            {
+                                used = true;
+                            }
+                        }
+                    }
+                }
+
+                foreach (ArrayDataType arr in autosarApp.ArrayDataTypes)
+                {
+                    if (arr.DataTypeGUID.Equals(cdt.GUID))
+                    {
+                        used = true;
+                    }
+                }
+
+                /* Searching in sender-receiver interfaces */
+                foreach (SenderReceiverInterface sri in autosarApp.SenderReceiverInterfaces)
+                {
+                    foreach (SenderReceiverInterfaceField field in sri.Fields)
+                    {
+                        if (field.BaseDataTypeGUID.Equals(cdt.GUID))
+                        {
+                            used = true;
+                        }
+                    }
+                }
+
+                if (used == false)
+                {
+                    AppendText("Complex datatype is not used:  " + cdt.Name, MessageType.WARNING);
+                }
+            }
         }
 
         void SortText()
@@ -100,7 +269,6 @@ namespace AutosarGuiEditor.Source.Tester
 
         const string WARNING_STR = "WARNING: ";
         const string ERROR_STR = "ERROR: ";
-        const string OK_STR = "OK: ";
 
         void TestConnections()
         {
@@ -115,6 +283,30 @@ namespace AutosarGuiEditor.Source.Tester
                         AppendText("Different datatypes in " + composition.Name + " connection: " + connection.Name, MessageType.ERROR);
                     }
                 }                
+            }
+        }
+
+        void TestRunnableFrequenciesInTasks()
+        {
+            foreach (OsTask osTask in AutosarApplication.GetInstance().OsTasks)
+            {
+                if (osTask.Events.Count > 0)
+                {
+                    for (int eventIndex = 0; eventIndex < osTask.Events.Count; eventIndex++)
+                    {
+
+                        AutosarEvent autosarEventDefenition = osTask.Events[eventIndex].Defenition;
+                        if (autosarEventDefenition is TimingEvent)
+                        {
+                            TimingEvent timingEvent = autosarEventDefenition as TimingEvent;
+                            if ((timingEvent.PeriodMs < osTask.PeriodMs) || (timingEvent.PeriodMs % osTask.PeriodMs != 0))
+                            {
+                                ApplicationSwComponentType compInst = AutosarApplication.GetInstance().FindComponentDefenitionByRunnnableGuid(timingEvent.Runnable.GUID);
+                                AppendText("Incorrect period for timing event: " + compInst.Name + " " +autosarEventDefenition.Name, MessageType.ERROR);
+                            }
+                        }
+                    }
+                }
             }
         }
 
@@ -182,27 +374,19 @@ namespace AutosarGuiEditor.Source.Tester
 
         protected void TestEnum(EnumDataType enumDt)
         {
-            bool withoutErrors = true;
-
             for (int i = 0; i < enumDt.Fields.Count - 1; i++)
             {
                 for (int j = i + 1; j < enumDt.Fields.Count; j++)
                 {
                     if (enumDt.Fields[i].Value == enumDt.Fields[j].Value)
                     {
-                        withoutErrors = false;
                         AppendText(enumDt.Name + " field value " + enumDt.Fields[i].Name + "equals to " + enumDt.Fields[j].Name + " (" + enumDt.Fields[i].Value + ")", MessageType.ERROR);
                     }
                     if (enumDt.Fields[i].Name == enumDt.Fields[j].Name)
                     {
-                        withoutErrors = false;
                         AppendText(enumDt.Name + " has similar names (" + enumDt.Fields[i].Name + ") of fields for " + i.ToString() + " and " + j.ToString() + " indexes", MessageType.ERROR);
                     }
                 }
-            }
-            if (withoutErrors)
-            {
-                AppendText(enumDt.Name);
             }
         }
 
@@ -220,8 +404,6 @@ namespace AutosarGuiEditor.Source.Tester
 
         protected void TestComplexDataType(ComplexDataType elem)
         {
-            bool withoutErrors = true;
-
             /* Check if fields have similar names */
             for (int i = 0; i < elem.Fields.Count - 1; i++)
             {
@@ -229,7 +411,6 @@ namespace AutosarGuiEditor.Source.Tester
                 {
                     if (elem.Fields[i].Name == elem.Fields[j].Name)
                     {
-                        withoutErrors = false;
                         AppendText(elem.Name + " has similar field names (" + elem.Fields[i].Name + ") of fields for " + i.ToString() + " and " + j.ToString() + " indexes", MessageType.ERROR);
                     }
                 }
@@ -241,13 +422,7 @@ namespace AutosarGuiEditor.Source.Tester
                 if (field.DataTypeName.Equals(AutosarApplication.ErrorDataType))
                 {
                     AppendText(elem.Name + " : " + field.Name + " doesn't have specified datatype ", MessageType.ERROR);
-                    withoutErrors = false;
                 }
-            }
-
-            if (withoutErrors)
-            {
-                AppendText(elem.Name);
             }
         }
 
@@ -305,12 +480,6 @@ namespace AutosarGuiEditor.Source.Tester
                     }
                 }                
             }
-
-            
-            if (withoutErrors)
-            {
-                AppendText(elem.Name);
-            }
         } 
 
 
@@ -348,12 +517,6 @@ namespace AutosarGuiEditor.Source.Tester
                     AppendText(elem.Name + " : " + field.Name + " doesn't have specified datatype ", MessageType.ERROR);
                     withoutErrors = false;
                 }
-            }
-
-
-            if (withoutErrors)
-            {
-                AppendText(elem.Name);
             }
         }
 
@@ -415,11 +578,6 @@ namespace AutosarGuiEditor.Source.Tester
                     withoutErrors = false;
                 }
             }
-
-            if (withoutErrors)
-            {
-                AppendText(elem.Name);
-            }
         }
 
         protected void TestCompostions()
@@ -449,11 +607,6 @@ namespace AutosarGuiEditor.Source.Tester
                     AppendText("Composition: " + elem.Name + ", Port : " + port.Name + " doesn't have specified datatype ", MessageType.ERROR);
                     withoutErrors = false;
                 }
-            }
-
-            if (withoutErrors)
-            {
-                AppendText(elem.Name);
             }
         }
 
@@ -779,18 +932,12 @@ namespace AutosarGuiEditor.Source.Tester
             }
         }
 
-        void AppendText(string text)
-        {
-            AppendText(text, MessageType.OK);
-        }
-
         void AppendText(string text, MessageType messageType)
         {
             switch (messageType)
             {
                 case MessageType.OK:
                 {
-                    writer.Write(OK_STR);
                     break;
                 }
                 case MessageType.WARNING:

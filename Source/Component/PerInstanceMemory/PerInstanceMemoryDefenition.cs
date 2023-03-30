@@ -24,13 +24,17 @@ namespace AutosarGuiEditor.Source.Component.PerInstanceMemory
 
             String dataTypeGuidString = XmlUtilits.GetFieldValue(xml, "DatatypeGuid", "");
             DatatypeGuid = GuidUtils.GetGuid(dataTypeGuidString, false);
+
+            String isThreadProtected = XmlUtilits.GetFieldValue(xml, "IsThreadProtected", "false");
+            IsThreadProtected = Convert.ToBoolean(isThreadProtected);
         }
 
         public override void WriteToXML(XElement xml)
         {
             XElement xmldatatype = new XElement("PerInstanceMemoryDefenition");
             base.WriteToXML(xmldatatype);
-            xmldatatype.Add(new XElement("DatatypeGuid", DatatypeGuid.ToString("B"))); 
+            xmldatatype.Add(new XElement("DatatypeGuid", DatatypeGuid.ToString("B")));
+            xmldatatype.Add(new XElement("IsThreadProtected", IsThreadProtected.ToString()));
             xml.Add(xmldatatype);
         }
 
@@ -50,5 +54,12 @@ namespace AutosarGuiEditor.Source.Component.PerInstanceMemory
                 return AutosarApplication.GetInstance().GetDataType(DatatypeGuid);
             }
         }
+
+        public Boolean IsThreadProtected
+        {
+            set;
+            get;
+        }
+
     }
 }

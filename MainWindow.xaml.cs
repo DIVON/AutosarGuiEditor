@@ -705,7 +705,7 @@ namespace AutosarGuiEditor
         private void ComponentPorts_PortName_TextEdit_TextChanged(object sender, TextChangedEventArgs e)
         {
             componentDefenitionViewController.RenamePortTextEdit((sender as TextBox).Text);
-            AutosarTree.UpdateAutosarTreeView(null);
+            //AutosarTree.UpdateAutosarTreeView(null);
         }
 
 
@@ -986,6 +986,11 @@ namespace AutosarGuiEditor
         private void PimDefaultValue_ValueColomn_TextEdit(object sender, TextChangedEventArgs e)
         {
             componentPropertiesController.PimDefaultValue_ValueColomn_TextEdit(sender, e);
+        }
+
+        private void PerInstanceMemoryName_ThreadProtection_Click(object sender, RoutedEventArgs e)
+        {
+            componentDefenitionViewController.ThreadProtection_Click(sender, e);
         }
 
         private void CDataDescriptionNameTextBox_TextChanged(object sender, TextChangedEventArgs e)
@@ -1451,6 +1456,18 @@ namespace AutosarGuiEditor
                 Render(null, null);
             }
         }
+
+        private void ComplexDatatype_MoveUp_Click(object sender, RoutedEventArgs e)
+        {
+            complexDataTypeMenu.MoveFieldUpButtonClick();
+        }
+
+        private void ComplexDatatype_MoveDown_Click(object sender, RoutedEventArgs e)
+        {
+            complexDataTypeMenu.MoveFieldDownButtonClick();
+        }
+
+       
     }
 
 }

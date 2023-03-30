@@ -35,13 +35,13 @@ namespace AutosarGuiEditor.Source.Render
 
         public double GetMinHeight()
         {
-            double MinHeight = 50;
+            double MinHeight = 60;
             return MinHeight;
         }
 
         public double GetMinWidth()
         {
-            double MinWidth = 50;
+            double MinWidth = 60;
             return MinWidth;
         }
 
@@ -111,49 +111,62 @@ namespace AutosarGuiEditor.Source.Render
 
         void BottomRightAnchor_OnMove(object sender, System.Windows.Point translate)
         {
-            if (painter.Width + translate.X > GetMinWidth())
+            AnchorPoint anchor = sender as AnchorPoint;
+            if (anchor != null)
             {
-                painter.Width += translate.X;
-                TopRightAnchor.Translate(translate.X, 0);
-            }
-            else
-            {
-                BottomRightAnchor.Position.X = painter.Left + painter.Width;
-            }
+                if (painter.Width + translate.X > GetMinWidth())
+                {
+					painter.Width  = BottomRightAnchor.Position.X - TopLeftAnchor.Position.X;
+                    TopRightAnchor.Position.X = anchor.Position.X;                    
+                    painter.Right = anchor.Position.X;
+                }
+                else
+                {
+                    BottomRightAnchor.Position.X = painter.Left + painter.Width;
+                }
 
-            if (painter.Height + translate.Y > GetMinHeight())
-            {
-                painter.Height += translate.Y;
-                BottomLeftAnchor.Translate(0, translate.Y);
-            }
-            else
-            {
-                BottomRightAnchor.Position.Y = painter.Top + painter.Height;
+                if (painter.Height + translate.Y > GetMinHeight())
+                {
+                    BottomLeftAnchor.Position.Y = anchor.Position.Y;                   
+                    painter.Bottom = anchor.Position.Y;
+					painter.Height = BottomRightAnchor.Position.Y - TopLeftAnchor.Position.Y;
+                }
+                else
+                {
+                    BottomRightAnchor.Position.Y = painter.Top + painter.Height;
+                }
+
+                
+               
             }
             OnMoveBottomRightAnchor(BottomRightAnchor, translate);
         }
 
         void BottomLeftAnchor_OnMove(object sender, System.Windows.Point translate)
         {
-            if (painter.Width - translate.X > GetMinWidth())
+            AnchorPoint anchor = sender as AnchorPoint;
+            if (anchor != null)
             {
-                painter.Left += translate.X;
-                painter.Width -= translate.X;
-                TopLeftAnchor.Translate(translate.X, 0);
-            }
-            else
-            {
-                BottomLeftAnchor.Position.X = painter.Right - painter.Width;
-            }
+                if (painter.Width - translate.X > GetMinWidth())
+                {
+					painter.Width -= translate.X;
+                    painter.Left = anchor.Position.X;
+                    TopLeftAnchor.Position.X = anchor.Position.X;
+                }
+                else
+                {
+                    BottomLeftAnchor.Position.X = painter.Right - painter.Width;
+                }
 
-            if (painter.Height + translate.Y > GetMinHeight())
-            {
-                painter.Height += translate.Y;
-                BottomRightAnchor.Translate(0, translate.Y);
-            }
-            else
-            {
-                BottomLeftAnchor.Position.Y = painter.Top + painter.Height;
+                if (painter.Height + translate.Y > GetMinHeight())
+                {
+                    painter.Bottom = anchor.Position.Y;
+                    BottomRightAnchor.Position.Y = anchor.Position.Y;
+                }
+                else
+                {
+                    BottomLeftAnchor.Position.Y = painter.Top + painter.Height;
+                }
             }
             OnMoveBottomLeftAnchor(BottomLeftAnchor, translate);
         }

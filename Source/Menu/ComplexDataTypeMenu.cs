@@ -132,5 +132,19 @@ namespace System
                 }
             }
         }
+
+        public void MoveFieldUpButtonClick()
+        {
+            int index = grid.SelectedIndex;
+            datatype.Fields.MoveItemUp(index);
+            RefreshComplexDatatypeGridView();
+        }
+        
+        public void MoveFieldDownButtonClick()
+        {
+            int index = grid.SelectedIndex;
+            datatype.Fields.MoveItemDown(index);
+            RefreshComplexDatatypeGridView();
+        }
 	}
 }

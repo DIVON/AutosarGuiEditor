@@ -164,5 +164,25 @@ namespace AutosarGuiEditor.Source.Interfaces
         {
             return true;
         }
+
+        public void MoveItemUp(int index)
+        {
+            if ((index > 0) && (index < Count))
+            {
+                T item = this[index];
+                RemoveAt(index);
+                Insert(index - 1, item);
+            }
+        }
+
+        public void MoveItemDown(int index)
+        {
+            if ((index >= 0) && (index < Count - 1))
+            {
+                T item = this[index];
+                RemoveAt(index);
+                Insert(index + 1, item);
+            }
+        }
     }
 }
