@@ -15,7 +15,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CppLang
 
             /* Add #include */
             RteConnectionGenerator_Cpp connectionsGenerator = new RteConnectionGenerator_Cpp();
-            connectionsGenerator.AddComponentIncludes(writer);
+            connectionsGenerator.AddComponentIncludesWithoutRte(writer);
 
             writer.WriteLine();
 

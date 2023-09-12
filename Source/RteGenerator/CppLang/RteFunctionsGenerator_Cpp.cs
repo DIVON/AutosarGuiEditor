@@ -141,14 +141,10 @@ namespace AutosarGuiEditor.Source.RteGenerator.CppLang
         }
 
 
-        public static String GenerateSenderReceiverInterfaceArguments(SenderReceiverInterfaceField field, PortType portType, Boolean MultipleInstantiation = false)
+        public static String GenerateSenderReceiverInterfaceArguments(SenderReceiverInterfaceField field, PortType portType)
         {
             String result = "(";
             
-            if (MultipleInstantiation)
-            {
-                result += RteFunctionsGenerator_Cpp.ComponentInstancePointerDatatype + " instance, ";
-            }
 
             String dataTypeName = AutosarApplication.GetInstance().GetDataTypeName(field.BaseDataTypeGUID);
                 
@@ -178,18 +174,10 @@ namespace AutosarGuiEditor.Source.RteGenerator.CppLang
             return result + ")";
         }
 
-        public static String GenerateMultipleInstanceFunctionArguments(Boolean MultipleInstantiation = false)
+        public static String GenerateMultipleInstanceFunctionArguments()
         {
             String result = "(";
-
-            if (MultipleInstantiation)
-            {
-                result += RteFunctionsGenerator_Cpp.ComponentInstancePointerDatatype + " instance";
-            }
-            else
-            {
-                result += "void";
-            }
+            result += "void";
             result += ")";
             return result;
         }
@@ -198,20 +186,9 @@ namespace AutosarGuiEditor.Source.RteGenerator.CppLang
         {
             String result = "";
 
-            if (MultipleInstantiation)
+            if (operation.Fields.Count == 0)
             {
-                result += RteFunctionsGenerator_Cpp.ComponentInstancePointerDatatype + " instance";
-                if (operation.Fields.Count > 0)
-                {
-                    result += ", ";
-                }
-            }
-            else
-            {
-                if (operation.Fields.Count == 0)
-                {
-                    result += "void";
-                }
+                result += "void";
             }
 
             for(int i = 0; i < operation.Fields.Count; i++)
@@ -312,12 +289,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CppLang
         public static String GenerateFullCDataFunctionDefenitionNameAndReturnType(ApplicationSwComponentType compDefenition, CDataDefenition cdata)
         {
             String returnDataType = GenerateCDataDataType(compDefenition, cdata);
-            String FunctionArguments = "(";
-            if (compDefenition.MultipleInstantiation)
-            {
-                FunctionArguments = ComponentInstancePointerDatatype + " instance";
-            }
-            FunctionArguments += ")";
+            String FunctionArguments = "(void)";
             String result = GenerateCDataDataType(compDefenition, cdata) + " " + GenerateFullCDataFunctionName(compDefenition, cdata) + FunctionArguments;
             return result;
         }
@@ -443,36 +415,20 @@ namespace AutosarGuiEditor.Source.RteGenerator.CppLang
 
         public static String Generate_RunnableFunction(ApplicationSwComponentType compDefenition, RunnableDefenition runnable, String arguments, String returnType, Boolean useClassName)
         {             
-            if (compDefenition.MultipleInstantiation)
+            if (arguments.Length == 0)
             {
-                String CDSName = RteFunctionsGenerator_Cpp.ComponentRteDataStructureDefenitionName(compDefenition);
-                if (arguments.Length == 0)
-                {
-                    return returnType + " " + Generate_RunnableFunctionName(compDefenition, runnable, useClassName) + "(const " + CDSName + " * const instance)";
-                }
-                else
-                {
-                    return returnType + " " + Generate_RunnableFunctionName(compDefenition, runnable, useClassName) + "(const " + CDSName + " * const instance, " + arguments + ")";
-                }
-
+                return returnType + " " + Generate_RunnableFunctionName(compDefenition, runnable, useClassName) + "(void)";
             }
-            else /* Single instantiation */
+            else
             {
-                if (arguments.Length == 0)
-                {
-                    return returnType + " " + Generate_RunnableFunctionName(compDefenition, runnable, useClassName) + "(void)";
-                }
-                else
-                {
-                    return returnType + " " + Generate_RunnableFunctionName(compDefenition, runnable, useClassName) + "(" + arguments + ")";
-                }
+                return returnType + " " + Generate_RunnableFunctionName(compDefenition, runnable, useClassName) + "(" + arguments + ")";
             }
         }
 
-        public static String Generate_RunnableDeclaration(ApplicationSwComponentType compDefenition, RunnableDefenition runnable, Boolean useClassName)
+        public static String Generate_RunnableDeclaration(ApplicationSwComponentType compDefenition, RunnableDefenition runnable, Boolean useClassName, out string returnType)
         {
             string arguments = "";
-            string returnType = "void";
+            returnType = "void";
 
             AutosarEventsList aevents = compDefenition.GetEventsWithTheRunnable(runnable);
 
@@ -489,7 +445,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CppLang
                         {
                             if (csEvent.SourceOperation.Fields.Count != 0)
                             {
-                                arguments = RteFunctionsGenerator_Cpp.GenerateClientServerInterfaceArguments(csEvent.SourceOperation, compDefenition.MultipleInstantiation); ;
+                                arguments = RteFunctionsGenerator_Cpp.GenerateClientServerInterfaceArguments(csEvent.SourceOperation); ;
                             }
 
                             returnType = Properties.Resources.STD_RETURN_TYPE;
@@ -512,9 +468,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CppLang
             else
             {
                 String funcName = Generate_RunnableFunctionName(compInstance.ComponentDefenition, eventInstance.Defenition.Runnable, false);
-                String compName = GenerateComponentName(compInstance.Name);
-
-                return funcName + "(" + LinkToTheComponentInstance(compInstance) + ");";
+                return funcName + "();";
             }
         }
 
@@ -625,24 +579,10 @@ namespace AutosarGuiEditor.Source.RteGenerator.CppLang
             return baseString;
         }
 
-        public static String LinkToTheComponentInstance(ComponentInstance compInstance)
-        {
-            String compName = "Rte_Instance_" + compInstance.Name;
-            String result = "(" + RteFunctionsGenerator_Cpp.ComponentInstancePointerDatatype + ")&" + compName;
-            return result;
-        }
-
         public static String Generate_ClientServerPort_Arguments(ComponentInstance compInstance, ClientServerOperation operation, Boolean multipleInstantiation)
         {
             String serverPortCallFunction = "(";
-            if (multipleInstantiation)
-            {
-                serverPortCallFunction += LinkToTheComponentInstance(compInstance);
-                if (operation.Fields.Count > 0)
-                {
-                    serverPortCallFunction += ", ";
-                }
-            }
+
             for (int i = 0; i < operation.Fields.Count; i++)
             {
                 serverPortCallFunction += operation.Fields[i].Name;

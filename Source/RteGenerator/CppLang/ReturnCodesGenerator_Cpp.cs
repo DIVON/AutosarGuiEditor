@@ -21,7 +21,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CppLang
             writer.WriteLine("    RTE_E_NO_DATA,");
             writer.WriteLine("    RTE_E_UNCONNECTED,");
             writer.WriteLine("    RTE_E_OUT_OF_RANGE,");
-            writer.WriteLine("    RTE_E_LIMIT");
+            writer.WriteLine("    RTE_E_LIMIT,");
             writer.WriteLine("    RTE_E_ERROR");
             writer.WriteLine("};");
 

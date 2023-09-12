@@ -321,12 +321,12 @@ namespace AutosarGuiEditor.Source.RteGenerator.CppLang
             writer.WriteLine("#define NULL 0U");
             writer.WriteLine("#endif");
             writer.WriteLine("");
+            writer.WriteLine("#ifndef boolean");
+            writer.WriteLine("typedef bool boolean;");
+            writer.WriteLine("#endif");
+            writer.WriteLine("");
 
             BaseDataTypesCodeGenerator_Cpp.GenerateCode(writer, AutosarApplication.GetInstance().BaseDataTypes);
-
-            writer.WriteLine("");
-            writer.WriteLine("typedef void    *" + RteFunctionsGenerator_Cpp.ComponentInstancePointerDatatype + ";");
-            writer.WriteLine("");
         }
 
         public void WriteSimpleDataTypes(StreamWriter writer)

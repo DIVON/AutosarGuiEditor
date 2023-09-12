@@ -9,7 +9,11 @@ namespace AutosarGuiEditor.Source.RteGenerator.CppLang
         {
             foreach (BaseDataType baseDataType in baseDataTypesList)
             {
-                writer.WriteLine("typedef  " + baseDataType.SystemName + "  " + baseDataType.Name + ";" );
+                if (baseDataType.Name == "boolean")
+                {
+                    continue;
+                }
+                writer.WriteLine("typedef  " + baseDataType.SystemName + "  " + baseDataType.Name + ";");
 
                 ArrayDataTypeGenerator_Cpp.GenerateArrayForDataType(writer, baseDataType);
             }            

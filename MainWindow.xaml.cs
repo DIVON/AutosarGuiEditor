@@ -872,8 +872,19 @@ namespace AutosarGuiEditor
             String testResult = writer.ToString();
             if(!tester.IsErrorExist(testResult))
             {
-                RteGenerator_C rteGenerator = new RteGenerator_C();
-                bool result = rteGenerator.Generate(); 
+                bool result = false;
+                if (autosarApp.ProgramLanguage.Type == ProgrammingLanguageTypeDef.C)
+                {
+                    RteGenerator_C rteGenerator = new RteGenerator_C();
+                    result = rteGenerator.Generate();
+                }
+                else if (autosarApp.ProgramLanguage.Type == ProgrammingLanguageTypeDef.Cpp)
+                {
+                    RteGenerator_Cpp rteGenerator = new RteGenerator_Cpp();
+                    result = rteGenerator.Generate();
+                }
+                else { }
+
                 if (result == true)
                 {
                     MessageBox.Show("RTE has been generated.");

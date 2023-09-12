@@ -189,6 +189,15 @@ namespace AutosarGuiEditor.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Rte_Externals.hpp.
+        /// </summary>
+        internal static string RTE_EXTERNALS_HPP_FILENAME {
+            get {
+                return ResourceManager.GetString("RTE_EXTERNALS_HPP_FILENAME", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на RTE.
         /// </summary>
         internal static string RTE_FOLDER {
@@ -243,6 +252,15 @@ namespace AutosarGuiEditor.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на RunTimeEnvironment.cpp.
+        /// </summary>
+        internal static string RTE_RUNTIME_ENVIRONMENT_CPP_FILENAME {
+            get {
+                return ResourceManager.GetString("RTE_RUNTIME_ENVIRONMENT_CPP_FILENAME", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на This component run all tasks with their own period.
         /// </summary>
         internal static string RTE_RUNTIME_ENVIRONMENT_FILE_DESCRIPTION {
@@ -257,6 +275,15 @@ namespace AutosarGuiEditor.Properties {
         internal static string RTE_RUNTIME_ENVIRONMENT_H_FILENAME {
             get {
                 return ResourceManager.GetString("RTE_RUNTIME_ENVIRONMENT_H_FILENAME", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на RunTimeEnvironment.hpp.
+        /// </summary>
+        internal static string RTE_RUNTIME_ENVIRONMENT_HPP_FILENAME {
+            get {
+                return ResourceManager.GetString("RTE_RUNTIME_ENVIRONMENT_HPP_FILENAME", resourceCulture);
             }
         }
         
@@ -297,6 +324,15 @@ namespace AutosarGuiEditor.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Rte_Task_Scheduler.cpp.
+        /// </summary>
+        internal static string RTE_TASK_SCHEDULER_CPP_FILENAME {
+            get {
+                return ResourceManager.GetString("RTE_TASK_SCHEDULER_CPP_FILENAME", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на This file contains extern functions defenitions and variables for organizing task scheduling..
         /// </summary>
         internal static string RTE_TASK_SCHEDULER_FILE_DESCRIPTION {
@@ -311,6 +347,15 @@ namespace AutosarGuiEditor.Properties {
         internal static string RTE_TASK_SCHEDULER_H_FILENAME {
             get {
                 return ResourceManager.GetString("RTE_TASK_SCHEDULER_H_FILENAME", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Rte_Task_Scheduler.hpp.
+        /// </summary>
+        internal static string RTE_TASK_SCHEDULER_HPP_FILENAME {
+            get {
+                return ResourceManager.GetString("RTE_TASK_SCHEDULER_HPP_FILENAME", resourceCulture);
             }
         }
         

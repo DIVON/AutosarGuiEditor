@@ -68,6 +68,25 @@ namespace AutosarGuiEditor.Source.Autosar.Events
             }
         }
 
+        public String ComponentInstanceName
+        {
+            get
+            {
+                String componentName;
+                ComponentInstance compInstance = AutosarApplication.GetInstance().FindComponentInstanceByEventId(this.GUID) as ComponentInstance;
+
+                if (Defenition != null)
+                {
+                    componentName = compInstance.Name;
+                }
+                else
+                {
+                    componentName = "ERROR";
+                }
+                return componentName;
+            }
+        }
+
         public Guid DefenitionGuid
         {
             set;

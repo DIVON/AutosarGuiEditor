@@ -68,15 +68,15 @@ namespace AutosarGuiEditor.Source.RteGenerator.CppLang
 
         void Generate_RunTimeEnvironment_Source_File(String dir)
         {
-            String FileName = dir + "\\" + Properties.Resources.RTE_RUNTIME_ENVIRONMENT_C_FILENAME;
+            String FileName = dir + "\\" + Properties.Resources.RTE_RUNTIME_ENVIRONMENT_CPP_FILENAME;
             StreamWriter writer = new StreamWriter(FileName);
 
             RteFunctionsGenerator_Cpp.GenerateFileTitle(writer, FileName, Properties.Resources.RTE_RUNTIME_ENVIRONMENT_FILE_DESCRIPTION);
             RteFunctionsGenerator_Cpp.OpenGuardDefine(writer);
 
             writer.WriteLine();
-            RteFunctionsGenerator_Cpp.AddInclude(writer, Properties.Resources.RTE_RUNTIME_ENVIRONMENT_H_FILENAME);
-            RteFunctionsGenerator_Cpp.AddInclude(writer, Properties.Resources.RTE_EXTERNALS_FILENAME);
+            RteFunctionsGenerator_Cpp.AddInclude(writer, Properties.Resources.RTE_RUNTIME_ENVIRONMENT_HPP_FILENAME);
+            RteFunctionsGenerator_Cpp.AddInclude(writer, Properties.Resources.RTE_EXTERNALS_HPP_FILENAME);
 
             writer.WriteLine();
 
@@ -93,7 +93,6 @@ namespace AutosarGuiEditor.Source.RteGenerator.CppLang
             }
             writer.WriteLine();
 
-            WriteAllExternComponentInstances(writer);
             /* End declare variables */
 
             WriteAllOsTasks(writer);
@@ -104,21 +103,6 @@ namespace AutosarGuiEditor.Source.RteGenerator.CppLang
             writer.WriteLine();
             RteFunctionsGenerator_Cpp.WriteEndOfFile(writer);
             writer.Close();
-        }
-
-        void WriteAllExternComponentInstances(StreamWriter writer)
-        {
-            return;
-
-            //writer.WriteLine("/* Extern component instances  */");
-            //foreach (CompositionInstance composition in AutosarApplication.GetInstance().Compositions)
-            //{
-            //    foreach(ComponentInstance compInstance in composition.ComponentInstances)
-            //    {
-            //        writer.WriteLine("extern " + compInstance.ComponentDefenition.Name + " cin" + compInstance.Name + ";");
-            //    }
-            //}
-            //writer.WriteLine();
         }
 
 #if false
@@ -323,7 +307,8 @@ namespace AutosarGuiEditor.Source.RteGenerator.CppLang
                 }
                        
                 wasBracersOpen = true;
-                writer.WriteLine("        " + RteFunctionsGenerator_Cpp.Generate_CallOfEvent(eventInstance));
+
+                writer.WriteLine("        Rte_CI_" + eventInstance.ComponentInstanceName + "." + RteFunctionsGenerator_Cpp.Generate_CallOfEvent(eventInstance));
             }
             else
             {
@@ -359,24 +344,24 @@ namespace AutosarGuiEditor.Source.RteGenerator.CppLang
 
         void WriteOneTimeEvent(StreamWriter writer, AutosarEventInstance eventInstance)
         {
-            writer.WriteLine("    " + RteFunctionsGenerator_Cpp.Generate_CallOfEvent(eventInstance));
+            writer.WriteLine("    Rte_CI_" + eventInstance.ComponentInstanceName + "." + RteFunctionsGenerator_Cpp.Generate_CallOfEvent(eventInstance));
         }
 
         void Generate_RunTimeEnvironment_Header_File(String dir)
         {
-            String FileName = dir + "\\" + Properties.Resources.RTE_RUNTIME_ENVIRONMENT_H_FILENAME;
+            String FileName = dir + "\\" + Properties.Resources.RTE_RUNTIME_ENVIRONMENT_HPP_FILENAME;
             StreamWriter writer = new StreamWriter(FileName);
 
-            RteFunctionsGenerator_Cpp.GenerateFileTitle(writer, FileName, Properties.Resources.RTE_RUNTIME_ENVIRONMENT_FILE_DESCRIPTION);
+            RteFunctionsGenerator_Cpp.GenerateFileTitle(writer, FileName, Properties.Resources.RTE_RUNTIME_ENVIRONMENT_HPP_FILENAME);
             RteFunctionsGenerator_Cpp.OpenGuardDefine(writer);
 
             writer.WriteLine();
-            writer.WriteLine("#define RTE_C");
+            writer.WriteLine("#define RTE_CPP");
             foreach (ApplicationSwComponentType compDef in AutosarApplication.GetInstance().ComponentDefenitionsList)
             {
-                RteFunctionsGenerator_Cpp.AddInclude(writer, "Rte_" + compDef.Name + ".h");
+                RteFunctionsGenerator_Cpp.AddInclude(writer, "Rte_" + compDef.Name + ".hpp");
             }
-            writer.WriteLine("#undef RTE_C");
+            writer.WriteLine("#undef RTE_CPP");
 
             writer.WriteLine();
 
@@ -438,7 +423,8 @@ namespace AutosarGuiEditor.Source.RteGenerator.CppLang
             {
                 foreach (RunnableDefenition runnable in compDefinition.Runnables)
                 {
-                    writer.WriteLine(RteFunctionsGenerator_Cpp.Generate_RunnableDeclaration(compDefinition, runnable, true) + ";");
+                    string returnType = "";
+                    writer.WriteLine(RteFunctionsGenerator_Cpp.Generate_RunnableDeclaration(compDefinition, runnable, true, out returnType) + ";");
                 }
             }
 
@@ -451,15 +437,16 @@ namespace AutosarGuiEditor.Source.RteGenerator.CppLang
 
         }
 
+
         public void Generate_RteExternalHeader_File(string folder)
         {
-            String FileName = folder + "\\" + Properties.Resources.RTE_EXTERNALS_FILENAME;
+            String FileName = folder + "\\" + Properties.Resources.RTE_EXTERNALS_HPP_FILENAME;
              StreamWriter writer = new StreamWriter(FileName);
 
             RteFunctionsGenerator_Cpp.GenerateFileTitle(writer, FileName, "This file contains all externals required for scheduling");
             RteFunctionsGenerator_Cpp.OpenGuardDefine(writer);
 
-            RteFunctionsGenerator_Cpp.AddInclude(writer, Properties.Resources.RTE_DATATYPES_HPP_FILENAME);
+            RteConnectionGenerator_Cpp.AddComponentIncludes(writer);
 
             writer.WriteLine();
             writer.WriteLine("/* Declaration of all async events  */");
@@ -467,7 +454,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CppLang
 
             RteConnectionGenerator_Cpp.GenerateAllAsyncServerNotificators(writer, true);
 
-            writer.WriteLine("/* Declaration of all async events  */");
+            writer.WriteLine("/* Declaration of all component instances  */");
             writer.WriteLine();
 
             RteConnectionGenerator_Cpp.GenerateExternComponentInstances(writer);
@@ -483,7 +470,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CppLang
 
         void Generate_RteTaskScheduler_Header_File(String dir)
         {
-            String FileName = dir + "\\" + Properties.Resources.RTE_TASK_SCHEDULER_H_FILENAME;
+            String FileName = dir + "\\" + Properties.Resources.RTE_TASK_SCHEDULER_HPP_FILENAME;
             StreamWriter writer = new StreamWriter(FileName);
 
             RteFunctionsGenerator_Cpp.GenerateFileTitle(writer, FileName, Properties.Resources.RTE_TASK_SCHEDULER_FILE_DESCRIPTION);
@@ -493,7 +480,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CppLang
 
             writer.WriteLine();
 
-            writer.WriteLine("extern volatile boolean timeEventOccured;");
+            writer.WriteLine("extern volatile bool timeEventOccured;");
 
             writer.WriteLine();
 
@@ -512,13 +499,13 @@ namespace AutosarGuiEditor.Source.RteGenerator.CppLang
             double systickfreq = AutosarApplication.GetInstance().SystickFrequencyHz;
             int schedulerStepMicrosec = (int)((1000.0d / systickfreq) * 1000.0);
 
-            String FileName = dir + "\\" + Properties.Resources.RTE_TASK_SCHEDULER_C_FILENAME;
+            String FileName = dir + "\\" + Properties.Resources.RTE_TASK_SCHEDULER_CPP_FILENAME;
             StreamWriter writer = new StreamWriter(FileName);
 
             RteFunctionsGenerator_Cpp.GenerateFileTitle(writer, FileName, Properties.Resources.RTE_RUNTIME_ENVIRONMENT_FILE_DESCRIPTION);
 
             writer.WriteLine();
-            RteFunctionsGenerator_Cpp.AddInclude(writer, Properties.Resources.RTE_RUNTIME_ENVIRONMENT_H_FILENAME);
+            RteFunctionsGenerator_Cpp.AddInclude(writer, Properties.Resources.RTE_RUNTIME_ENVIRONMENT_HPP_FILENAME);
             writer.WriteLine();
 
             

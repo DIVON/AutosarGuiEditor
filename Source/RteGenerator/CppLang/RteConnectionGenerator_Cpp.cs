@@ -28,7 +28,9 @@ namespace AutosarGuiEditor.Source.RteGenerator.CppLang
             /*Add #include */
             RteFunctionsGenerator_Cpp.AddInclude(writer, "<string.h>");
             RteFunctionsGenerator_Cpp.AddInclude(writer, Properties.Resources.RTE_DATATYPES_HPP_FILENAME);
+            RteFunctionsGenerator_Cpp.AddInclude(writer, Properties.Resources.RTE_EXTERNALS_HPP_FILENAME);
             RteFunctionsGenerator_Cpp.AddInclude(writer, Properties.Resources.SYSTEM_ERRORS_HPP_FILENAME);
+            
             AddComponentIncludes(writer);
 
             /* Include */
@@ -66,14 +68,24 @@ namespace AutosarGuiEditor.Source.RteGenerator.CppLang
             portInterfaceGenerator.GeneratePortInterfaces(folder);
         }
 
-        public void AddComponentIncludes(StreamWriter writer)
+        public static void AddComponentIncludes(StreamWriter writer)
         {
-            writer.WriteLine("#define RTE_C");
+            writer.WriteLine("#define RTE_CPP");
             foreach(ApplicationSwComponentType compDef in AutosarApplication.GetInstance().ComponentDefenitionsList)
             {
-                RteFunctionsGenerator_Cpp.AddInclude(writer, "<Rte_" + compDef.Name + ".hpp>");
+                RteFunctionsGenerator_Cpp.AddInclude(writer, "<" + compDef.Name + ".hpp>");
             }
-            writer.WriteLine("#undef RTE_C");
+            writer.WriteLine("#undef RTE_CPP");
+        }
+
+        public void AddComponentIncludesWithoutRte(StreamWriter writer)
+        {
+            writer.WriteLine("#define RTE_CPP");
+            foreach (ApplicationSwComponentType compDef in AutosarApplication.GetInstance().ComponentDefenitionsList)
+            {
+                RteFunctionsGenerator_Cpp.AddInclude(writer, "<" + compDef.Name + ".hpp>");
+            }
+            writer.WriteLine("#undef RTE_CPP");
         }
 
         void GenerateCDataFunctions(StreamWriter writer)
@@ -102,6 +114,11 @@ namespace AutosarGuiEditor.Source.RteGenerator.CppLang
 
         void GenerateCallFunctions(StreamWriter writer)
         {
+            writer.WriteLine(
+@"/*************************************************************
+ * BEGIN RTE Sync Call operation handlers
+ *************************************************************/
+");
             foreach (CompositionInstance composition in AutosarApplication.GetInstance().Compositions)
             {
                 foreach (ComponentInstance component in composition.ComponentInstances)
@@ -136,7 +153,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CppLang
                                         ClientServerEvent csEvent = oppositCompInstance.ComponentDefenition.GetEventsWithServerOperation(operation);
                                         
                                         String arguments = RteFunctionsGenerator_Cpp.Generate_ClientServerPort_Arguments(oppositCompInstance, operation, oppositCompInstance.ComponentDefenition.MultipleInstantiation);
-                                        writer.WriteLine("    return " + oppositCompInstance.Name +"." + csEvent.Runnable.Name + arguments + ";");
+                                        writer.WriteLine("    return Rte_CI_" + oppositCompInstance.Name +".ru" + csEvent.Runnable.Name + arguments + ";");
                                     }
                                     else
                                     {
@@ -173,7 +190,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CppLang
                                             writer.WriteLine("    " + asyncField + " = TRUE;");
                                         }
                                         
-                                        writer.WriteLine("    return RTE_E_OK;");
+                                        writer.WriteLine("    return Std_ReturnType::RTE_E_OK;");
                                     }
                                     else
                                     {
@@ -188,6 +205,11 @@ namespace AutosarGuiEditor.Source.RteGenerator.CppLang
                     }
                 }
             }
+            writer.WriteLine(
+@"/*************************************************************
+ * END RTE Sync Call operation handlers
+ *************************************************************/
+");
         }
 
         void GenerateReceiveFunctions(StreamWriter writer)
@@ -207,7 +229,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CppLang
                             {
                                 String returnValue = Properties.Resources.STD_RETURN_TYPE;
                                 String RteFuncName = RteFunctionsGenerator_Cpp.GenerateInternalSendReceiveConnectionFunctionName(component.Name, portDef, field);
-                                String fieldVariable = RteFunctionsGenerator_Cpp.GenerateSenderReceiverInterfaceArguments(field, portDef.PortType, false);
+                                String fieldVariable = RteFunctionsGenerator_Cpp.GenerateSenderReceiverInterfaceArguments(field, portDef.PortType);
 
                                 writer.WriteLine(returnValue + " " + RteFuncName + fieldVariable);
                                 writer.WriteLine("{");
@@ -216,7 +238,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CppLang
 
                                 String copyFromField = "Rte_ReceiveBuffer_" + component.Name + "_" + portDef.Name + "_" + field.Name;
 
-                                writer.WriteLine("    Std_ReturnType _returnValue = RTE_E_NO_DATA;");
+                                writer.WriteLine("    Std_ReturnType _returnValue = Std_ReturnType::RTE_E_NO_DATA;");
                                 writer.WriteLine("");
                                 writer.WriteLine("    uint32 head = " + copyFromField + ".head;");
                                 writer.WriteLine("    uint32 tail = " + copyFromField + ".tail;");
@@ -225,8 +247,8 @@ namespace AutosarGuiEditor.Source.RteGenerator.CppLang
                                 writer.WriteLine("    {");
                                 writer.WriteLine("        (*data) = " + copyFromField + ".elements[head % " + queueSize.ToString() + "U];");
                                 writer.WriteLine("        " + copyFromField + ".head = (head + 1U) % " + (queueSize * 2).ToString() + "U;");
-                                writer.WriteLine("        _returnValue = RTE_E_OK | " + copyFromField + ".overlayError;");
-                                writer.WriteLine("        " + copyFromField + ".overlayError = RTE_E_OK;");
+                                writer.WriteLine("        _returnValue = Std_ReturnType::RTE_E_OK | " + copyFromField + ".overlayError;");
+                                writer.WriteLine("        " + copyFromField + ".overlayError = Std_ReturnType::RTE_E_OK;");
                                 writer.WriteLine("    }");
                                 writer.WriteLine("");
                                 writer.WriteLine("    return _returnValue;");  
@@ -257,7 +279,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CppLang
                             {
                                 String returnValue = Properties.Resources.STD_RETURN_TYPE;
                                 String RteFuncName = RteFunctionsGenerator_Cpp.GenerateInternalSendReceiveConnectionFunctionName(component.Name, portDef, field);
-                                String fieldVariable = RteFunctionsGenerator_Cpp.GenerateSenderReceiverInterfaceArguments(field, portDef.PortType, false);
+                                String fieldVariable = RteFunctionsGenerator_Cpp.GenerateSenderReceiverInterfaceArguments(field, portDef.PortType);
 
                                 writer.WriteLine(returnValue + " " + RteFuncName + fieldVariable);
                                 writer.WriteLine("{");
@@ -272,7 +294,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CppLang
 
                                     String copyFromField = "Rte_ReceiveBuffer_" + oppositCompInstance.Name + "_" + oppositePort.PortDefenition.Name + "_" + field.Name;
 
-                                    writer.WriteLine("    Std_ReturnType _returnValue = RTE_E_OK;");
+                                    writer.WriteLine("    Std_ReturnType _returnValue = Std_ReturnType::RTE_E_OK;");
                                     writer.WriteLine("");
                                     writer.WriteLine("    uint32 head = " + copyFromField + ".head;");  
                                     writer.WriteLine("    uint32 tail = " + copyFromField + ".tail;");
@@ -326,7 +348,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CppLang
                             {
                                 String returnValue = Properties.Resources.STD_RETURN_TYPE;
                                 String RteFuncName = RteFunctionsGenerator_Cpp.GenerateInternalReadWriteConnectionFunctionName(component.Name, portDef, field);
-                                String fieldVariable = RteFunctionsGenerator_Cpp.GenerateSenderReceiverInterfaceArguments(field, portDef.PortType, false);
+                                String fieldVariable = RteFunctionsGenerator_Cpp.GenerateSenderReceiverInterfaceArguments(field, portDef.PortType);
 
                                 writer.WriteLine(returnValue + " " + RteFuncName + fieldVariable);
                                 writer.WriteLine("{");
@@ -341,7 +363,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CppLang
                                     writer.WriteLine("    " + writeFieldName + " = data;");
                                 }
 
-                                writer.WriteLine("    return " + Properties.Resources.RTE_E_OK + ";");
+                                writer.WriteLine("    return Std_ReturnType::" + Properties.Resources.RTE_E_OK + ";");
                                 writer.WriteLine("}");
                                 writer.WriteLine("");
                             }
@@ -378,7 +400,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CppLang
                             {
                                 String returnValue = Properties.Resources.STD_RETURN_TYPE;
                                 String RteFuncName = RteFunctionsGenerator_Cpp.GenerateInternalReadWriteConnectionFunctionName(component.Name, portDef, field);
-                                String fieldVariable = RteFunctionsGenerator_Cpp.GenerateSenderReceiverInterfaceArguments(field, portDef.PortType, false);
+                                String fieldVariable = RteFunctionsGenerator_Cpp.GenerateSenderReceiverInterfaceArguments(field, portDef.PortType);
 
                                 writer.WriteLine(returnValue + " " + RteFuncName + fieldVariable);
                                 writer.WriteLine("{");
@@ -393,7 +415,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CppLang
                                     String copyFromField = "Rte_DataBuffer_" + oppositCompInstance.Name + "_" + oppositePort.PortDefenition.Name + "_" + field.Name;
 
                                     writer.WriteLine("    data = " + copyFromField + ";");
-                                    writer.WriteLine("    return " + Properties.Resources.RTE_E_OK + ";");
+                                    writer.WriteLine("    return Std_ReturnType::" + Properties.Resources.RTE_E_OK + ";");
                                 }
                                 else
                                 {
@@ -473,7 +495,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CppLang
 
                             foreach (ClientServerOperation operation in csInterface.Operations)
                             {
-                                String asyncField = "boolean Rte_AsyncCall_" + component.Name + "_" + portDef.Name + "_" + operation.Name + ";";
+                                String asyncField = "bool Rte_AsyncCall_" + component.Name + "_" + portDef.Name + "_" + operation.Name + ";";
                                 if (isExtern)
                                 {
                                     asyncField = "extern " + asyncField;
@@ -499,8 +521,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CppLang
                 foreach (ComponentInstance component in composition.ComponentInstances)
                 {
                     ApplicationSwComponentType compDef = component.ComponentDefenition;
-                    String CDSname = RteFunctionsGenerator_Cpp.ComponentRteDataStructureDefenitionName(compDef);
-                    writer.WriteLine("extern const " + CDSname + " Rte_Instance_" + component.Name + ";");
+                    writer.WriteLine("extern " + compDef.Name + " Rte_CI_" + component.Name + ";");
                 }  
             }
             writer.WriteLine("");
@@ -697,9 +718,8 @@ namespace AutosarGuiEditor.Source.RteGenerator.CppLang
                 foreach (ComponentInstance component in composition.ComponentInstances)
                 {
                     ApplicationSwComponentType compDef = component.ComponentDefenition;
-                    String CDSname = RteFunctionsGenerator_Cpp.ComponentRteDataStructureDefenitionName(compDef);
-                    String rteCommunicationObject = "Rte_CO_" + compDef.Name;
-                    writer.WriteLine(CDSname + " Rte_CI_" + component.Name + "(" + rteCommunicationObject + ");");
+                    String rteCommunicationObject = "Rte_CO_" + component.Name;
+                    writer.WriteLine(compDef.Name + " Rte_CI_" + component.Name + "(" + rteCommunicationObject + ");");
                 }                
             }
 

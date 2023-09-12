@@ -16,6 +16,10 @@ namespace AutosarGuiEditor.Source.RteGenerator.CppLang
         public static void GenerateHeader(String dir, ApplicationSwComponentType compDef)
         {
             String filename = dir + "\\" + RteFunctionsGenerator_Cpp.GenerateComponentHeaderFile(compDef);
+            if (!Directory.Exists(dir))
+            { 
+                Directory.CreateDirectory(dir); 
+            }
 
             StreamWriter writer = new StreamWriter(filename);
             RteFunctionsGenerator_Cpp.GenerateFileTitle(writer, filename, "Implementation for " + compDef.Name + " header file");
@@ -101,13 +105,14 @@ writer.WriteLine(@"#ifndef RTE_CPP
             writer.WriteLine("public:");
 
             writer.WriteLine("    /* Constructor */");
-            writer.WriteLine("    " + baseClassName + "(const " + rteStructureName + " &Rte);");
+            writer.WriteLine("    " + baseClassName + "(const " + rteStructureName + " &rte) : Rte(rte) {} ");
             writer.WriteLine("");
 
             writer.WriteLine("    /* Abstract component's runnables */");
             foreach (RunnableDefenition runnable in compDef.Runnables)
             {
-                String runnableName = RteFunctionsGenerator_Cpp.Generate_RunnableDeclaration(compDef, runnable, false);
+                String returnType = "";
+                String runnableName = RteFunctionsGenerator_Cpp.Generate_RunnableDeclaration(compDef, runnable, false, out returnType);
                 writer.WriteLine("    virtual " + runnableName + " = 0;");
             }
             writer.WriteLine("protected:");

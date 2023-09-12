@@ -28,12 +28,15 @@ namespace AutosarGuiEditor.Source.RteGenerator.CppLang
         void GenerateComponent(ApplicationSwComponentType component)
         {
             /* Generate component Folder */
-            String componentFolder = RteFunctionsGenerator_Cpp.GetComponentsFolder() + "\\" + component.Name + "\\contracts\\skeleton";
+            String componentFolder = RteFunctionsGenerator_Cpp.GetComponentsFolder() + "\\" + component.Name;
+            String componentSkeletonFolder = componentFolder + "\\contracts\\skeleton";
             String rteDir = RteFunctionsGenerator_Cpp.GetRteFolder() + "\\";
-            String incDir = componentFolder + "\\include\\";
-            String srcDir = componentFolder + "\\src\\";
+            String incDir = componentSkeletonFolder + "\\include\\";
+            String srcDir = componentSkeletonFolder + "\\src\\";
             Directory.CreateDirectory(incDir);
             Directory.CreateDirectory(srcDir);
+            Directory.CreateDirectory(componentFolder + "\\include\\");
+            Directory.CreateDirectory(componentFolder + "\\src\\");
 
             /* Fill sections of code */
 
@@ -42,25 +45,28 @@ namespace AutosarGuiEditor.Source.RteGenerator.CppLang
             foreach (RunnableDefenition runnable in component.Runnables)
             {
                 string arguments = "";
-                string returnType = "void";
+                string returnType = "";
 
-                String runnableDefenitionLine = RteFunctionsGenerator_Cpp.Generate_RunnableDeclaration(component, runnable, true);
+                String runnableDefenitionLine = RteFunctionsGenerator_Cpp.Generate_RunnableDeclaration(component, runnable, true, out returnType);
                 
-                CreateRunnableFile(srcDir, component, runnable, runnableDefenitionLine, arguments, returnType);
+                CreateRunnableFile(srcDir, componentFolder + "\\src\\", component, runnable, runnableDefenitionLine, arguments, returnType);
             }
 
 
             /* Generate funcitons for Sender-Receiver ports and call operations from client ports */
             ComponentRteHeaderGenerator_Cpp.GenerateHeader(rteDir, component);
 
-            CreateComponentIncludes(incDir, component);
+            CreateComponentIncludes(incDir, componentFolder + "\\include\\", component);
         }
 
-        void CreateComponentIncludes(String dir, ApplicationSwComponentType componentDefenition)
+        void CreateComponentIncludes(String skeletonDir, String srcDir, ApplicationSwComponentType componentDefenition)
         {
-            String filename = dir + componentDefenition.Name + ".hpp";
-            StreamWriter writer = new StreamWriter(filename);
-            RteFunctionsGenerator_Cpp.GenerateFileTitle(writer, filename, "Implementation for header of " + componentDefenition.Name);
+            String fileName = componentDefenition.Name + ".hpp";
+            String fullFileName = skeletonDir + fileName;
+            String srcFileName = srcDir + fileName;
+
+            StreamWriter writer = new StreamWriter(fullFileName);
+            RteFunctionsGenerator_Cpp.GenerateFileTitle(writer, fullFileName, "Implementation for header of " + componentDefenition.Name);
             RteFunctionsGenerator_Cpp.OpenGuardDefine(writer);
 
             writer.WriteLine("");
@@ -71,12 +77,10 @@ namespace AutosarGuiEditor.Source.RteGenerator.CppLang
             writer.WriteLine(RteFunctionsGenerator_Cpp.EndOfIncludesLine);
             writer.WriteLine("");
 
-            writer.WriteLine("");
             writer.WriteLine(RteFunctionsGenerator_Cpp.MacrosLine);
             writer.WriteLine(RteFunctionsGenerator_Cpp.EndOfMacrosLine);
             writer.WriteLine("");
 
-            writer.WriteLine("");
             writer.WriteLine(RteFunctionsGenerator_Cpp.TypeDefenitionsLine);
             writer.WriteLine("");
             
@@ -86,18 +90,21 @@ namespace AutosarGuiEditor.Source.RteGenerator.CppLang
             writer.WriteLine(RteFunctionsGenerator_Cpp.EndOfTypeDefenitionsLine);
             writer.WriteLine("");
 
-            writer.WriteLine("");
             writer.WriteLine(RteFunctionsGenerator_Cpp.ExternalVariablesLine);
             writer.WriteLine(RteFunctionsGenerator_Cpp.EndOfExternalVariableLine);
             writer.WriteLine("");
 
-            writer.WriteLine("");
             writer.WriteLine(RteFunctionsGenerator_Cpp.GlobalFunctionsDeclarationLine);
             writer.WriteLine(RteFunctionsGenerator_Cpp.EndOfGlobalFunctionsDeclarationLine);
             writer.WriteLine("");
 
             RteFunctionsGenerator_Cpp.CloseGuardDefine(writer);
             writer.Close();
+
+            if (!File.Exists(srcFileName))
+            {
+                File.Copy(fullFileName, srcFileName, false);
+            }
         }
 
         void WriteComponentClass(StreamWriter writer, ApplicationSwComponentType compDefenition)
@@ -116,7 +123,8 @@ namespace AutosarGuiEditor.Source.RteGenerator.CppLang
             writer.WriteLine("    /* Component runnables */");
             foreach (RunnableDefenition runnable in compDefenition.Runnables)
             {
-                String runnableName = RteFunctionsGenerator_Cpp.Generate_RunnableDeclaration(compDefenition, runnable, false);
+                String returnType = "";
+                String runnableName = RteFunctionsGenerator_Cpp.Generate_RunnableDeclaration(compDefenition, runnable, false, out returnType);
                 writer.WriteLine("    " + runnableName + ";");
             }
             writer.WriteLine("");
@@ -128,11 +136,13 @@ namespace AutosarGuiEditor.Source.RteGenerator.CppLang
             writer.WriteLine("");
         }
 
-        void CreateRunnableFile(String dir, ApplicationSwComponentType compDefenition, RunnableDefenition runnable, String runnableDefenitionLine, String arguments, String returnType)
+        void CreateRunnableFile(String skeletonDir, String srcDir, ApplicationSwComponentType compDefenition, RunnableDefenition runnable, String runnableDefenitionLine, String arguments, String returnType)
         {
-            String filename = dir + compDefenition.Name + "_ru" + runnable.Name + ".cpp";
-            StreamWriter writer = new StreamWriter(filename);
-            RteFunctionsGenerator_Cpp.GenerateFileTitle(writer, filename, "Implementation for " + compDefenition.Name + "_" + runnable.Name);
+            String filename = compDefenition.Name + "_ru" + runnable.Name + ".cpp";
+            String fullFileName = skeletonDir + filename;
+            String srcFileName = srcDir + filename; 
+            StreamWriter writer = new StreamWriter(fullFileName);
+            RteFunctionsGenerator_Cpp.GenerateFileTitle(writer, fullFileName, "Implementation for " + compDefenition.Name + "_" + runnable.Name);
 
             writer.WriteLine("");
             writer.WriteLine(RteFunctionsGenerator_Cpp.IncludesLine);
@@ -142,42 +152,35 @@ namespace AutosarGuiEditor.Source.RteGenerator.CppLang
             writer.WriteLine(RteFunctionsGenerator_Cpp.EndOfIncludesLine);
             writer.WriteLine("");
 
-            writer.WriteLine("");
             writer.WriteLine(RteFunctionsGenerator_Cpp.MacrosLine);
             writer.WriteLine(RteFunctionsGenerator_Cpp.EndOfMacrosLine);
             writer.WriteLine("");
 
-            writer.WriteLine("");
             writer.WriteLine(RteFunctionsGenerator_Cpp.TypeDefenitionsLine);
             writer.WriteLine(RteFunctionsGenerator_Cpp.EndOfTypeDefenitionsLine);
             writer.WriteLine("");
 
-            writer.WriteLine("");
             writer.WriteLine(RteFunctionsGenerator_Cpp.VariablesLine);
             writer.WriteLine(RteFunctionsGenerator_Cpp.EndOfVariableLine);
             writer.WriteLine("");
 
-            writer.WriteLine("");
             writer.WriteLine(RteFunctionsGenerator_Cpp.LocalFunctionsDeclarationLine);
             writer.WriteLine(RteFunctionsGenerator_Cpp.EndOfLocalFunctionsDeclarationLine);
             writer.WriteLine("");
 
-            writer.WriteLine("");
             writer.WriteLine(RteFunctionsGenerator_Cpp.LocalFunctionsDefenitionsLine);
             writer.WriteLine(RteFunctionsGenerator_Cpp.EndOfLocalFunctionsDefenitionsLine);
             writer.WriteLine("");
 
-            writer.WriteLine("");
+
             writer.WriteLine(RteFunctionsGenerator_Cpp.PrivateFunctionsDefenitionsLine);
             writer.WriteLine(RteFunctionsGenerator_Cpp.EndOfPrivateFunctionsDefenitionsLine);
             writer.WriteLine("");
 
-            writer.WriteLine("");
             writer.WriteLine(RteFunctionsGenerator_Cpp.ProtectedFunctionsDefenitionsLine);
             writer.WriteLine(RteFunctionsGenerator_Cpp.EndOfProtectedFunctionsDefenitionsLine);
             writer.WriteLine("");
 
-            writer.WriteLine("");
             writer.WriteLine(RteFunctionsGenerator_Cpp.PublicFunctionsDefenitionsLine);
             writer.WriteLine("");
 
@@ -185,7 +188,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CppLang
             writer.WriteLine("{");
             if (returnType != "void")
             {
-                writer.WriteLine("    return " + Properties.Resources.RTE_E_OK + ";");
+                writer.WriteLine("    return Std_ReturnType::" + Properties.Resources.RTE_E_OK + ";");
             }
             else
             {
@@ -200,6 +203,11 @@ namespace AutosarGuiEditor.Source.RteGenerator.CppLang
 
             RteFunctionsGenerator_Cpp.WriteEndOfFile(writer);
             writer.Close();
+
+            if (!File.Exists(srcFileName))
+            {
+                File.Copy(fullFileName, srcFileName, false);
+            }
         }
     }
 }

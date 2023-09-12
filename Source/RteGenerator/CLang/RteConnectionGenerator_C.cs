@@ -342,8 +342,6 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLang
                                 }
                                 else
                                 {
-                                    //writer.WriteLine("    memset(data, 0, sizeof(" + field.DataTypeName + "));");
-
                                     if (srInterface.IsThreadIrqProtected == true)
                                     {
                                         writer.WriteLine("    OnAfter_" + RteFuncName + "();");

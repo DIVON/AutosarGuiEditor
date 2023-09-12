@@ -128,6 +128,12 @@ namespace AutosarGuiEditor.Source.RteGenerator
 
         void GenerateCallFunctions(StreamWriter writer)
         {
+            writer.WriteLine(
+@"/*************************************************************
+ * BEGIN RTE Sync Call operation handlers
+ *************************************************************/
+");
+
             foreach (CompositionInstance composition in AutosarApplication.GetInstance().Compositions)
             {
                 foreach (ComponentInstance component in composition.ComponentInstances)
@@ -183,6 +189,12 @@ namespace AutosarGuiEditor.Source.RteGenerator
                     }
                 }
             }
+
+            writer.WriteLine(
+@"/*************************************************************
+ * END RTE Sync Call operation handlers
+ *************************************************************/
+");
         }
 
         void GenerateReceiveFunctions(StreamWriter writer)
@@ -299,8 +311,7 @@ namespace AutosarGuiEditor.Source.RteGenerator
                                     }
                                     else
                                     {
-                                        writer.WriteLine("    memset(data, 0, sizeof(" + field.DataTypeName + "));");
-                                        writer.WriteLine("    return " + Properties.Resources.RTE_E_UNCONNECTED + ";");
+                                        writer.WriteLine("        return " + Properties.Resources.RTE_E_UNCONNECTED + ";");
                                     }
 
                                 writer.WriteLine("    }");
@@ -457,7 +468,6 @@ namespace AutosarGuiEditor.Source.RteGenerator
                                 }
                                 else
                                 {
-                                    writer.WriteLine("        memset(data, " + "0u, sizeof(" + field.DataTypeName + "));");
                                     writer.WriteLine("        return " + Properties.Resources.RTE_E_UNCONNECTED + ";");
                                 }
 
