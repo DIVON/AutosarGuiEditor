@@ -12,6 +12,7 @@ using AutosarGuiEditor.Source.Painters.Components.PerInstance;
 using AutosarGuiEditor.Source.Painters.PortsPainters;
 using AutosarGuiEditor.Source.PortDefenitions;
 using AutosarGuiEditor.Source.RteGenerator.CppLang;
+using AutosarGuiEditor.Source.DataTypes.ArrayDataType;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -389,7 +390,16 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLang
                                 String writeFieldName = "Rte_DataBuffer_" + component.Name + "_" + portDef.Name + "_" + field.Name;
                                 if (field.IsPointer == false)
                                 {
-                                    writer.WriteLine("    " + writeFieldName + " = (*data);");
+                                    
+
+                                    if (!(field.DataType is ArrayDataType))
+                                    {
+                                        writer.WriteLine("    " + writeFieldName + " = (*data);");
+                                    }
+                                    else
+                                    {
+                                        writer.WriteLine("    memcpy("+ writeFieldName + ", (*data), sizeof(" + field.DataTypeName + "));");
+                                    }
                                 }
                                 else
                                 {
@@ -446,7 +456,15 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLang
                                 {
                                     String copyFromField = "Rte_DataBuffer_" + oppositCompInstance.Name + "_" + oppositePort.PortDefenition.Name + "_" + field.Name;
 
-                                    writer.WriteLine("    *data = " + copyFromField + ";");
+                                    if (!(field.DataType is ArrayDataType))
+                                    {
+                                        writer.WriteLine("    *data = " + copyFromField + ";");
+                                    }
+                                    else
+                                    {
+                                        writer.WriteLine("    memcpy(*data, " + copyFromField + ", sizeof(" + field .DataTypeName + "));");
+                                    }
+
                                     if (srInterface.IsThreadIrqProtected == true)
                                     {
                                         writer.WriteLine("    OnAfter_" + RteFuncName + "();");

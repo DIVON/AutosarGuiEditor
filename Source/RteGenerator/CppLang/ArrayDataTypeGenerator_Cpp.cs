@@ -34,7 +34,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CppLang
                     writer.WriteLine(RteFunctionsGenerator_Cpp.CreateDefine(arraySizeNameMacro, arrayDT.Size.ToString() + "U", false));
 
                     writer.WriteLine();
-                    writer.WriteLine("typedef " + datatype.Name + " " + arrayDT.Name + "[" + arrayDT.Size + "];");
+                    writer.WriteLine("using " + arrayDT.Name + " = std::array<" + datatype.Name + ", " + arrayDT.Size + ">;");
                     writer.WriteLine();
                 }
             }

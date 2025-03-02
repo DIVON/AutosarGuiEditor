@@ -19,7 +19,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLang
 
             StreamWriter writer = new StreamWriter(filename);
             RteFunctionsGenerator_C.GenerateFileTitle(writer, filename, "Implementation for " + compDef.Name + " header file");
-            RteFunctionsGenerator_C.OpenGuardDefine(writer);
+            RteFunctionsGenerator_C.OpenCppGuardDefine(writer);
             RteFunctionsGenerator_C.OpenCGuardDefine(writer);
 
             writer.WriteLine(@"
@@ -190,6 +190,8 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLang
  *************************************************************/
 #ifndef RTE_C
 ");
+            String CDSName = RteFunctionsGenerator_C.ComponentDataStructureDefenitionName(compDef);
+            String instance = "(" + CDSName + "*)instance";
 
             /* Write all cdata */
             foreach (CDataDefenition cdata in compDef.CDataDefenitions)
@@ -201,12 +203,16 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLang
                 }
                 else
                 {
-                    define = RteFunctionsGenerator_C.CreateDefine(RteFunctionsGenerator_C.GenerateShortCDataFunctionName(cdata) + "(instance)", "(instance)->CData_" + cdata.Name + "()", true);
+                    
+                    define = RteFunctionsGenerator_C.CreateDefine(
+                        RteFunctionsGenerator_C.GenerateShortCDataFunctionName(cdata) + "(instance)",
+                        "(" + instance + ")->CData_" + cdata.Name + "()", 
+                        true
+                    );
                 }
 
                 writer.WriteLine(define);
             }
-
 
             /* Write all pims */
             foreach (PimDefenition pim in compDef.PerInstanceMemoryList)
@@ -214,11 +220,19 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLang
                 String define;
                 if (compDef.MultipleInstantiation == false)
                 {
-                    define = RteFunctionsGenerator_C.CreateDefine(RteFunctionsGenerator_C.GenerateShortPimFunctionName(pim) + "()", singleComponentInstanceVariableName + ".Pim_" + pim.Name, true);
+                    define = RteFunctionsGenerator_C.CreateDefine(
+                        RteFunctionsGenerator_C.GenerateShortPimFunctionName(pim) + "()", 
+                        singleComponentInstanceVariableName + ".Pim_" + pim.Name, 
+                        true
+                    );
                 }
                 else
                 {
-                    define = RteFunctionsGenerator_C.CreateDefine(RteFunctionsGenerator_C.GenerateShortPimFunctionName(pim) + "(instance)", "(instance)->Pim_" + pim.Name, true);
+                    define = RteFunctionsGenerator_C.CreateDefine(
+                        RteFunctionsGenerator_C.GenerateShortPimFunctionName(pim) + "(instance)",
+                         "(" + instance + ")->Pim_" + pim.Name, 
+                        true
+                    );
                 }
 
 
@@ -250,7 +264,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLang
                         }
                         else
                         {
-                            rteFuncName = "(instance)->" + portDefenition.Name + ".";
+                            rteFuncName = "(" + instance + ")->" + portDefenition.Name + ".";
                         }
                         rteFuncName += (portDefenition.PortType == PortType.Sender ? "Write_" : "Read_") + field.Name + "(_data_)";
 
@@ -275,7 +289,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLang
                         }
                         else
                         {
-                            rteFuncName = "(instance)->" + portDefenition.Name + ".";
+                            rteFuncName = "(" + instance + ")->" + portDefenition.Name + ".";
                         }
                         rteFuncName += "Call_" + operation.Name + argumentsWithoutInstance;
 
@@ -299,7 +313,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLang
 ");
 
             RteFunctionsGenerator_C.CloseCGuardDefine(writer);
-            RteFunctionsGenerator_C.CloseGuardDefine(writer);
+            RteFunctionsGenerator_C.CloseCppGuardDefine(writer);
             writer.Close();
         }
     }

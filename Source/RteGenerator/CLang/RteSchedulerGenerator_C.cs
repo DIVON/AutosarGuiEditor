@@ -27,7 +27,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLang
             StreamWriter writer = new StreamWriter(FileName);
 
             RteFunctionsGenerator_C.GenerateFileTitle(writer, FileName, Properties.Resources.RTE_PERIODS_H_FILENAME);
-            RteFunctionsGenerator_C.OpenGuardDefine(writer);
+            RteFunctionsGenerator_C.OpenCppGuardDefine(writer);
 
             writer.WriteLine();
 
@@ -57,7 +57,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLang
             writer.WriteLine();
 
             writer.WriteLine();
-            RteFunctionsGenerator_C.CloseGuardDefine(writer);
+            RteFunctionsGenerator_C.CloseCppGuardDefine(writer);
 
             writer.Close();
         }
@@ -68,7 +68,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLang
             StreamWriter writer = new StreamWriter(FileName);
 
             RteFunctionsGenerator_C.GenerateFileTitle(writer, FileName, Properties.Resources.RTE_RUNTIME_ENVIRONMENT_FILE_DESCRIPTION);
-            RteFunctionsGenerator_C.OpenGuardDefine(writer);
+            RteFunctionsGenerator_C.OpenCppGuardDefine(writer);
 
             writer.WriteLine();
             RteFunctionsGenerator_C.AddInclude(writer, Properties.Resources.RTE_RUNTIME_ENVIRONMENT_H_FILENAME);
@@ -95,7 +95,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLang
             WriteAllOsTasks(writer);
 
             writer.WriteLine();
-            RteFunctionsGenerator_C.CloseGuardDefine(writer);
+            RteFunctionsGenerator_C.CloseCppGuardDefine(writer);
             RteFunctionsGenerator_C.WriteEndOfFile(writer);
             writer.Close();
         }
@@ -369,7 +369,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLang
             StreamWriter writer = new StreamWriter(FileName);
 
             RteFunctionsGenerator_C.GenerateFileTitle(writer, FileName, Properties.Resources.RTE_RUNTIME_ENVIRONMENT_FILE_DESCRIPTION);
-            RteFunctionsGenerator_C.OpenGuardDefine(writer);
+            RteFunctionsGenerator_C.OpenCppGuardDefine(writer);
 
             writer.WriteLine();
             //writer.WriteLine("#define RTE_C");
@@ -385,7 +385,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLang
             writer.WriteLine();
 
             writer.WriteLine("/* Time periods */");
-            writer.WriteLine(RteFunctionsGenerator_C.CreateDefine("SYSTICK_FREQUENCY", AutosarApplication.GetInstance().SystickFrequencyHz.ToString()));
+            writer.WriteLine(RteFunctionsGenerator_C.CreateDefine("RTE_SYSTICK_FREQUENCY", AutosarApplication.GetInstance().SystickFrequencyHz.ToString()));
             writer.WriteLine();
 
 
@@ -424,7 +424,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLang
             writer.WriteLine();
 
             writer.WriteLine();
-            RteFunctionsGenerator_C.CloseGuardDefine(writer);
+            RteFunctionsGenerator_C.CloseCppGuardDefine(writer);
             
             writer.Close();
         }
@@ -435,13 +435,15 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLang
             StreamWriter writer = new StreamWriter(FileName);
 
             RteFunctionsGenerator_C.GenerateFileTitle(writer, FileName, Properties.Resources.RTE_EXTERNAL_RUNNABLES_FILE_DESCRIPTION);
-            RteFunctionsGenerator_C.OpenGuardDefine(writer);
+            RteFunctionsGenerator_C.OpenCppGuardDefine(writer);
             RteFunctionsGenerator_C.OpenCGuardDefine(writer);
 
             RteFunctionsGenerator_C.AddInclude(writer, Properties.Resources.RTE_DATATYPES_H_FILENAME);
 
             RteConnectionGenerator_C.AddComponentIncludes(writer);
 
+            writer.WriteLine();
+            writer.WriteLine("#include \"Rte_DataTypes.h\"");
             writer.WriteLine();
             writer.WriteLine("/* Declaration of all component's runnables */");
             writer.WriteLine();
@@ -458,7 +460,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLang
             writer.WriteLine();
 
             RteFunctionsGenerator_C.CloseCGuardDefine(writer);
-            RteFunctionsGenerator_C.CloseGuardDefine(writer);
+            RteFunctionsGenerator_C.CloseCppGuardDefine(writer);
             RteFunctionsGenerator_C.WriteEndOfFile(writer);
             writer.Close();
 
@@ -470,7 +472,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLang
              StreamWriter writer = new StreamWriter(FileName);
 
             RteFunctionsGenerator_C.GenerateFileTitle(writer, FileName, "This file contains all externals required for scheduling");
-            RteFunctionsGenerator_C.OpenGuardDefine(writer);
+            RteFunctionsGenerator_C.OpenCppGuardDefine(writer);
             RteFunctionsGenerator_C.OpenCGuardDefine(writer);
 
             RteFunctionsGenerator_C.AddInclude(writer, Properties.Resources.RTE_DATATYPES_H_FILENAME);
@@ -497,7 +499,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLang
             writer.WriteLine();
 
             RteFunctionsGenerator_C.CloseCGuardDefine(writer);
-            RteFunctionsGenerator_C.CloseGuardDefine(writer);
+            RteFunctionsGenerator_C.CloseCppGuardDefine(writer);
             RteFunctionsGenerator_C.WriteEndOfFile(writer);
             writer.Close();
 
@@ -509,7 +511,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLang
             StreamWriter writer = new StreamWriter(FileName);
 
             RteFunctionsGenerator_C.GenerateFileTitle(writer, FileName, Properties.Resources.RTE_TASK_SCHEDULER_FILE_DESCRIPTION);
-            RteFunctionsGenerator_C.OpenGuardDefine(writer);
+            RteFunctionsGenerator_C.OpenCppGuardDefine(writer);
             RteFunctionsGenerator_C.OpenCGuardDefine(writer);
 
             RteFunctionsGenerator_C.AddInclude(writer, Properties.Resources.RTE_DATATYPES_H_FILENAME);
@@ -520,7 +522,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLang
             
             writer.WriteLine();
             RteFunctionsGenerator_C.CloseCGuardDefine(writer);
-            RteFunctionsGenerator_C.CloseGuardDefine(writer);
+            RteFunctionsGenerator_C.CloseCppGuardDefine(writer);
             RteFunctionsGenerator_C.WriteEndOfFile(writer);
             writer.Close();
         }

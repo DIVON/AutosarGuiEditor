@@ -28,14 +28,16 @@ namespace AutosarGuiEditor.Source.RteGenerator.CppLang
 
         void GenerateConstructor(StreamWriter writer, ApplicationSwComponentType compDef)
         {
+            if ((compDef.Runnables.Count == 0) && (compDef.Ports.Count == 0))
+            {
+                return;
+            }
+
             String rteStructureName = RteFunctionsGenerator_Cpp.ComponentRteDataStructureDefenitionName(compDef);
             String baseClassName = RteFunctionsGenerator_Cpp.ComponentBaseClassDefenitionName(compDef);
 
-            String line = compDef.Name + "::" + compDef.Name + "(const " + rteStructureName + " &Rte):" + baseClassName + "(Rte)";
+            String line = compDef.Name + "::" + compDef.Name + "(const " + rteStructureName + " &rte):" + baseClassName + "(rte) {}";
             writer.WriteLine(line);
-            writer.WriteLine("{");
-            writer.WriteLine("}");
-            writer.WriteLine("");
         }
     }
 }

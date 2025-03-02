@@ -40,6 +40,7 @@ using AutosarGuiEditor.Source.App.Settings;
 using AutosarGuiEditor.Source;
 using AutosarGuiEditor.Source.RteGenerator.CLang;
 using AutosarGuiEditor.Source.RteGenerator.CppLang;
+using AutosarGuiEditor.Source.RteGenerator.TestGeneratorCpp;
 
 namespace AutosarGuiEditor
 { 
@@ -1220,13 +1221,28 @@ namespace AutosarGuiEditor
 
         private void GenerateTestEnvironment_Click(object sender, RoutedEventArgs e)
         {
-            TestRteEnvironmentGenerator generator = new TestRteEnvironmentGenerator();
+            if (autosarApp.ProgramLanguage.Type == ProgrammingLanguageTypeDef.C)
+            {
+                TestRteEnvironmentGenerator generator = new TestRteEnvironmentGenerator();
+
+                generator.GenerateRteEnvironment(autosarApp.GenerateTestRtePath);
+                generator.GenerateCommonFiles(autosarApp.GenerateTestRtePath);
+                RteSchedulerGenerator_C rteSchedulerGenerator = new RteSchedulerGenerator_C();
+                rteSchedulerGenerator.Generate_ExternalRunnables_File(autosarApp.GenerateTestRtePath);
+                MessageBox.Show("Test environment has been generated.");
+            }
+            else if (autosarApp.ProgramLanguage.Type == ProgrammingLanguageTypeDef.Cpp)
+            {
+                TestRteEnvironmentGeneratorCpp generator = new TestRteEnvironmentGeneratorCpp();
+
+                generator.GenerateRteEnvironment(autosarApp.GenerateTestRtePath);
+                generator.GenerateCommonFiles(autosarApp.GenerateTestRtePath);
+                RteSchedulerGenerator_Cpp rteSchedulerGenerator = new RteSchedulerGenerator_Cpp();
+                rteSchedulerGenerator.Generate_ExternalRunnables_File(autosarApp.GenerateTestRtePath);
+                MessageBox.Show("Test environment has been generated.");
+            }
+
             
-            generator.GenerateRteEnvironment(autosarApp.GenerateTestRtePath);
-            generator.GenerateCommonFiles(autosarApp.GenerateTestRtePath);
-            RteSchedulerGenerator_C rteSchedulerGenerator = new RteSchedulerGenerator_C();
-            rteSchedulerGenerator.Generate_ExternalRunnables_File(autosarApp.GenerateTestRtePath);
-            MessageBox.Show("Test environment has been generated.");
         }
 
         private void NewProject_Click(object sender, RoutedEventArgs e)

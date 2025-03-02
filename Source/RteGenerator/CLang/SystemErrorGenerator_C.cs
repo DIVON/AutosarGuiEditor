@@ -15,12 +15,12 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLang
             String FileName = folder + "\\" + Properties.Resources.SYSTEM_ERRORS_H_FILENAME;
             StreamWriter writer = new StreamWriter(FileName);
             RteFunctionsGenerator_C.GenerateFileTitle(writer, Properties.Resources.SYSTEM_ERRORS_H_FILENAME, "This file contains all defined system error IDs");
-            RteFunctionsGenerator_C.OpenGuardDefine(writer);
+            RteFunctionsGenerator_C.OpenCppGuardDefine(writer);
 
             writer.WriteLine("/*  System errors */");
             WriteErrorsCount(writer);
             WriteAllErrors(writer);
-            RteFunctionsGenerator_C.CloseGuardDefine(writer);
+            RteFunctionsGenerator_C.CloseCppGuardDefine(writer);
             RteFunctionsGenerator_C.WriteEndOfFile(writer);
             writer.Close();
         }

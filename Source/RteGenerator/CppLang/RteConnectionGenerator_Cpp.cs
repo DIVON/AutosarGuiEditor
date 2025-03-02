@@ -157,7 +157,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CppLang
                                     }
                                     else
                                     {
-                                        writer.WriteLine("    return " + Properties.Resources.RTE_E_UNCONNECTED + ";");
+                                        writer.WriteLine("    return Std_ReturnType::" + Properties.Resources.RTE_E_UNCONNECTED + ";");
                                     }
 
                                     writer.WriteLine("}");
@@ -194,7 +194,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CppLang
                                     }
                                     else
                                     {
-                                        writer.WriteLine("    return " + Properties.Resources.RTE_E_UNCONNECTED + ";");
+                                        writer.WriteLine("    return Std_ReturnType::" + Properties.Resources.RTE_E_UNCONNECTED + ";");
                                     }
 
                                     writer.WriteLine("}");
@@ -314,8 +314,8 @@ namespace AutosarGuiEditor.Source.RteGenerator.CppLang
                                 }
                                 else
                                 {
-                                    writer.WriteLine("    memset(data, 0, sizeof(" + field.DataTypeName + "));");
-                                    writer.WriteLine("    return " + Properties.Resources.RTE_E_UNCONNECTED + ";");
+                                    writer.WriteLine("    memset(&data, 0, sizeof(" + field.DataTypeName + "));");
+                                    writer.WriteLine("    return Std_ReturnType::" + Properties.Resources.RTE_E_UNCONNECTED + ";");
                                 }
                                 writer.WriteLine("}");
                                 writer.WriteLine("");
@@ -419,8 +419,8 @@ namespace AutosarGuiEditor.Source.RteGenerator.CppLang
                                 }
                                 else
                                 {
-                                    writer.WriteLine("    memset(data, " + "0, sizeof(" + field.DataTypeName + "));");
-                                    writer.WriteLine("    return " + Properties.Resources.RTE_E_UNCONNECTED + ";");
+                                    writer.WriteLine("    memset(&data, " + "0, sizeof(" + field.DataTypeName + "));");
+                                    writer.WriteLine("    return Std_ReturnType::" + Properties.Resources.RTE_E_UNCONNECTED + ";");
                                 }
 
                                 writer.WriteLine("}");
@@ -521,6 +521,9 @@ namespace AutosarGuiEditor.Source.RteGenerator.CppLang
                 foreach (ComponentInstance component in composition.ComponentInstances)
                 {
                     ApplicationSwComponentType compDef = component.ComponentDefenition;
+                    if ((compDef.Ports.Count == 0) && (compDef.Runnables.Count == 0)) {
+                        continue;
+                    }
                     writer.WriteLine("extern " + compDef.Name + " Rte_CI_" + component.Name + ";");
                 }  
             }
@@ -634,6 +637,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CppLang
                 foreach (ComponentInstance component in composition.ComponentInstances)
                 {
                     ApplicationSwComponentType compDef = component.ComponentDefenition;
+                    
                     String CDSname = RteFunctionsGenerator_Cpp.ComponentRteDataStructureDefenitionName(compDef);
                     writer.WriteLine("const " + CDSname + " Rte_CO_" + component.Name + " = ");
                     writer.WriteLine("{");
@@ -642,7 +646,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CppLang
                     foreach (PimDefenition pim in compDef.PerInstanceMemoryList)
                     {
                         String pimName = "Rte_PimBuffer_" + component.Name + "_" + pim.Name;
-                        writer.WriteLine("    &" + pimName + ",");
+                        writer.WriteLine("    " + pimName + ",");
                     }
 
                     /* write ports */
@@ -718,6 +722,11 @@ namespace AutosarGuiEditor.Source.RteGenerator.CppLang
                 foreach (ComponentInstance component in composition.ComponentInstances)
                 {
                     ApplicationSwComponentType compDef = component.ComponentDefenition;
+                    if ((compDef.Runnables.Count == 0) && (compDef.Ports.Count == 0))
+                    {
+                        continue;
+                        
+                    }
                     String rteCommunicationObject = "Rte_CO_" + component.Name;
                     writer.WriteLine(compDef.Name + " Rte_CI_" + component.Name + "(" + rteCommunicationObject + ");");
                 }                

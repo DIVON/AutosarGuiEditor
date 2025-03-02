@@ -169,8 +169,8 @@
   <data name="STD_RETURN_TYPE" xml:space="preserve">
     <value>Std_ReturnType</value>
   </data>
-  <data name="SYSTICK_FREQUENCY" xml:space="preserve">
-    <value>SYSTICK_FREQUENCY</value>
+  <data name="RTE_SYSTICK_FREQUENCY" xml:space="preserve">
+    <value>RTE_SYSTICK_FREQUENCY</value>
   </data>
   <data name="SYSTEM_ERRORS_H_FILENAME" xml:space="preserve">
     <value>SystemErrors.h</value>
@@ -249,5 +249,8 @@
   </data>
   <data name="RTE_TASK_SCHEDULER_HPP_FILENAME" xml:space="preserve">
     <value>Rte_Task_Scheduler.hpp</value>
+  </data>
+  <data name="TEST_RTE_HPP_FILENAME" xml:space="preserve">
+    <value>TestRte.hpp</value>
   </data>
 </root>

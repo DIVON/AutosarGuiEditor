@@ -301,6 +301,10 @@ namespace AutosarGuiEditor.Source.RteGenerator.CppLang
 
 #endregion
 
+        public static String GenerateTestRteClassName(ApplicationSwComponentType compDefenition)
+        {
+            return "Rte_Test_" + compDefenition.Name;
+        }
 #region SENDER_RECEIVER
         public static String GenerateRteWriteFieldInComponentDefenitionStruct(PortDefenition portDefenition, SenderReceiverInterfaceField field)
         {
@@ -309,9 +313,9 @@ namespace AutosarGuiEditor.Source.RteGenerator.CppLang
         }
 #endregion
 
-        public static String GenerateReadWriteFunctionName(PortDefenition port, SenderReceiverInterfaceField field)
+        public static String GenerateReadWritePortName(PortDefenition port)
         {
-            String res = "Rte_";
+            String res = "";
             if (port.PortType == PortType.Sender)
             {
                 if ((port.InterfaceDatatype as SenderReceiverInterface).IsQueued == false)
@@ -335,7 +339,13 @@ namespace AutosarGuiEditor.Source.RteGenerator.CppLang
                 }
             }
 
-            res += port.Name + "_" + field.Name;
+            res += port.Name;
+            return res;
+        }
+
+        public static String GenerateReadWriteFunctionName(PortDefenition port, SenderReceiverInterfaceField field)
+        {
+            String res = "Rte_" + GenerateReadWritePortName(port) + "_" + field.Name;
             return res;
         }
 
@@ -479,32 +489,24 @@ namespace AutosarGuiEditor.Source.RteGenerator.CppLang
             writer.WriteLine(" *");
             writer.WriteLine(" * " + FileDescription);
             writer.WriteLine(" *");
-            writer.WriteLine(" * $Author: $");
-            writer.WriteLine(" * $Date: $");
-            writer.WriteLine(" * $Revision: $");
-            writer.WriteLine(" *");
-            writer.WriteLine(" *" + AutosarApplication.GetInstance().Signature);
+            writer.WriteLine(" * " + AutosarApplication.GetInstance().Signature);
             writer.WriteLine(" */");
         }
 
         /* Returns generated define */
-        public static String OpenGuardDefine(StreamWriter writer)
+        public static String OpenCppGuardDefine(StreamWriter writer)
         {
             String fileName = ((FileStream)(writer.BaseStream)).Name;
 
             String define = GenerateFileNameDefine(fileName);
-            writer.WriteLine("#ifndef " + define);
-            writer.WriteLine("#define " + define);
+            writer.WriteLine("#pragma once");
             writer.WriteLine("");
 
             return define;
         }
 
-        public static void CloseGuardDefine(StreamWriter writer)
+        public static void CloseCppGuardDefine(StreamWriter writer)
         {
-            String define = GenerateFileNameDefine(((FileStream)(writer.BaseStream)).Name);
-            writer.WriteLine("#endif /* " + define + " */");
-
         }
 
         public static void WriteEndOfFile(StreamWriter writer)

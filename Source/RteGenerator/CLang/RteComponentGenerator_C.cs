@@ -61,7 +61,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLang
             String filename = dir + componentDefenition.Name + ".h";
             StreamWriter writer = new StreamWriter(filename);
             RteFunctionsGenerator_C.GenerateFileTitle(writer, filename, "Implementation for header of " + componentDefenition.Name);
-            RteFunctionsGenerator_C.OpenGuardDefine(writer);
+            RteFunctionsGenerator_C.OpenCppGuardDefine(writer);
 
             writer.WriteLine("");
             writer.WriteLine(RteFunctionsGenerator_C.IncludesLine);
@@ -91,7 +91,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLang
             writer.WriteLine(RteFunctionsGenerator_C.EndOfGlobalFunctionsDeclarationLine);
             writer.WriteLine("");
 
-            RteFunctionsGenerator_C.CloseGuardDefine(writer);
+            RteFunctionsGenerator_C.CloseCppGuardDefine(writer);
             writer.Close();
         }
 

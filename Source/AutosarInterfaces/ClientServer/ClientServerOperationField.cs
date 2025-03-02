@@ -16,7 +16,8 @@ namespace AutosarGuiEditor.Source.AutosarInterfaces.ClientServer
         VAL_REF,
         CONST_VAL_REF,
         VAL_CONST_REF,
-        CONST_VAL_CONST_REF
+        CONST_VAL_CONST_REF,
+        CONST_REF
     }
 
 
@@ -25,10 +26,9 @@ namespace AutosarGuiEditor.Source.AutosarInterfaces.ClientServer
         public const string STR_VALUE = "value";
         public const string STR_CONST_VALUE = "const value";
         public const string STR_VAL_REF = "reference";
-        public const string STR_CONST_VAL_REF = "const dt * vn";
+        public const string STR_CONST_VAL_REF = "const dt * vn / const &";
         public const string STR_VAL_CONST_REF = "dt * const vn";
         public const string STR_CONST_VAL_CONST_REF = "const dt * const vn";
-
 
         public ClientServerOperationDirection Direction
         {

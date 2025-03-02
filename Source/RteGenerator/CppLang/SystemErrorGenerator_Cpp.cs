@@ -15,12 +15,12 @@ namespace AutosarGuiEditor.Source.RteGenerator.CppLang
             String FileName = folder + "\\" + Properties.Resources.SYSTEM_ERRORS_HPP_FILENAME;
             StreamWriter writer = new StreamWriter(FileName);
             RteFunctionsGenerator_Cpp.GenerateFileTitle(writer, Properties.Resources.RTE_DATATYPES_HPP_FILENAME, Properties.Resources.DATATYPES_H_FILE_DESCRIPTION);
-            RteFunctionsGenerator_Cpp.OpenGuardDefine(writer);
+            RteFunctionsGenerator_Cpp.OpenCppGuardDefine(writer);
 
             writer.WriteLine("/*  System errors */");
             WriteErrorsCount(writer);
             WriteAllErrors(writer);
-            RteFunctionsGenerator_Cpp.CloseGuardDefine(writer);
+            RteFunctionsGenerator_Cpp.CloseCppGuardDefine(writer);
             RteFunctionsGenerator_Cpp.WriteEndOfFile(writer);
             writer.Close();
         }

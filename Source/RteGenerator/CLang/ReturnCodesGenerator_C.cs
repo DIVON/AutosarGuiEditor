@@ -10,7 +10,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLang
             String FileName = folder + "\\" + Properties.Resources.RTE_RETURN_CODES_FILENAME;
             StreamWriter writer = new StreamWriter(FileName);
             RteFunctionsGenerator_C.GenerateFileTitle(writer, Properties.Resources.RTE_RETURN_CODES_FILENAME, "This file contains return codes of the RTE functions.");
-            RteFunctionsGenerator_C.OpenGuardDefine(writer);
+            RteFunctionsGenerator_C.OpenCppGuardDefine(writer);
 
             writer.WriteLine("/* Rte return codes */");
             writer.WriteLine(RteFunctionsGenerator_C.CreateDefine("RTE_E_OK", "0u"));
@@ -23,7 +23,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLang
             writer.WriteLine(RteFunctionsGenerator_C.CreateDefine("RTE_E_ERROR", "139u"));
             writer.WriteLine();
 
-            RteFunctionsGenerator_C.CloseGuardDefine(writer);
+            RteFunctionsGenerator_C.CloseCppGuardDefine(writer);
             RteFunctionsGenerator_C.WriteEndOfFile(writer);
             writer.Close();
         }

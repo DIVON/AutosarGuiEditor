@@ -203,12 +203,26 @@ namespace AutosarGuiEditor.Source.Painters.Components.PerInstance
         public String GetDefaultValue()
         {
             String defValue = "";
-            if (DefaultValues.Count >= 1)
+            if (DefaultValues.Count == 1)
             {
                 if (DefaultValues[0].DefaultValue.Length > 0)
                 {                    
                     defValue = DefaultValues[0].DefaultValue;
                 }
+            }
+            else
+            {
+                defValue = "{ ";
+                for (int i = 0; i < DefaultValues.Count; i++)
+                {
+                    if (i != 0)
+                    {
+                        defValue += ", ";
+                    }
+
+                    defValue += DefaultValues[i].DefaultValue;
+                }
+                defValue += " };";
             }
             return defValue;
         }

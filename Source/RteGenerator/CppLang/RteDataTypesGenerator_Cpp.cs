@@ -18,10 +18,14 @@ namespace AutosarGuiEditor.Source.RteGenerator.CppLang
             String FileName = folder + "\\" + Properties.Resources.RTE_DATATYPES_HPP_FILENAME;
             StreamWriter writer = new StreamWriter(FileName);
             RteFunctionsGenerator_Cpp.GenerateFileTitle(writer, Properties.Resources.RTE_DATATYPES_HPP_FILENAME, Properties.Resources.DATATYPES_H_FILE_DESCRIPTION);
-            RteFunctionsGenerator_Cpp.OpenGuardDefine(writer);
+            RteFunctionsGenerator_Cpp.OpenCppGuardDefine(writer);
 
             writer.WriteLine();
             RteFunctionsGenerator_Cpp.AddInclude(writer, Properties.Resources.RTE_RETURN_CODES_HPP_FILENAME);
+            writer.WriteLine();
+
+            writer.WriteLine("#include <array>");
+            writer.WriteLine("#include <stdint.h>");
             writer.WriteLine();
 
             WriteStaticGlobal(writer);
@@ -36,7 +40,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CppLang
 
            // GenerateComponentsDataTypes(writer);
 
-            RteFunctionsGenerator_Cpp.CloseGuardDefine(writer);
+            RteFunctionsGenerator_Cpp.CloseCppGuardDefine(writer);
             writer.Close();
         }
 
@@ -321,9 +325,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CppLang
             writer.WriteLine("#define NULL 0U");
             writer.WriteLine("#endif");
             writer.WriteLine("");
-            writer.WriteLine("#ifndef boolean");
-            writer.WriteLine("typedef bool boolean;");
-            writer.WriteLine("#endif");
+            writer.WriteLine("using boolean = bool;");
             writer.WriteLine("");
 
             BaseDataTypesCodeGenerator_Cpp.GenerateCode(writer, AutosarApplication.GetInstance().BaseDataTypes);

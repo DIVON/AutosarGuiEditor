@@ -10,7 +10,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CppLang
             String FileName = folder + "\\" + Properties.Resources.RTE_RETURN_CODES_HPP_FILENAME;
             StreamWriter writer = new StreamWriter(FileName);
             RteFunctionsGenerator_Cpp.GenerateFileTitle(writer, Properties.Resources.RTE_RETURN_CODES_FILENAME, "This file contains return codes of the RTE functions.");
-            RteFunctionsGenerator_Cpp.OpenGuardDefine(writer);
+            RteFunctionsGenerator_Cpp.OpenCppGuardDefine(writer);
 
             writer.WriteLine("/* Rte return codes */");
             writer.WriteLine(" enum class Std_ReturnType");
@@ -27,7 +27,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CppLang
 
             writer.WriteLine();
 
-            RteFunctionsGenerator_Cpp.CloseGuardDefine(writer);
+            RteFunctionsGenerator_Cpp.CloseCppGuardDefine(writer);
             writer.Close();
         }
     }

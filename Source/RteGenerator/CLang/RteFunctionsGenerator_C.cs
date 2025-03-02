@@ -433,12 +433,13 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLang
                 String CDSName = RteFunctionsGenerator_C.ComponentDataStructureDefenitionName(compDefenition);
                 if (arguments.Length == 0)
                 {
-                    return returnType + " " + Generate_RunnableFunctionName(compDefenition, runnable) + "(const " + CDSName + " * const instance)";
+                    return returnType + " " + Generate_RunnableFunctionName(compDefenition, runnable) + "(" + RteFunctionsGenerator_C.ComponentInstancePointerDatatype + " instance)";
                 }
                 else
                 {
-                    return returnType + " " + Generate_RunnableFunctionName(compDefenition, runnable) + "(const " + CDSName + " * const instance, " + arguments + ")";
+                    return returnType + " " + Generate_RunnableFunctionName(compDefenition, runnable) + "( " + RteFunctionsGenerator_C.ComponentInstancePointerDatatype + " instance, " + arguments + ")";
                 }
+
 
             }
             else /* Single instantiation */
@@ -519,7 +520,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLang
         }
 
         /* Returns generated define */
-        public static String OpenGuardDefine(StreamWriter writer)
+        public static String OpenCppGuardDefine(StreamWriter writer)
         {
             String fileName = ((FileStream)(writer.BaseStream)).Name;
 
@@ -531,7 +532,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLang
             return define;
         }
 
-        public static void CloseGuardDefine(StreamWriter writer)
+        public static void CloseCppGuardDefine(StreamWriter writer)
         {
             String define = GenerateFileNameDefine(((FileStream)(writer.BaseStream)).Name);
             writer.WriteLine("#endif /* " + define + " */");

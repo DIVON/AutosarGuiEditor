@@ -18,7 +18,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLang
             String FileName = folder + "\\" + Properties.Resources.RTE_DATATYPES_H_FILENAME;
             StreamWriter writer = new StreamWriter(FileName);
             RteFunctionsGenerator_C.GenerateFileTitle(writer, Properties.Resources.RTE_DATATYPES_H_FILENAME, Properties.Resources.DATATYPES_H_FILE_DESCRIPTION);
-            RteFunctionsGenerator_C.OpenGuardDefine(writer);
+            RteFunctionsGenerator_C.OpenCppGuardDefine(writer);
             RteFunctionsGenerator_C.OpenCGuardDefine(writer);
 
             writer.WriteLine();
@@ -38,7 +38,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLang
             GenerateComponentsDataTypes(writer);
 
             RteFunctionsGenerator_C.CloseCGuardDefine(writer);
-            RteFunctionsGenerator_C.CloseGuardDefine(writer);
+            RteFunctionsGenerator_C.CloseCppGuardDefine(writer);
             writer.Close();
         }
 
@@ -49,6 +49,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLang
             writer.WriteLine("    #define STATIC");
             writer.WriteLine("    #define VOLATILE volatile");
             writer.WriteLine("    #define STATIC_CONST const");
+            writer.WriteLine("    #define STATIC_GLOBAL");
             writer.WriteLine("    #define CONST_VOLATILE volatile");
             writer.WriteLine("    #define ALWAYS_INLINE");
 
@@ -61,6 +62,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLang
             writer.WriteLine("    #define STATIC static");
             writer.WriteLine("    #define VOLATILE volatile");
             writer.WriteLine("    #define STATIC_CONST static const");
+            writer.WriteLine("    #define STATIC_GLOBAL static");
             writer.WriteLine("    #define CONST_VOLATILE const volatile");
             writer.WriteLine("    #define ALWAYS_INLINE  inline __attribute__((always_inline))");
 

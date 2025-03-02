@@ -31,7 +31,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CppLang
             StreamWriter writer = new StreamWriter(FileName);
 
             RteFunctionsGenerator_Cpp.GenerateFileTitle(writer, FileName, Properties.Resources.RTE_PERIODS_H_FILENAME);
-            RteFunctionsGenerator_Cpp.OpenGuardDefine(writer);
+            RteFunctionsGenerator_Cpp.OpenCppGuardDefine(writer);
 
             writer.WriteLine();
 
@@ -61,7 +61,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CppLang
             writer.WriteLine();
 
             writer.WriteLine();
-            RteFunctionsGenerator_Cpp.CloseGuardDefine(writer);
+            RteFunctionsGenerator_Cpp.CloseCppGuardDefine(writer);
 
             writer.Close();
         }
@@ -72,7 +72,6 @@ namespace AutosarGuiEditor.Source.RteGenerator.CppLang
             StreamWriter writer = new StreamWriter(FileName);
 
             RteFunctionsGenerator_Cpp.GenerateFileTitle(writer, FileName, Properties.Resources.RTE_RUNTIME_ENVIRONMENT_FILE_DESCRIPTION);
-            RteFunctionsGenerator_Cpp.OpenGuardDefine(writer);
 
             writer.WriteLine();
             RteFunctionsGenerator_Cpp.AddInclude(writer, Properties.Resources.RTE_RUNTIME_ENVIRONMENT_HPP_FILENAME);
@@ -98,7 +97,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CppLang
             WriteAllOsTasks(writer);
 
             writer.WriteLine();
-            RteFunctionsGenerator_Cpp.CloseGuardDefine(writer);
+            RteFunctionsGenerator_Cpp.CloseCppGuardDefine(writer);
 
             writer.WriteLine();
             RteFunctionsGenerator_Cpp.WriteEndOfFile(writer);
@@ -318,7 +317,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CppLang
                     writer.WriteLine("    }");
                 }
                 lastPeriod = osTask.PeriodMs;
-                writer.WriteLine("    " + RteFunctionsGenerator_Cpp.Generate_CallOfEvent(eventInstance));
+                writer.WriteLine("        Rte_CI_" + eventInstance.ComponentInstanceName + "." + RteFunctionsGenerator_Cpp.Generate_CallOfEvent(eventInstance));
             }
         }
 
@@ -353,7 +352,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CppLang
             StreamWriter writer = new StreamWriter(FileName);
 
             RteFunctionsGenerator_Cpp.GenerateFileTitle(writer, FileName, Properties.Resources.RTE_RUNTIME_ENVIRONMENT_HPP_FILENAME);
-            RteFunctionsGenerator_Cpp.OpenGuardDefine(writer);
+            RteFunctionsGenerator_Cpp.OpenCppGuardDefine(writer);
 
             writer.WriteLine();
             writer.WriteLine("#define RTE_CPP");
@@ -366,7 +365,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CppLang
             writer.WriteLine();
 
             writer.WriteLine("/* Time periods */");
-            writer.WriteLine(RteFunctionsGenerator_Cpp.CreateDefine("SYSTICK_FREQUENCY", AutosarApplication.GetInstance().SystickFrequencyHz.ToString()));
+            writer.WriteLine(RteFunctionsGenerator_Cpp.CreateDefine("RTE_SYSTICK_FREQUENCY", AutosarApplication.GetInstance().SystickFrequencyHz.ToString()));
             writer.WriteLine();
 
 
@@ -399,7 +398,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CppLang
             }
 
             writer.WriteLine();
-            RteFunctionsGenerator_Cpp.CloseGuardDefine(writer);
+            RteFunctionsGenerator_Cpp.CloseCppGuardDefine(writer);
 
             writer.WriteLine();
             RteFunctionsGenerator_Cpp.WriteEndOfFile(writer);
@@ -412,7 +411,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CppLang
             StreamWriter writer = new StreamWriter(FileName);
 
             RteFunctionsGenerator_Cpp.GenerateFileTitle(writer, FileName, Properties.Resources.RTE_EXTERNAL_RUNNABLES_FILE_DESCRIPTION);
-            RteFunctionsGenerator_Cpp.OpenGuardDefine(writer);
+            RteFunctionsGenerator_Cpp.OpenCppGuardDefine(writer);
 
             RteFunctionsGenerator_Cpp.AddInclude(writer, Properties.Resources.RTE_DATATYPES_HPP_FILENAME);
 
@@ -429,7 +428,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CppLang
             }
 
             writer.WriteLine();
-            RteFunctionsGenerator_Cpp.CloseGuardDefine(writer);
+            RteFunctionsGenerator_Cpp.CloseCppGuardDefine(writer);
 
             writer.WriteLine();
             RteFunctionsGenerator_Cpp.WriteEndOfFile(writer);
@@ -444,7 +443,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CppLang
              StreamWriter writer = new StreamWriter(FileName);
 
             RteFunctionsGenerator_Cpp.GenerateFileTitle(writer, FileName, "This file contains all externals required for scheduling");
-            RteFunctionsGenerator_Cpp.OpenGuardDefine(writer);
+            RteFunctionsGenerator_Cpp.OpenCppGuardDefine(writer);
 
             RteConnectionGenerator_Cpp.AddComponentIncludes(writer);
 
@@ -460,7 +459,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CppLang
             RteConnectionGenerator_Cpp.GenerateExternComponentInstances(writer);
 
             writer.WriteLine();
-            RteFunctionsGenerator_Cpp.CloseGuardDefine(writer);
+            RteFunctionsGenerator_Cpp.CloseCppGuardDefine(writer);
 
             writer.WriteLine();
             RteFunctionsGenerator_Cpp.WriteEndOfFile(writer);
@@ -474,7 +473,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CppLang
             StreamWriter writer = new StreamWriter(FileName);
 
             RteFunctionsGenerator_Cpp.GenerateFileTitle(writer, FileName, Properties.Resources.RTE_TASK_SCHEDULER_FILE_DESCRIPTION);
-            RteFunctionsGenerator_Cpp.OpenGuardDefine(writer);
+            RteFunctionsGenerator_Cpp.OpenCppGuardDefine(writer);
 
             RteFunctionsGenerator_Cpp.AddInclude(writer, Properties.Resources.RTE_DATATYPES_HPP_FILENAME);
 
@@ -487,7 +486,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CppLang
             writer.WriteLine("void DoScheduling(void);");
 
             writer.WriteLine();
-            RteFunctionsGenerator_Cpp.CloseGuardDefine(writer);
+            RteFunctionsGenerator_Cpp.CloseCppGuardDefine(writer);
 
             writer.WriteLine();
             RteFunctionsGenerator_Cpp.WriteEndOfFile(writer);

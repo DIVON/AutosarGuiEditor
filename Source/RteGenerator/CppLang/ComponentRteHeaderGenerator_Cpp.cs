@@ -23,7 +23,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CppLang
 
             StreamWriter writer = new StreamWriter(filename);
             RteFunctionsGenerator_Cpp.GenerateFileTitle(writer, filename, "Implementation for " + compDef.Name + " header file");
-            RteFunctionsGenerator_Cpp.OpenGuardDefine(writer);
+            RteFunctionsGenerator_Cpp.OpenCppGuardDefine(writer);
 
 
             
@@ -51,7 +51,11 @@ writer.WriteLine(@"#ifndef RTE_CPP
             writer.WriteLine("    /* Per Instance Memory Section */");
             foreach (PimDefenition pim in compDef.PerInstanceMemoryList)
             {
-                writer.WriteLine("    " + pim.DataTypeName + " * Pim_" + pim.Name + ";");
+                writer.WriteLine("    " + pim.DataTypeName + "& Pim_" + pim.Name + ";");
+            }
+            if (compDef.PerInstanceMemoryList.Count > 0)
+            {
+                writer.WriteLine();
             }
 
 
@@ -61,8 +65,9 @@ writer.WriteLine(@"#ifndef RTE_CPP
                 if (portDef.InterfaceDatatype is SenderReceiverInterface)
                 {
                     SenderReceiverInterface srInterface = portDef.InterfaceDatatype as SenderReceiverInterface;
+                                          
                     String portDatatype = RteFunctionsGenerator_Cpp.GeneratePortDataStructureDefenition(srInterface, portDef.PortType);
-                    writer.WriteLine("    " + portDatatype + " " + portDef.Name + ";");
+                    writer.WriteLine("    " + portDatatype + " " + RteFunctionsGenerator_Cpp.GenerateReadWritePortName(portDef) + ";");
                 }
                 else if (portDef.InterfaceDatatype is ClientServerInterface)
                 {
@@ -78,10 +83,8 @@ writer.WriteLine(@"#ifndef RTE_CPP
             writer.WriteLine("    /* Calibration Parameter Handles Section */");
             foreach (CDataDefenition cdata in compDef.CDataDefenitions)
             {
-                writer.WriteLine("    " + cdata.DataTypeName + " (*CData_" + cdata.Name + ")(void);");
+                writer.WriteLine("    std::function<" + cdata.DataTypeName + "(void)> CData_" + cdata.Name + ";");
             }
-
-
             writer.WriteLine("};");
 
             writer.WriteLine(
@@ -126,7 +129,7 @@ writer.WriteLine(@"#ifndef RTE_CPP
  * END Component Base Class Definition
  *************************************************************/
 ");
-            RteFunctionsGenerator_Cpp.CloseGuardDefine(writer);
+            RteFunctionsGenerator_Cpp.CloseCppGuardDefine(writer);
             writer.Close();
         }
     }

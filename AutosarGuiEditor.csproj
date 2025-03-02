@@ -288,7 +288,10 @@
     <Compile Include="Source\RteGenerator\CppLang\RteSchedulerGenerator_Cpp.cs" />
     <Compile Include="Source\RteGenerator\CppLang\SystemErrorGenerator_Cpp.cs" />
     <Compile Include="Source\RteGenerator\ProgrammingLanguage.cs" />
-    <Compile Include="Source\RteGenerator\TestGenerator\RteTestConnectionCGenerator.cs" />
+    <Compile Include="Source\RteGenerator\TestGeneratorCpp\RteTestConnectionCppGenerator.cs" />
+    <Compile Include="Source\RteGenerator\TestGeneratorCpp\TestRteCommonHppGegenerator.cs" />
+    <Compile Include="Source\RteGenerator\TestGeneratorCpp\TestRteEnvironmentGeneratorCpp.cs" />
+    <Compile Include="Source\RteGenerator\TestGeneratorC\RteTestConnectionCGenerator.cs" />
     <Compile Include="Source\RteGenerator\CLang\RteConnectionGenerator_C.cs" />
     <Compile Include="Source\RteGenerator\CLang\RteDataTypesGenerator_C.cs" />
     <Compile Include="Source\RteGenerator\CLang\RteGenerator_C.cs" />
@@ -298,8 +301,8 @@
     <Compile Include="Source\RteGenerator\CLang\RteSchedulerGenerator_C.cs" />
     <Compile Include="Source\RteGenerator\CLang\SystemErrorGenerator_C.cs" />
     <Compile Include="Source\Interfaces\IGuid.cs" />
-    <Compile Include="Source\RteGenerator\TestGenerator\TestRteCommonHGegenerator.cs" />
-    <Compile Include="Source\RteGenerator\TestGenerator\TestRteEnvironmentGenerator.cs" />
+    <Compile Include="Source\RteGenerator\TestGeneratorC\TestRteCommonHGegenerator.cs" />
+    <Compile Include="Source\RteGenerator\TestGeneratorC\TestRteEnvironmentGeneratorC.cs" />
     <Compile Include="Source\Tester\ArxmlTester.cs" />
     <Compile Include="Source\Utility\AllowUpdater.cs" />
     <Compile Include="Source\Utility\ConsoleWorker.cs" />

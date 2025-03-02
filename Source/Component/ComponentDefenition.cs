@@ -3,6 +3,7 @@ using AutosarGuiEditor.Source.AutosarInterfaces.ClientServer;
 using AutosarGuiEditor.Source.Component.CData;
 using AutosarGuiEditor.Source.Component.PerInstanceMemory;
 using AutosarGuiEditor.Source.Interfaces;
+using AutosarGuiEditor.Source.AutosarInterfaces.SenderReceiver;
 using AutosarGuiEditor.Source.PortDefenitions;
 using AutosarGuiEditor.Source.SystemInterfaces;
 using AutosarGuiEditor.Source.Utility;
@@ -12,6 +13,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
+
 
 namespace AutosarGuiEditor.Source.Component
 {
@@ -31,7 +33,30 @@ namespace AutosarGuiEditor.Source.Component
         
         public PerInstanceMemoryDefenitionList PerInstanceMemoryList = new PerInstanceMemoryDefenitionList();
         public CDataDefenitionList CDataDefenitions = new CDataDefenitionList();
-        
+
+        public Boolean IsComponentEmpty()
+        {
+            /* Если Нету никаких элементов то пропускаем генерацию этого объекта */
+            int elementsCount = 0;
+            elementsCount += PerInstanceMemoryList.Count;
+            elementsCount += CDataDefenitions.Count;
+            foreach (PortDefenition portDef in Ports)
+            {
+                if (portDef.InterfaceDatatype is SenderReceiverInterface)
+                {
+                    elementsCount++;
+                }
+            }
+            if (elementsCount == 0)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
         public override void LoadFromXML(XElement xml)
         {
             base.LoadFromXML(xml);

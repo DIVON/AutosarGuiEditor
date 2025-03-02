@@ -10,9 +10,11 @@ using AutosarGuiEditor.Source.RteGenerator;
 using System.Diagnostics;
 using System.IO;
 using AutosarGuiEditor.Source.RteGenerator.TestGenerator;
+using AutosarGuiEditor.Source.RteGenerator.TestGeneratorCpp;
 using AutosarGuiEditor.Source.Component;
 using AutosarGuiEditor.Source.RteGenerator.CLang;
 using AutosarGuiEditor.Source.RteGenerator.CppLang;
+
 
 namespace AutosarGuiEditor
 {
@@ -115,12 +117,25 @@ namespace AutosarGuiEditor
                     String testResult = writer.ToString();
                     if (!tester.IsErrorExist(testResult))
                     {
-                        TestRteEnvironmentGenerator generator = new TestRteEnvironmentGenerator();
-                        generator.GenerateRteEnvironment(autosarApp.GenerateTestRtePath);
+                        if (autosarApp.ProgramLanguage.Type == ProgrammingLanguageTypeDef.C)
+                        {
+                            TestRteEnvironmentGenerator generator = new TestRteEnvironmentGenerator();
 
-                        generator.GenerateCommonFiles(autosarApp.GenerateTestRtePath);
-                        RteSchedulerGenerator_C rteSchedulerGenerator = new RteSchedulerGenerator_C();
-                        rteSchedulerGenerator.Generate_ExternalRunnables_File(autosarApp.GenerateTestRtePath);
+                            generator.GenerateRteEnvironment(autosarApp.GenerateTestRtePath);
+                            generator.GenerateCommonFiles(autosarApp.GenerateTestRtePath);
+                            RteSchedulerGenerator_C rteSchedulerGenerator = new RteSchedulerGenerator_C();
+                            rteSchedulerGenerator.Generate_ExternalRunnables_File(autosarApp.GenerateTestRtePath);
+                        }
+                        else if (autosarApp.ProgramLanguage.Type == ProgrammingLanguageTypeDef.Cpp)
+                        {
+                            TestRteEnvironmentGeneratorCpp generator = new TestRteEnvironmentGeneratorCpp();
+
+                            generator.GenerateRteEnvironment(autosarApp.GenerateTestRtePath);
+                            generator.GenerateCommonFiles(autosarApp.GenerateTestRtePath);
+                            RteSchedulerGenerator_Cpp rteSchedulerGenerator = new RteSchedulerGenerator_Cpp();
+                            rteSchedulerGenerator.Generate_ExternalRunnables_File(autosarApp.GenerateTestRtePath);
+                        }
+
                     }
                     else
                     {
