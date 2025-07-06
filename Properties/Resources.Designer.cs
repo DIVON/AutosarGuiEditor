@@ -442,6 +442,15 @@ namespace AutosarGuiEditor.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to TestRte.cpp.
+        /// </summary>
+        internal static string TEST_RTE_CPP_FILENAME {
+            get {
+                return ResourceManager.GetString("TEST_RTE_CPP_FILENAME", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to TestRte.h.
         /// </summary>
         internal static string TEST_RTE_H_FILENAME {

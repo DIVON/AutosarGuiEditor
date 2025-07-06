@@ -90,6 +90,13 @@ namespace AutosarGuiEditor.Source.RteGenerator.CppLang
 
         void GenerateCDataFunctions(StreamWriter writer)
         {
+#if false
+            writer.WriteLine(
+@"/*************************************************************
+ * BEGIN RTE CData Call operation handlers
+ *************************************************************/
+");
+
             foreach (CompositionInstance composition in AutosarApplication.GetInstance().Compositions)
             {
                 foreach (ComponentInstance component in composition.ComponentInstances)
@@ -110,6 +117,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CppLang
                     }
                 }
             }
+#endif
         }
 
         void GenerateCallFunctions(StreamWriter writer)
@@ -693,8 +701,8 @@ namespace AutosarGuiEditor.Source.RteGenerator.CppLang
                     /* write cdata  */
                     foreach (CDataDefenition cdata in compDef.CDataDefenitions)
                     {
-                        String rteFuncName = RteFunctionsGenerator_Cpp.GenerateInternalCDataFunctionName(component.Name, cdata);
-                        writer.WriteLine("    &" + rteFuncName + ",");
+                        String rteBufName = RteFunctionsGenerator_Cpp.GenerateInternalCDataBufferName(component, cdata);
+                        writer.WriteLine("    " + rteBufName + ",");
                     }
 
                     writer.WriteLine("};");

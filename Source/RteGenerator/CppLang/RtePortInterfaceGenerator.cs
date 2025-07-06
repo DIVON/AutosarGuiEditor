@@ -80,7 +80,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CppLang
             foreach (SenderReceiverInterfaceField field in srInterface.Fields)
             {
                 String args = RteFunctionsGenerator_Cpp.GenerateSenderReceiverInterfaceArguments(field, PortDefenitions.PortType.Sender);
-                writer.WriteLine("using " + GenerateWriteFuncName(srInterface, field) + " =  std::function<Std_ReturnType" + args + "> ;");
+                writer.WriteLine("using " + GenerateWriteFuncName(srInterface, field) + " =  Std_ReturnType(*)" + args + ";");
             }
         }
 
@@ -90,7 +90,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CppLang
             foreach (SenderReceiverInterfaceField field in srInterface.Fields)
             {
                 String args = RteFunctionsGenerator_Cpp.GenerateSenderReceiverInterfaceArguments(field, PortDefenitions.PortType.Receiver);
-                writer.WriteLine("using " + GenerateReadFuncName(srInterface, field) + " =  std::function<Std_ReturnType" + args + "> ;");
+                writer.WriteLine("using " + GenerateReadFuncName(srInterface, field) + " = Std_ReturnType(*)" + args + ";");
             }
         }
 

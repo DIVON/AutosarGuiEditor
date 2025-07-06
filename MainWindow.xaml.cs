@@ -1236,9 +1236,9 @@ namespace AutosarGuiEditor
                 TestRteEnvironmentGeneratorCpp generator = new TestRteEnvironmentGeneratorCpp();
 
                 generator.GenerateRteEnvironment(autosarApp.GenerateTestRtePath);
-                generator.GenerateCommonFiles(autosarApp.GenerateTestRtePath);
-                RteSchedulerGenerator_Cpp rteSchedulerGenerator = new RteSchedulerGenerator_Cpp();
-                rteSchedulerGenerator.Generate_ExternalRunnables_File(autosarApp.GenerateTestRtePath);
+                //generator.GenerateCommonFiles(autosarApp.GenerateTestRtePath);
+                //RteSchedulerGenerator_Cpp rteSchedulerGenerator = new RteSchedulerGenerator_Cpp();
+                //rteSchedulerGenerator.Generate_ExternalRunnables_File(autosarApp.GenerateTestRtePath);
                 MessageBox.Show("Test environment has been generated.");
             }
 

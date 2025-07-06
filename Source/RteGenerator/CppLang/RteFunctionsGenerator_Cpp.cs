@@ -294,6 +294,14 @@ namespace AutosarGuiEditor.Source.RteGenerator.CppLang
             return result;
         }
 
+        public static String GenerateFullCDataTestFunctionDefenitionNameAndReturnType(ApplicationSwComponentType compDefenition, CDataDefenition cdata)
+        {
+            String returnDataType = cdata.DataTypeName;
+            String FunctionArguments = "(void)";
+            String result = returnDataType + " " + GenerateTestCDataFunctionName(compDefenition.Name, cdata) + FunctionArguments;
+            return result;
+        }
+
         public static String GenerateRteCDataFieldInComponentDefenitionStruct(ApplicationSwComponentType compDefenition, CDataDefenition cdata)
         {
             return "Rte_CDataField_" + compDefenition.Name + "_" + cdata.Name;
@@ -310,6 +318,24 @@ namespace AutosarGuiEditor.Source.RteGenerator.CppLang
         {
             SenderReceiverInterface srInterface = portDefenition.InterfaceDatatype as SenderReceiverInterface;
             return "Rte_WriteField_" + portDefenition.Name + "_" + field.Name;
+        }
+
+        public static String GenerateFullReadWriteTestFunctionDefenitionName(ApplicationSwComponentType compDef, PortDefenition portDef, SenderReceiverInterfaceField field)
+        {
+            string data = "Rte_Test_" + compDef.Name + "_" + portDef.Name;
+            data += (portDef.PortType == PortType.Sender) ? "_Write_" : "_Read_";
+            data += field.Name;
+            return data;
+        }
+
+        public static String GenerateFullReadWriteTestFunctionDefenitionNameAndReturnType(ApplicationSwComponentType compDef, PortDefenition portDef, SenderReceiverInterfaceField field)
+        {
+            string data = "Std_ReturnType Rte_Test_" + compDef.Name + "_" + portDef.Name;
+            data += (portDef.PortType == PortType.Sender) ? "_Write_" : "_Read_";
+            var args = GenerateSenderReceiverInterfaceArguments(field, portDef.PortType);
+            data += field.Name + args;
+
+            return data;
         }
 #endregion
 
@@ -597,6 +623,22 @@ namespace AutosarGuiEditor.Source.RteGenerator.CppLang
             return serverPortCallFunction;
         }
 
+        public static String GenerateFullCallTestFunctionDefenitionName(ApplicationSwComponentType compDef, PortDefenition portDef, ClientServerOperation operation)
+        {
+            string data = "Rte_Test_" + compDef.Name + "_" + portDef.Name + "_Call_" + operation.Name;
+            return data;
+        }
+
+        public static String GenerateFullCallTestFunctionDefenitionNameAndReturnType(ApplicationSwComponentType compDef, PortDefenition portDef, ClientServerOperation operation)
+        {
+            string data = "Std_ReturnType Rte_Test_" + compDef.Name + "_" + portDef.Name + "_Call_" + operation.Name;
+
+            var args = "("+GenerateClientServerInterfaceArguments(operation)+")";
+            data += args;
+
+            return data;
+        }
+
         
 
         public static String GenerateReadWriteConnectionFunctionName(PortDefenition port, SenderReceiverInterfaceField field)
@@ -614,6 +656,24 @@ namespace AutosarGuiEditor.Source.RteGenerator.CppLang
 
             ApplicationSwComponentType compDefenition = AutosarApplication.GetInstance().FindComponentDefenitionByPort(port);
             res += compDefenition.Name + "_" + port.Name + "_" + field.Name;
+
+            return res;
+        }
+
+        public static String GenerateReadWriteTestConnectionFunctionName(ApplicationSwComponentType compDef, PortDefenition port, SenderReceiverInterfaceField field)
+        {
+            String res = "Rte_Test_" + compDef.Name + "_" + port.Name;
+
+            if (port.PortType == PortType.Sender)
+            {
+                res += "_Write_";
+            }
+            else
+            {
+                res += "_Read_";
+            }
+
+            res += field.Name;
 
             return res;
         }
@@ -651,6 +711,19 @@ namespace AutosarGuiEditor.Source.RteGenerator.CppLang
             String res = "Rte_InternalCData_";
 
             res += componentName + "_" + cdata.Name;
+
+            return res;
+        }
+
+        public static String GenerateInternalCDataBufferName(ComponentInstance component, CDataDefenition cdata)
+        {
+            String res = "Rte_CDataBuffer_" + component.Name + "_" + cdata.Name;
+            return res;
+        }
+
+        public static String GenerateTestCDataFunctionName(String componentName, CDataDefenition cdata)
+        {
+            String res = "Rte_Test_" + componentName + "_CData_" + cdata.Name;
 
             return res;
         }

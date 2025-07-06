@@ -253,4 +253,7 @@
   <data name="TEST_RTE_HPP_FILENAME" xml:space="preserve">
     <value>TestRte.hpp</value>
   </data>
+  <data name="TEST_RTE_CPP_FILENAME" xml:space="preserve">
+    <value>TestRte.cpp</value>
+  </data>
 </root>

@@ -17,8 +17,8 @@ namespace AutosarGuiEditor.Source.RteGenerator.CppLang
         {
             String filename = dir + "\\" + RteFunctionsGenerator_Cpp.GenerateComponentHeaderFile(compDef);
             if (!Directory.Exists(dir))
-            { 
-                Directory.CreateDirectory(dir); 
+            {
+                Directory.CreateDirectory(dir);
             }
 
             StreamWriter writer = new StreamWriter(filename);
@@ -26,7 +26,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CppLang
             RteFunctionsGenerator_Cpp.OpenCppGuardDefine(writer);
 
 
-            
+
 writer.WriteLine(@"#ifndef RTE_CPP
     #ifdef RTE_APP_HEADER_FILE
         #error Multiple application header files included.
@@ -65,9 +65,9 @@ writer.WriteLine(@"#ifndef RTE_CPP
                 if (portDef.InterfaceDatatype is SenderReceiverInterface)
                 {
                     SenderReceiverInterface srInterface = portDef.InterfaceDatatype as SenderReceiverInterface;
-                                          
+
                     String portDatatype = RteFunctionsGenerator_Cpp.GeneratePortDataStructureDefenition(srInterface, portDef.PortType);
-                    writer.WriteLine("    " + portDatatype + " " + RteFunctionsGenerator_Cpp.GenerateReadWritePortName(portDef) + ";");
+                    writer.WriteLine("    const " + portDatatype + " " + RteFunctionsGenerator_Cpp.GenerateReadWritePortName(portDef) + ";");
                 }
                 else if (portDef.InterfaceDatatype is ClientServerInterface)
                 {
@@ -79,11 +79,12 @@ writer.WriteLine(@"#ifndef RTE_CPP
                     }
                 }
             }
+            writer.WriteLine();
 
             writer.WriteLine("    /* Calibration Parameter Handles Section */");
             foreach (CDataDefenition cdata in compDef.CDataDefenitions)
             {
-                writer.WriteLine("    std::function<" + cdata.DataTypeName + "(void)> CData_" + cdata.Name + ";");
+                writer.WriteLine("    const " + cdata.DataTypeName + " &CData_" + cdata.Name + ";");
             }
             writer.WriteLine("};");
 
@@ -109,19 +110,10 @@ writer.WriteLine(@"#ifndef RTE_CPP
 
             writer.WriteLine("    /* Constructor */");
             writer.WriteLine("    " + baseClassName + "(const " + rteStructureName + " &rte) : Rte(rte) {} ");
-            writer.WriteLine("");
-
-            writer.WriteLine("    /* Abstract component's runnables */");
-            foreach (RunnableDefenition runnable in compDef.Runnables)
-            {
-                String returnType = "";
-                String runnableName = RteFunctionsGenerator_Cpp.Generate_RunnableDeclaration(compDef, runnable, false, out returnType);
-                writer.WriteLine("    virtual " + runnableName + " = 0;");
-            }
             writer.WriteLine("protected:");
             writer.WriteLine("    const Rte_" + compDef.Name + " &Rte;");
             writer.WriteLine("private:");
-            writer.WriteLine("};");            
+            writer.WriteLine("};");
 
             writer.WriteLine(
 @"
