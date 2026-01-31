@@ -182,6 +182,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CppLang
         void GenerateOsTaskFunctionCallOfRunnables(StreamWriter writer, OsTask osTask)
         {
             String osTaskName = RteFunctionsGenerator_Cpp.GenerateRteOsTaskFunctionName(osTask);
+            writer.WriteLine("extern \"C\"");
             writer.WriteLine("void " + osTaskName + "(void)");
             writer.WriteLine("{");
             WriteCallOfOsRunnables(writer, osTask);
@@ -394,7 +395,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CppLang
             foreach (OsTask osTask in AutosarApplication.GetInstance().OsTasks)
             {
                 String osTaskName = RteFunctionsGenerator_Cpp.GenerateRteOsTaskFunctionName(osTask);
-                writer.WriteLine("void " + osTaskName + "(void);");
+                writer.WriteLine("extern \"C\" void " + osTaskName + "(void);");
             }
 
             writer.WriteLine();
@@ -483,6 +484,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CppLang
 
             writer.WriteLine();
 
+            writer.WriteLine("extern \"C\"");
             writer.WriteLine("void DoScheduling(void);");
 
             writer.WriteLine();
@@ -608,12 +610,13 @@ namespace AutosarGuiEditor.Source.RteGenerator.CppLang
             writer.WriteLine();
 
             /* Writing DoScheduling function */
+            writer.WriteLine("extern \"C\"");
             writer.WriteLine("void DoScheduling(void)");
             writer.WriteLine("{");
             writer.WriteLine("    uint32 index = schedulingCounter % RTE_SCHEDULER_STEPS;");
             writer.WriteLine("    for (uint32 i = 0; i < RTE_TASKS_COUNT; i++)");
             writer.WriteLine("    {");
-            writer.WriteLine("        if (((void *)0) != taskScheduling[index][i])");
+            writer.WriteLine("        if (nullptr != taskScheduling[index][i])");
             writer.WriteLine("        {");
             writer.WriteLine("            taskScheduling[index][i]();");
             writer.WriteLine("        }");

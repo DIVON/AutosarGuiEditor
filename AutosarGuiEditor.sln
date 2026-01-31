@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.1.32407.343
+# Visual Studio 2013
+VisualStudioVersion = 12.0.40629.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AutosarGuiEditor", "AutosarGuiEditor.csproj", "{C87CB053-50A4-454E-9436-6B0A96AF2FA3}"
 	ProjectSection(ProjectDependencies) = postProject
@@ -23,8 +23,8 @@ Global
 		{C87CB053-50A4-454E-9436-6B0A96AF2FA3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C87CB053-50A4-454E-9436-6B0A96AF2FA3}.RegenRTE|Any CPU.ActiveCfg = RegenRTE|Any CPU
 		{C87CB053-50A4-454E-9436-6B0A96AF2FA3}.RegenRTE|Any CPU.Build.0 = RegenRTE|Any CPU
-		{C87CB053-50A4-454E-9436-6B0A96AF2FA3}.RegenSkeleton|Any CPU.ActiveCfg = RegenSkeleton|Any CPU
-		{C87CB053-50A4-454E-9436-6B0A96AF2FA3}.RegenSkeleton|Any CPU.Build.0 = RegenSkeleton|Any CPU
+		{C87CB053-50A4-454E-9436-6B0A96AF2FA3}.RegenSkeleton|Any CPU.ActiveCfg = Debug|Any CPU
+		{C87CB053-50A4-454E-9436-6B0A96AF2FA3}.RegenSkeleton|Any CPU.Build.0 = Debug|Any CPU
 		{C87CB053-50A4-454E-9436-6B0A96AF2FA3}.RegenTestRte|Any CPU.ActiveCfg = RegenTestRte|Any CPU
 		{C87CB053-50A4-454E-9436-6B0A96AF2FA3}.RegenTestRte|Any CPU.Build.0 = RegenTestRte|Any CPU
 		{C87CB053-50A4-454E-9436-6B0A96AF2FA3}.Release|Any CPU.ActiveCfg = Release|Any CPU

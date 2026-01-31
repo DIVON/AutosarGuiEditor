@@ -222,7 +222,7 @@ namespace AutosarGuiEditor.Source.Painters.Components.PerInstance
 
                     defValue += DefaultValues[i].DefaultValue;
                 }
-                defValue += " };";
+                defValue += " }";
             }
             return defValue;
         }

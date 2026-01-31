@@ -517,6 +517,8 @@ namespace AutosarGuiEditor.Source.RteGenerator.CppLang
             writer.WriteLine(" *");
             writer.WriteLine(" * " + AutosarApplication.GetInstance().Signature);
             writer.WriteLine(" */");
+            writer.WriteLine();
+            writer.WriteLine("// clang-format off");
         }
 
         /* Returns generated define */

@@ -307,6 +307,15 @@ namespace AutosarGuiEditor.Source.RteGenerator.TestGeneratorCpp
             writer.WriteLine("        Rte_" + compDef.Name + "{");
 
             // ГЕНЕРАЦИЯ СТРУКТУРЫ С ЗАПОЛНЕНИЕМ
+
+            /* Write All PIMs */
+            foreach (PimDefenition pimDef in compDef.PerInstanceMemoryList)
+            {
+                var pimField = "Pim_" + pimDef.Name;
+                writer.WriteLine("        ." + pimField + " = stubs." + pimField + ",");
+            }
+            writer.WriteLine();
+
             /* Write All Rte Read structures */
             foreach (PortDefenition portDef in compDef.Ports)
             {
@@ -335,14 +344,6 @@ namespace AutosarGuiEditor.Source.RteGenerator.TestGeneratorCpp
                     }
                     writer.WriteLine("        },");
                 }
-            }
-            writer.WriteLine();
-
-            /* Write All PIMs */
-            foreach (PimDefenition pimDef in compDef.PerInstanceMemoryList)
-            {
-                var pimField = "Pim_" + pimDef.Name;
-                writer.WriteLine("        ." + pimField + " = stubs." + pimField + ",");
             }
             writer.WriteLine();
 

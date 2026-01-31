@@ -29,17 +29,15 @@ namespace AutosarGuiEditor.Source.RteGenerator.CppLang
         {
             /* Generate component Folder */
             String componentFolder = RteFunctionsGenerator_Cpp.GetComponentsFolder() + "\\" + component.Name;
-            String componentSkeletonFolder = componentFolder + "\\contracts\\skeleton";
             String rteDir = RteFunctionsGenerator_Cpp.GetRteFolder() + "\\";
-            String incDir = componentSkeletonFolder + "\\include\\";
-            String srcDir = componentSkeletonFolder + "\\src\\";
-            Directory.CreateDirectory(incDir);
-            Directory.CreateDirectory(srcDir);
-            Directory.CreateDirectory(componentFolder + "\\include\\");
-            Directory.CreateDirectory(componentFolder + "\\src\\");
-
-            /* Fill sections of code */
-
+            String skeletonIncDir = componentFolder + "\\Contracts\\skeleton\\include\\";
+            String skeletonSrcDir = componentFolder + "\\Contracts\\skeleton\\src\\";
+            String sourceIncDir = componentFolder + "\\Source\\include\\";
+            String sourceSrcDir = componentFolder + "\\Source\\src\\";
+            Directory.CreateDirectory(skeletonIncDir);
+            Directory.CreateDirectory(skeletonSrcDir);
+            Directory.CreateDirectory(sourceIncDir);
+            Directory.CreateDirectory(sourceSrcDir);
 
             /* Each component's runnable shall be in its own file */
             foreach (RunnableDefenition runnable in component.Runnables)
@@ -48,15 +46,15 @@ namespace AutosarGuiEditor.Source.RteGenerator.CppLang
                 string returnType = "";
 
                 String runnableDefenitionLine = RteFunctionsGenerator_Cpp.Generate_RunnableDeclaration(component, runnable, true, out returnType);
-                
-                CreateRunnableFile(srcDir, componentFolder + "\\src\\", component, runnable, runnableDefenitionLine, arguments, returnType);
+
+                CreateRunnableFile(skeletonSrcDir, sourceSrcDir, component, runnable, runnableDefenitionLine, arguments, returnType);
             }
 
 
             /* Generate funcitons for Sender-Receiver ports and call operations from client ports */
             ComponentRteHeaderGenerator_Cpp.GenerateHeader(rteDir, component);
 
-            CreateComponentIncludes(incDir, componentFolder + "\\include\\", component);
+            CreateComponentIncludes(skeletonIncDir, sourceIncDir, component);
         }
 
         void CreateComponentIncludes(String skeletonDir, String srcDir, ApplicationSwComponentType componentDefenition)

@@ -13,6 +13,11 @@ namespace AutosarGuiEditor.Source.RteGenerator.CppLang
                 {
                     continue;
                 }
+                if (baseDataType.SystemName == "float" && baseDataType.Name == "float")
+                {
+                    //TODO: избавиться от этого костыля
+                    continue;
+                }
                 writer.WriteLine("typedef  " + baseDataType.SystemName + "  " + baseDataType.Name + ";");
 
                 ArrayDataTypeGenerator_Cpp.GenerateArrayForDataType(writer, baseDataType);
