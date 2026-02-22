@@ -1,8 +1,9 @@
 /*.user
 /*.suo
-/bin
+bin/*
 /obj
 obj
 /WriteableBitmapEx/Build/Debug/WriteableBitmapEx.Wpf.dll
 /WriteableBitmapEx/Build/Debug/WriteableBitmapEx.Wpf.pdb
 /.vs/AutosarGuiEditor/v17/*.suo
+WriteableBitmapEx/bin/*
