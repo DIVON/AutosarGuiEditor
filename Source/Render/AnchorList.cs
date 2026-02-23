@@ -71,6 +71,16 @@ namespace System {
             }
         }
 
+        public void Reindex()
+        {
+            int index = 0;
+            foreach (AnchorPoint point in this)
+            {
+                point.Index = index;
+                index++;
+            }
+        }
+
 	}//end AnchorList
 
 }//end namespace System

@@ -125,6 +125,35 @@ namespace System {
             bmp.DrawLine((int)startX, (int)startY, (int)endX, (int)endY, color);
         }
 
+        int ShiftAndScaleX(double x)
+        {
+            int xPoint = (int)(Offset.X + x * Scale);
+            return xPoint;
+        }
+
+        int ShiftAndScaleY(double y)
+        {
+            int yPoint = (int)(Offset.Y + y * Scale);
+            return yPoint;
+        }
+
+        public void DrawArc(double x1, double y1, double cx1, double cy1, double cx2, double cy2, double x2, double y2, Color color)
+        {
+            int x1_ = ShiftAndScaleX(x1);
+            int y1_ = ShiftAndScaleY(y1);
+
+            int x2_ = ShiftAndScaleX(x2);
+            int y2_ = ShiftAndScaleY(y2);
+
+            int cx1_ = ShiftAndScaleX(cx1);
+            int cy1_ = ShiftAndScaleY(cy1);
+
+            int cx2_ = ShiftAndScaleX(cx2);
+            int cy2_ = ShiftAndScaleY(cy2);
+
+           // bmp.DrawBezier(x1_, y1_, cx1_, cy1_, cx2_, cy2_, x2_, y2_, color);
+        }
+
         public void DrawRectangle(double startX, double startY, double endX, double endY, Color color)
         {            
             startX = Offset.X + startX * Scale;

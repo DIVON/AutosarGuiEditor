@@ -38,6 +38,8 @@ namespace AutosarGuiEditor.Source.Render
             rectangle.BackgroundColor = Colors.Blue;
         }
 
+        public int Index = 0;
+
         public void Render(RenderContext context)
         {
             rectangle.Top = Position.Y - Size / context.Scale / 2;

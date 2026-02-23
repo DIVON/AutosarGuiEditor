@@ -142,6 +142,19 @@ namespace System
             }
         }
 
+        public PortPainter Port2
+        {
+            get
+            {
+                return AutosarApplication.GetInstance().FindPort(PortPainter2Guid);
+            }
+            set
+            {
+                PortPainter2Guid = value.GUID;
+                UpdateName();
+            }
+        }
+
         public void UpdateName()
         {
             String name = "NoName";
@@ -172,18 +185,7 @@ namespace System
             }
         }
 
-        public PortPainter Port2
-        {
-            get
-            {
-                return AutosarApplication.GetInstance().FindPort(PortPainter2Guid);
-            }
-            set
-            {
-                PortPainter2Guid = value.GUID;
-                UpdateName();
-            }
-        }
+       
 
         public bool IsClicked(Point point, out Object clickedObject)
         {
@@ -258,12 +260,113 @@ namespace System
         
         public void AddPoint(Point newPoint)
         {
-            AnchorPoint point = new AnchorPoint(this);
-            point.Position.X = newPoint.X;
-            point.Position.Y = newPoint.Y;
-            point.OnMove += Anchor_OnMove;
-            anchors.Add(point);
-            RecreateLines();
+            if ((Port1 == null) || (Port2 == null))
+            {
+                return;
+            }
+
+            Point startPoint = Port1.GetConnectionPoint();
+            Point endPoint = Port2.GetConnectionPoint();
+
+            RectangleSide port1Side = Port1.ConnectionPortLocation;
+            RectangleSide port2Side = Port2.ConnectionPortLocation;
+
+            if (anchors.Count == 0)
+            {
+                // Оба горизонтально
+                if ((port1Side == RectangleSide.Left || port1Side == RectangleSide.Right) &&
+                    (port2Side == RectangleSide.Left || port2Side == RectangleSide.Right))
+                {
+                    double x1 = startPoint.X + 1.0 * (endPoint.X - startPoint.X) / 4.0;
+                    double x2 = startPoint.X + 2.0 * (endPoint.X - startPoint.X) / 4.0;
+                    double x3 = startPoint.X + 3.0 * (endPoint.X - startPoint.X) / 4.0;
+                    double y2 = (startPoint.Y + endPoint.Y) / 2.0;
+
+                    AnchorPoint point1 = new AnchorPoint(this);
+                    point1.Position.X = x1;
+                    point1.Position.Y = startPoint.Y;
+                    point1.OnMove += Anchor_OnMove;
+                    point1.Index = 0;
+                    anchors.Add(point1);
+
+                    AnchorPoint point2 = new AnchorPoint(this);
+                    point2.Position.X = x2;
+                    point2.Position.Y = y2;
+                    point2.OnMove += Anchor_OnMove;
+                    point2.Index = 1;
+                    anchors.Add(point2);
+
+                    AnchorPoint point3 = new AnchorPoint(this);
+                    point3.Position.X = x3;
+                    point3.Position.Y = endPoint.Y;
+                    point3.OnMove += Anchor_OnMove;
+                    point3.Index = 2;
+                    anchors.Add(point3);
+
+                    RecreateLines();
+                }
+                // Оба вертикально
+                else if ((port1Side == RectangleSide.Top || port1Side == RectangleSide.Bottom) &&
+                    (port2Side == RectangleSide.Top || port2Side == RectangleSide.Bottom))
+                {
+                    double y1 = startPoint.Y + 1.0 * (endPoint.Y - startPoint.Y) / 4.0;
+                    double y2 = startPoint.Y + 2.0 * (endPoint.Y - startPoint.Y) / 4.0;
+                    double y3 = startPoint.Y + 3.0 * (endPoint.Y - startPoint.Y) / 4.0;
+                    double x2 = (startPoint.X + endPoint.X) / 2.0;
+
+                    AnchorPoint point1 = new AnchorPoint(this);
+                    point1.Position.X = startPoint.X;
+                    point1.Position.Y = y1;
+                    point1.OnMove += Anchor_OnMove;
+                    point1.Index = 0;
+                    anchors.Add(point1);
+
+                    AnchorPoint point2 = new AnchorPoint(this);
+                    point2.Position.X = x2;
+                    point2.Position.Y = y2;
+                    point2.OnMove += Anchor_OnMove;
+                    point2.Index = 1;
+                    anchors.Add(point2);
+
+                    AnchorPoint point3 = new AnchorPoint(this);
+                    point3.Position.X = endPoint.X;
+                    point3.Position.Y = y3;
+                    point3.OnMove += Anchor_OnMove;
+                    point3.Index = 2;
+                    anchors.Add(point3);
+
+                    RecreateLines();
+                }
+                // Порты смотрят в разные стороны
+                else 
+                {
+                    if (port1Side == RectangleSide.Top || port1Side == RectangleSide.Bottom)
+                    {
+                        Point midPoint = startPoint;
+                        startPoint = endPoint;
+                        endPoint = midPoint;
+                    }
+
+                    double x1 = (endPoint.X + startPoint.X) / 2.0;
+                    double y2 = (endPoint.Y + startPoint.Y) / 2.0;
+
+                    AnchorPoint point1 = new AnchorPoint(this);
+                    point1.Position.X = x1;
+                    point1.Position.Y = startPoint.Y;
+                    point1.OnMove += Anchor_OnMove;
+                    point1.Index = 0;
+                    anchors.Add(point1);
+
+                    AnchorPoint point2 = new AnchorPoint(this);
+                    point2.Position.X = endPoint.X;
+                    point2.Position.Y = y2;
+                    point2.OnMove += Anchor_OnMove;
+                    point2.Index = 1;
+                    anchors.Add(point2);
+
+                    RecreateLines();
+                }
+            }
         }
 
         public Boolean RecreateLines()
@@ -275,6 +378,7 @@ namespace System
             }
             Point startPoint = Port1.GetConnectionPoint();
             Point endPoint = Port2.GetConnectionPoint();
+
             if (anchors.Count == 0)
             {
                 LineRenderer line = new LineRenderer();
@@ -284,17 +388,37 @@ namespace System
             }
             else
             {
-                lines.AddNewLine(startPoint.X, startPoint.Y, anchors[0].Position.X, startPoint.Y, LineColor);
-                lines.AddNewLine(anchors[0].Position.X, startPoint.Y, anchors[0].Position.X, anchors[0].Position.Y, LineColor);
+                RectangleSide port1Side = Port1.ConnectionPortLocation;
+                RectangleSide port2Side = Port2.ConnectionPortLocation;
 
-                for (int i = 1; i < anchors.Count; i++)
+                if (port1Side == RectangleSide.Left || port1Side == RectangleSide.Right)
                 {
-                    lines.AddNewLine(anchors[i - 1].Position.X, anchors[i - 1].Position.Y, anchors[i].Position.X, anchors[i - 1].Position.Y, LineColor);
-                    lines.AddNewLine(anchors[i].Position.X, anchors[i - 1].Position.Y, anchors[i].Position.X, anchors[i].Position.Y, LineColor);
+                    lines.AddNewLine(startPoint.X, startPoint.Y, anchors[0].Position.X, startPoint.Y, LineColor);
+                    startPoint.X = anchors[0].Position.X;
+
+                    for (int i = 0; i < anchors.Count; i++)
+                    {
+                        if (i % 2 == 1)
+                        {
+                            lines.AddNewLine(startPoint.X, startPoint.Y, anchors[i].Position.X, startPoint.Y, LineColor);
+                            startPoint.X = anchors[i].Position.X;
+                        }
+                        else
+                        {
+                            lines.AddNewLine(startPoint.X, startPoint.Y, startPoint.X, anchors[i].Position.Y, LineColor);
+                            startPoint.Y = anchors[i].Position.Y;
+                        }
+                    }
+
+                    if (port1Side == RectangleSide.Left || port1Side == RectangleSide.Right)
+                    {
+                        lines.AddNewLine(startPoint.X, startPoint.Y, startPoint.X, endPoint.Y, LineColor);
+                        startPoint.Y = endPoint.Y;
+                    }
+                    lines.AddNewLine(startPoint, endPoint, LineColor);
                 }
 
-                lines.AddNewLine(anchors[anchors.Count - 1].Position.X, anchors[anchors.Count - 1].Position.Y, anchors[anchors.Count - 1].Position.X, endPoint.Y, LineColor);
-                lines.AddNewLine(anchors[anchors.Count - 1].Position.X, endPoint.Y, endPoint.X, endPoint.Y, LineColor);
+                
             }
 
             if (IsSelected())
@@ -311,36 +435,37 @@ namespace System
         /* */
         public void UpdateLines()
         {
-            if (linesCreated == false)
-            {
-                linesCreated = RecreateLines();    
-                if (linesCreated == false)
-                {
-                    return;
-                }
-            }
-            Point startPoint = Port1.GetConnectionPoint();
-            Point endPoint = Port2.GetConnectionPoint();
-            if (anchors.Count == 0)
-            {
-                lines[0].UpdateCoordinates(startPoint, endPoint);                
-            }
-            else
-            {
-                lines[0].UpdateCoordinates(startPoint.X, startPoint.Y, anchors[0].Position.X, startPoint.Y);
-                lines[1].UpdateCoordinates(anchors[0].Position.X, startPoint.Y, anchors[0].Position.X, anchors[0].Position.Y);
-
-                int lineindex = 1;
-                for (int i = 1; i < anchors.Count; i++)
-                {
-                    lines[i + 1].UpdateCoordinates(anchors[i - 1].Position.X, anchors[i - 1].Position.Y, anchors[i].Position.X, anchors[i - 1].Position.Y);
-                    lines[i + 2].UpdateCoordinates(anchors[i].Position.X, anchors[i - 1].Position.Y, anchors[i].Position.X, anchors[i].Position.Y);
-                    lineindex += 2;
-                }
-
-                lines[lineindex + 1].UpdateCoordinates(anchors[anchors.Count - 1].Position.X, anchors[anchors.Count - 1].Position.Y, anchors[anchors.Count - 1].Position.X, endPoint.Y);
-                lines[lineindex + 2].UpdateCoordinates(anchors[anchors.Count - 1].Position.X, endPoint.Y, endPoint.X, endPoint.Y);
-            }
+            RecreateLines();
+            //if (linesCreated == false)
+            //{
+            //    linesCreated = RecreateLines();    
+            //    if (linesCreated == false)
+            //    {
+            //        return;
+            //    }
+            //}
+            //Point startPoint = Port1.GetConnectionPoint();
+            //Point endPoint = Port2.GetConnectionPoint();
+            //if (anchors.Count == 0)
+            //{
+            //    lines[0].UpdateCoordinates(startPoint, endPoint);                
+            //}
+            //else
+            //{
+            //    lines[0].UpdateCoordinates(startPoint.X, startPoint.Y, anchors[0].Position.X, startPoint.Y);
+            //    lines[1].UpdateCoordinates(anchors[0].Position.X, startPoint.Y, anchors[0].Position.X, anchors[0].Position.Y);
+            //
+            //    int lineindex = 1;
+            //    for (int i = 1; i < anchors.Count; i++)
+            //    {
+            //        lines[i + 1].UpdateCoordinates(anchors[i - 1].Position.X, anchors[i - 1].Position.Y, anchors[i].Position.X, anchors[i - 1].Position.Y);
+            //        lines[i + 2].UpdateCoordinates(anchors[i].Position.X, anchors[i - 1].Position.Y, anchors[i].Position.X, anchors[i].Position.Y);
+            //        lineindex += 2;
+            //    }
+            //
+            //    lines[lineindex + 1].UpdateCoordinates(anchors[anchors.Count - 1].Position.X, anchors[anchors.Count - 1].Position.Y, anchors[anchors.Count - 1].Position.X, endPoint.Y);
+            //    lines[lineindex + 2].UpdateCoordinates(anchors[anchors.Count - 1].Position.X, endPoint.Y, endPoint.X, endPoint.Y);
+            //}
         }
 
         void Anchor_OnMove(object sender, Point translate)
