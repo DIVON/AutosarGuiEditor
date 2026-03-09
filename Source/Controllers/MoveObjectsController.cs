@@ -103,6 +103,11 @@ namespace AutosarGuiEditor.Source.Controllers
         public void Viewport_MouseLeftButtonUp()
         {
             leftMouseDown = false;
+            if (SelectedObject is AnchorPoint)
+            {
+                var anchor = (AnchorPoint)SelectedObject;
+                anchor.MoveFinished();
+            }
             SelectedObject = null;
         }
 

@@ -22,7 +22,7 @@ using AutosarGuiEditor.Source.Painters;
 using AutosarGuiEditor.Source.Painters.Boundaries;
 using AutosarGuiEditor.Source.Interfaces;
 
-namespace System 
+namespace System
 {
     public class PortConnection : IGUID, IRender, IClickable, ISelectable, IBoundary
     {
@@ -185,7 +185,7 @@ namespace System
             }
         }
 
-       
+
 
         public bool IsClicked(Point point, out Object clickedObject)
         {
@@ -257,10 +257,15 @@ namespace System
                 return Port1;
             }
         }
-        
-        public void AddPoint(Point newPoint)
+
+        public void MakeOrthogonal(Point newPoint)
         {
             if ((Port1 == null) || (Port2 == null))
+            {
+                return;
+            }
+
+            if (anchors.Count != 0)
             {
                 return;
             }
@@ -271,101 +276,126 @@ namespace System
             RectangleSide port1Side = Port1.ConnectionPortLocation;
             RectangleSide port2Side = Port2.ConnectionPortLocation;
 
-            if (anchors.Count == 0)
+
+            // Оба горизонтально
+            if ((port1Side == RectangleSide.Left || port1Side == RectangleSide.Right) &&
+                (port2Side == RectangleSide.Left || port2Side == RectangleSide.Right))
             {
-                // Оба горизонтально
-                if ((port1Side == RectangleSide.Left || port1Side == RectangleSide.Right) &&
-                    (port2Side == RectangleSide.Left || port2Side == RectangleSide.Right))
+                double x1 = startPoint.X + 1.0 * (endPoint.X - startPoint.X) / 4.0;
+                double x2 = startPoint.X + 2.0 * (endPoint.X - startPoint.X) / 4.0;
+                double x3 = startPoint.X + 3.0 * (endPoint.X - startPoint.X) / 4.0;
+                double y2 = (startPoint.Y + endPoint.Y) / 2.0;
+
+                AnchorPoint point1 = new AnchorPoint(this);
+                point1.Position.X = x1;
+                point1.Position.Y = startPoint.Y;
+                point1.OnMove += Anchor_OnMove;
+                point1.OnMoveFinished += TryMergeAnchors;
+                point1.Index = 0;
+                point1.AllowedDirections = new HashSet<Direction> { Direction.Y };
+                anchors.Add(point1);
+
+                AnchorPoint point2 = new AnchorPoint(this);
+                point2.Position.X = x2;
+                point2.Position.Y = y2;
+                point2.OnMove += Anchor_OnMove;
+                point2.OnMoveFinished += TryMergeAnchors;
+                point2.Index = 1;
+                point2.AllowedDirections = new HashSet<Direction> { Direction.X };
+                anchors.Add(point2);
+
+                AnchorPoint point3 = new AnchorPoint(this);
+                point3.Position.X = x3;
+                point3.Position.Y = endPoint.Y;
+                point3.OnMove += Anchor_OnMove;
+                point3.OnMoveFinished += TryMergeAnchors;
+                point3.Index = 2;
+                point3.AllowedDirections = new HashSet<Direction> { Direction.Y };
+                anchors.Add(point3);
+
+                RecreateLines();
+            }
+            // Оба вертикально
+            else if ((port1Side == RectangleSide.Top || port1Side == RectangleSide.Bottom) &&
+                (port2Side == RectangleSide.Top || port2Side == RectangleSide.Bottom))
+            {
+                double y1 = startPoint.Y + 1.0 * (endPoint.Y - startPoint.Y) / 4.0;
+                double y2 = startPoint.Y + 2.0 * (endPoint.Y - startPoint.Y) / 4.0;
+                double y3 = startPoint.Y + 3.0 * (endPoint.Y - startPoint.Y) / 4.0;
+                double x2 = (startPoint.X + endPoint.X) / 2.0;
+
+                AnchorPoint point1 = new AnchorPoint(this);
+                point1.Position.X = startPoint.X;
+                point1.Position.Y = y1;
+                point1.OnMove += Anchor_OnMove;
+                point1.OnMoveFinished += TryMergeAnchors;
+                point1.Index = 0;
+                point1.AllowedDirections = new HashSet<Direction> { Direction.X };
+                anchors.Add(point1);
+
+                AnchorPoint point2 = new AnchorPoint(this);
+                point2.Position.X = x2;
+                point2.Position.Y = y2;
+                point2.OnMove += Anchor_OnMove;
+                point2.OnMoveFinished += TryMergeAnchors;
+                point2.Index = 1;
+                point2.AllowedDirections = new HashSet<Direction> { Direction.Y };
+                anchors.Add(point2);
+
+                AnchorPoint point3 = new AnchorPoint(this);
+                point3.Position.X = endPoint.X;
+                point3.Position.Y = y3;
+                point3.OnMove += Anchor_OnMove;
+                point3.OnMoveFinished += TryMergeAnchors;
+                point3.Index = 2;
+                point3.AllowedDirections = new HashSet<Direction> { Direction.X };
+                anchors.Add(point3);
+
+                RecreateLines();
+            }
+            // Порты смотрят в разные стороны
+            else
+            {
+                var p1Directions = new HashSet<Direction>();
+                var p2Directions = new HashSet<Direction>();
+
+                if (port1Side == RectangleSide.Top || port1Side == RectangleSide.Bottom)
                 {
-                    double x1 = startPoint.X + 1.0 * (endPoint.X - startPoint.X) / 4.0;
-                    double x2 = startPoint.X + 2.0 * (endPoint.X - startPoint.X) / 4.0;
-                    double x3 = startPoint.X + 3.0 * (endPoint.X - startPoint.X) / 4.0;
-                    double y2 = (startPoint.Y + endPoint.Y) / 2.0;
+                    Point midPoint = startPoint;
+                    startPoint = endPoint;
+                    endPoint = midPoint;
 
-                    AnchorPoint point1 = new AnchorPoint(this);
-                    point1.Position.X = x1;
-                    point1.Position.Y = startPoint.Y;
-                    point1.OnMove += Anchor_OnMove;
-                    point1.Index = 0;
-                    anchors.Add(point1);
-
-                    AnchorPoint point2 = new AnchorPoint(this);
-                    point2.Position.X = x2;
-                    point2.Position.Y = y2;
-                    point2.OnMove += Anchor_OnMove;
-                    point2.Index = 1;
-                    anchors.Add(point2);
-
-                    AnchorPoint point3 = new AnchorPoint(this);
-                    point3.Position.X = x3;
-                    point3.Position.Y = endPoint.Y;
-                    point3.OnMove += Anchor_OnMove;
-                    point3.Index = 2;
-                    anchors.Add(point3);
-
-                    RecreateLines();
+                    p1Directions = new HashSet<Direction> { Direction.X };
+                    p2Directions = new HashSet<Direction> { Direction.Y };
                 }
-                // Оба вертикально
-                else if ((port1Side == RectangleSide.Top || port1Side == RectangleSide.Bottom) &&
-                    (port2Side == RectangleSide.Top || port2Side == RectangleSide.Bottom))
+                else
                 {
-                    double y1 = startPoint.Y + 1.0 * (endPoint.Y - startPoint.Y) / 4.0;
-                    double y2 = startPoint.Y + 2.0 * (endPoint.Y - startPoint.Y) / 4.0;
-                    double y3 = startPoint.Y + 3.0 * (endPoint.Y - startPoint.Y) / 4.0;
-                    double x2 = (startPoint.X + endPoint.X) / 2.0;
-
-                    AnchorPoint point1 = new AnchorPoint(this);
-                    point1.Position.X = startPoint.X;
-                    point1.Position.Y = y1;
-                    point1.OnMove += Anchor_OnMove;
-                    point1.Index = 0;
-                    anchors.Add(point1);
-
-                    AnchorPoint point2 = new AnchorPoint(this);
-                    point2.Position.X = x2;
-                    point2.Position.Y = y2;
-                    point2.OnMove += Anchor_OnMove;
-                    point2.Index = 1;
-                    anchors.Add(point2);
-
-                    AnchorPoint point3 = new AnchorPoint(this);
-                    point3.Position.X = endPoint.X;
-                    point3.Position.Y = y3;
-                    point3.OnMove += Anchor_OnMove;
-                    point3.Index = 2;
-                    anchors.Add(point3);
-
-                    RecreateLines();
+                    p1Directions = new HashSet<Direction> { Direction.Y };
+                    p2Directions = new HashSet<Direction> { Direction.X };
                 }
-                // Порты смотрят в разные стороны
-                else 
-                {
-                    if (port1Side == RectangleSide.Top || port1Side == RectangleSide.Bottom)
-                    {
-                        Point midPoint = startPoint;
-                        startPoint = endPoint;
-                        endPoint = midPoint;
-                    }
 
-                    double x1 = (endPoint.X + startPoint.X) / 2.0;
-                    double y2 = (endPoint.Y + startPoint.Y) / 2.0;
+                double x1 = (endPoint.X + startPoint.X) / 2.0;
+                double y2 = (endPoint.Y + startPoint.Y) / 2.0;
 
-                    AnchorPoint point1 = new AnchorPoint(this);
-                    point1.Position.X = x1;
-                    point1.Position.Y = startPoint.Y;
-                    point1.OnMove += Anchor_OnMove;
-                    point1.Index = 0;
-                    anchors.Add(point1);
+                AnchorPoint point1 = new AnchorPoint(this);
+                point1.Position.X = x1;
+                point1.Position.Y = startPoint.Y;
+                point1.OnMove += Anchor_OnMove;
+                point1.OnMoveFinished += TryMergeAnchors;
+                point1.Index = 0;
+                point1.AllowedDirections = p1Directions;
+                anchors.Add(point1);
 
-                    AnchorPoint point2 = new AnchorPoint(this);
-                    point2.Position.X = endPoint.X;
-                    point2.Position.Y = y2;
-                    point2.OnMove += Anchor_OnMove;
-                    point2.Index = 1;
-                    anchors.Add(point2);
+                AnchorPoint point2 = new AnchorPoint(this);
+                point2.Position.X = endPoint.X;
+                point2.Position.Y = y2;
+                point2.OnMove += Anchor_OnMove;
+                point2.OnMoveFinished += TryMergeAnchors;
+                point2.Index = 1;
+                point2.AllowedDirections = p1Directions;
+                anchors.Add(point2);
 
-                    RecreateLines();
-                }
+                RecreateLines();
             }
         }
 
@@ -376,6 +406,7 @@ namespace System
             {
                 return false;
             }
+
             Point startPoint = Port1.GetConnectionPoint();
             Point endPoint = Port2.GetConnectionPoint();
 
@@ -391,34 +422,24 @@ namespace System
                 RectangleSide port1Side = Port1.ConnectionPortLocation;
                 RectangleSide port2Side = Port2.ConnectionPortLocation;
 
-                if (port1Side == RectangleSide.Left || port1Side == RectangleSide.Right)
+                for (int i = 0; i < anchors.Count - 1; i++)
                 {
-                    lines.AddNewLine(startPoint.X, startPoint.Y, anchors[0].Position.X, startPoint.Y, LineColor);
-                    startPoint.X = anchors[0].Position.X;
+                    var anchor = anchors[i];
+                    var nextAnchor = anchors[i + 1];
 
-                    for (int i = 0; i < anchors.Count; i++)
+                    if (anchor.AllowedDirections.Contains(Direction.Y))
                     {
-                        if (i % 2 == 1)
-                        {
-                            lines.AddNewLine(startPoint.X, startPoint.Y, anchors[i].Position.X, startPoint.Y, LineColor);
-                            startPoint.X = anchors[i].Position.X;
-                        }
-                        else
-                        {
-                            lines.AddNewLine(startPoint.X, startPoint.Y, startPoint.X, anchors[i].Position.Y, LineColor);
-                            startPoint.Y = anchors[i].Position.Y;
-                        }
+                        lines.AddNewLine(startPoint.X, startPoint.Y, nextAnchor.Position.X, startPoint.Y, LineColor);
+                        startPoint.X = nextAnchor.Position.X;
                     }
-
-                    if (port1Side == RectangleSide.Left || port1Side == RectangleSide.Right)
+                    else
                     {
-                        lines.AddNewLine(startPoint.X, startPoint.Y, startPoint.X, endPoint.Y, LineColor);
-                        startPoint.Y = endPoint.Y;
+                        lines.AddNewLine(startPoint.X, startPoint.Y, startPoint.X, nextAnchor.Position.Y, LineColor);
+                        startPoint.Y = nextAnchor.Position.Y;
                     }
-                    lines.AddNewLine(startPoint, endPoint, LineColor);
                 }
 
-                
+                lines.AddNewLine(startPoint, endPoint, LineColor);
             }
 
             if (IsSelected())
@@ -429,48 +450,131 @@ namespace System
 
             return true;
         }
-
-        Boolean linesCreated = false;
-
-        /* */
         public void UpdateLines()
         {
             RecreateLines();
-            //if (linesCreated == false)
-            //{
-            //    linesCreated = RecreateLines();    
-            //    if (linesCreated == false)
-            //    {
-            //        return;
-            //    }
-            //}
-            //Point startPoint = Port1.GetConnectionPoint();
-            //Point endPoint = Port2.GetConnectionPoint();
-            //if (anchors.Count == 0)
-            //{
-            //    lines[0].UpdateCoordinates(startPoint, endPoint);                
-            //}
-            //else
-            //{
-            //    lines[0].UpdateCoordinates(startPoint.X, startPoint.Y, anchors[0].Position.X, startPoint.Y);
-            //    lines[1].UpdateCoordinates(anchors[0].Position.X, startPoint.Y, anchors[0].Position.X, anchors[0].Position.Y);
-            //
-            //    int lineindex = 1;
-            //    for (int i = 1; i < anchors.Count; i++)
-            //    {
-            //        lines[i + 1].UpdateCoordinates(anchors[i - 1].Position.X, anchors[i - 1].Position.Y, anchors[i].Position.X, anchors[i - 1].Position.Y);
-            //        lines[i + 2].UpdateCoordinates(anchors[i].Position.X, anchors[i - 1].Position.Y, anchors[i].Position.X, anchors[i].Position.Y);
-            //        lineindex += 2;
-            //    }
-            //
-            //    lines[lineindex + 1].UpdateCoordinates(anchors[anchors.Count - 1].Position.X, anchors[anchors.Count - 1].Position.Y, anchors[anchors.Count - 1].Position.X, endPoint.Y);
-            //    lines[lineindex + 2].UpdateCoordinates(anchors[anchors.Count - 1].Position.X, endPoint.Y, endPoint.X, endPoint.Y);
-            //}
         }
 
         void Anchor_OnMove(object sender, Point translate)
         {
+            var anchor = (sender as AnchorPoint);
+            var connection = (anchor.GetOwner() as PortConnection);
+
+            if (connection == null) { return; }
+
+            if (connection.lines.Count <= 1)
+            {
+                return;
+            }
+
+            if (anchor.Index == 0)
+            {
+                var newDirection = new HashSet<Direction>();
+                if (anchor.AllowedDirections.Contains(Direction.X))
+                {
+                    newDirection.Add(Direction.Y);
+                }
+                else
+                {
+                    newDirection.Add(Direction.X);
+                }
+
+
+                Point startPoint = Port1.GetConnectionPoint();
+                
+                AnchorPoint point1 = new AnchorPoint(this);
+                if (anchor.AllowedDirections.Contains(Direction.X))
+                {
+                    point1.Position.X = (startPoint.X + anchor.Position.X) / 2;
+                    point1.Position.Y = startPoint.Y;
+                }
+                else
+                {
+                    point1.Position.X = startPoint.X;
+                    point1.Position.Y = (startPoint.Y + anchor.Position.Y) / 2;
+                }
+                point1.OnMove += Anchor_OnMove;
+                point1.OnMoveFinished += TryMergeAnchors;
+                point1.Index = 0;
+                point1.AllowedDirections = newDirection;
+                anchors.Insert(0, point1);
+
+                RenumberAnchors();
+            }
+            else if (anchor.Index == connection.anchors.Count - 1)
+            {
+                var newDirection = new HashSet<Direction>();
+                if (anchor.AllowedDirections.Contains(Direction.X))
+                {
+                    newDirection.Add(Direction.Y);
+                }
+                else
+                {
+                    newDirection.Add(Direction.X);
+                }
+
+
+                Point endPoint = Port2.GetConnectionPoint();
+
+                AnchorPoint point1 = new AnchorPoint(this);
+                if (anchor.AllowedDirections.Contains(Direction.X))
+                {
+                    point1.Position.X = (endPoint.X + anchor.Position.X) / 2;
+                    point1.Position.Y = endPoint.Y;
+                }
+                else
+                {
+                    point1.Position.X = endPoint.X;
+                    point1.Position.Y = (endPoint.Y + anchor.Position.Y) / 2;
+                }
+                point1.OnMove += Anchor_OnMove;
+                point1.OnMoveFinished += TryMergeAnchors;
+                point1.Index = 0;
+                point1.AllowedDirections = newDirection;
+                anchors.Add(point1);
+
+                RenumberAnchors();
+            }
+
+            // Сдвигаем предыдущуй и следующий якоря
+            List<int> indexesToMove = new List<int>();
+            // Сдвигаем предыдущий
+            if (anchor.Index != 0)
+            {
+                indexesToMove.Add(anchor.Index - 1);
+            }
+            // Сдвигаем следующий, если есть
+            if (anchor.Index + 1 < connection.anchors.Count)
+            {
+                indexesToMove.Add(anchor.Index + 1);
+            }
+
+            for (int i = 0; i < indexesToMove.Count; i++)
+            { 
+                int indexToMove = indexesToMove[i]; 
+                var shiftedAnchor = connection.anchors[indexToMove];
+                //Если этой разрешено движение по X, то двигаем две предыдущие по Y
+                if (anchor.AllowedDirections.Contains(Direction.X))
+                {
+                    shiftedAnchor.Position.X += translate.X / 2;
+                }
+                else
+                {
+                    shiftedAnchor.Position.Y += translate.Y / 2;
+                }
+            }
+
+
             UpdateLines();
+        }
+
+        private void RenumberAnchors()
+        {
+            for (int i = 0; i < anchors.Count; i++)
+            {
+                var anchor = anchors[i];
+                anchor.Index = i;
+            }
         }
 
         public void RemoveAllAnchors()
@@ -485,13 +589,71 @@ namespace System
             RecreateLines();
         }
 
+        private void TryMergeAnchors(object sender)
+        {
+            if (anchors.Count <= 2)
+            {
+                return;
+            }
+
+            var startPoint = Port1.GetConnectionPoint();
+
+            for (var i = 0; i < anchors.Count - 3; i++)
+            {
+                if (i > 0)
+                {
+                    if (anchors[i].AllowedDirections.Contains(Direction.X))
+                    {
+                        startPoint.X = anchors[i].Position.X;
+                    }
+                    else
+                    {
+                        startPoint.Y = anchors[i].Position.Y;
+                    }
+                }
+                
+                // Выбираем между конечным портом или якорем через два
+                Point endPoint = i < anchors.Count - 3 ? anchors[i + 3].Position : Port2.GetConnectionPoint();
+                
+                var activeAnchor = anchors[i]; 
+                double xDist = Math.Abs(activeAnchor.Position.X - anchors[i + 2].Position.X);
+                double yDist = Math.Abs(activeAnchor.Position.Y - anchors[i + 2].Position.Y);
+
+                if (anchors[i].AllowedDirections.Contains(Direction.Y))
+                {
+                    if (yDist < AnchorsStep.Step * 2)
+                    {
+                        anchors.RemoveAt(i + 2);
+                        anchors.RemoveAt(i + 1);
+                        activeAnchor.Position.X = (startPoint.X + endPoint.X) / 2;
+                        RenumberAnchors();
+                        i = 0;
+                        startPoint = Port1.GetConnectionPoint();
+                    }
+                }
+                else
+                {
+                    if (xDist < AnchorsStep.Step * 2)
+                    {
+                        anchors.RemoveAt(i + 2);
+                        anchors.RemoveAt(i + 1);
+                        activeAnchor.Position.Y = (startPoint.Y + endPoint.Y) / 2;
+                        RenumberAnchors();
+                        i = 0;
+                        startPoint = Port1.GetConnectionPoint();
+                    }
+                }
+                RecreateLines();
+            }
+        }
+
         public void DeleteAnchor(Point closestPoint)
         {
             if (anchors.Count == 0)
             {
                 return;
             }
-            
+
             AnchorPoint closestAnchor = anchors[0];
             double minDistance = MathUtility.Distance(closestAnchor.Position, closestPoint);
 
@@ -526,6 +688,7 @@ namespace System
             foreach (AnchorPoint anchor in anchors)
             {
                 anchor.OnMove += Anchor_OnMove;
+                anchor.OnMoveFinished += TryMergeAnchors;
             }
         }
 
@@ -544,6 +707,7 @@ namespace System
 
             anchors.LoadFromXML(xml, this);
             RecreateLines();
+            UpdateAnchorsOnMove();
         }
 	}
 }

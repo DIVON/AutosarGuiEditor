@@ -257,7 +257,8 @@ namespace AutosarGuiEditor
             /* Add connection line command started */
             connectionLineController.Viewport_MouseLeftButtonUp(sceneCoordinates);
 
-           // moveObjectsController.Viewport_MouseLeftButtonUp();
+            moveObjectsController.Viewport_MouseLeftButtonUp();
+
             Render(null, null);
         }
         
@@ -760,7 +761,7 @@ namespace AutosarGuiEditor
         {
             if (moveObjectsController.SelectedObject is PortConnection)
             {
-                (moveObjectsController.SelectedObject as PortConnection).AddPoint(RightMouseButton_DownCoord);
+                (moveObjectsController.SelectedObject as PortConnection).MakeOrthogonal(RightMouseButton_DownCoord);
                 Render(null, null);
             }
         }

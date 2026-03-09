@@ -164,7 +164,7 @@
 
                         <Image.ContextMenu>
                             <ContextMenu Name="ImageContextMenu">
-                                <MenuItem Click="AddPointToConnectionLineMenu_Click" Header="Add point" />
+                                <MenuItem Click="AddPointToConnectionLineMenu_Click" Header="Make orthogonal" />
                                 <MenuItem Click="ConnectionPointMenu_DeleteClick" Header="Delete" />
                                 <MenuItem Click="HideConnectionLine_Click" Header="Hide" />
                                 <MenuItem Click="ShowConnectionLinePermanent_Click" Header="Show permanent" />

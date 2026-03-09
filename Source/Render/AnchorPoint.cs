@@ -16,15 +16,23 @@ namespace AutosarGuiEditor.Source.Render
     }
 
 
-    public delegate void OnTranslate(object sender, Point translate);
+    public delegate void OnTranslateAction(object sender, Point translate);
+    public delegate void OnTranslateFinishedAction(object sender);
+
+    public enum Direction{X, Y};
 
     public class AnchorPoint : IRender
     {
         public int Size = 10;
 
         private RectanglePainter rectangle = new RectanglePainter();
-         
+
         public Point Position;
+
+        // Разрешённые направления движения
+        // По умолчанию разрешено горизонтальное движение
+        // По умолчанию разрешено вертикальное движение
+        public HashSet<Direction> AllowedDirections = new HashSet<Direction> { Direction.X, Direction.Y };
 
         private Object owner;
         public Object GetOwner()
@@ -72,12 +80,20 @@ namespace AutosarGuiEditor.Source.Render
         {
             Point translate = new Point(0, 0);
 
-            cummulatedShift.X += X;
-            cummulatedShift.Y += Y;
+            bool allowMoveX = AllowedDirections.Contains(Direction.X);
+            bool allowMoveY = AllowedDirections.Contains(Direction.Y);
+
+            // Суммируем смещение только для разрешённых направлений
+            if (allowMoveX)
+                cummulatedShift.X += X;
+
+             if (allowMoveY)
+                cummulatedShift.Y += Y;
 
             bool doMove = false;
 
-            if (Math.Abs(cummulatedShift.X) > AnchorsStep.Step)
+            // Движение по горизонтали
+            if (allowMoveX && Math.Abs(cummulatedShift.X) > AnchorsStep.Step)
             {
                 double ceilPart = Math.Round(cummulatedShift.X / 5) * 5;
                 this.Position.X += ceilPart;
@@ -87,7 +103,8 @@ namespace AutosarGuiEditor.Source.Render
                 doMove = true;
             }
 
-            if (Math.Abs(cummulatedShift.Y) > AnchorsStep.Step)
+            // Движение по вертикали
+            if (allowMoveY && Math.Abs(cummulatedShift.Y) > AnchorsStep.Step)
             {
                 double ceilPart = Math.Round(cummulatedShift.Y / 5) * 5;
                 this.Position.Y += ceilPart;
@@ -109,10 +126,18 @@ namespace AutosarGuiEditor.Source.Render
             this.Position.Y += Y;
         }
 
-        public event OnTranslate OnMove;
+        public event OnTranslateAction OnMove;
+        public event OnTranslateFinishedAction OnMoveFinished;
+
+        public void MoveFinished()
+        {
+            OnMoveFinished?.Invoke(this);
+        }
 
         public void LoadFromXML(XElement xml)
         {
+            AllowedDirections.Clear();  
+
             double p;
             if (double.TryParse(xml.Element("X").Value, out p) == true)
             {
@@ -122,6 +147,44 @@ namespace AutosarGuiEditor.Source.Render
             {
                 Position.Y = p;
             }
+
+            
+
+            var allowX = xml.Elements("AllowX").Any();
+            if (allowX == true)
+            {
+                bool allowDirection;
+                if (bool.TryParse(xml.Element("AllowX").Value, out allowDirection) == true)
+                {
+                    if (allowDirection)
+                    {
+                        AllowedDirections.Add(Direction.X);
+                    }
+                }
+            }
+
+            var allowY = xml.Elements("AllowY").Any();
+            if (allowY == true)
+            {
+                bool allowDirection;
+                if (bool.TryParse(xml.Element("AllowY").Value, out allowDirection) == true)
+                {
+                    if (allowDirection)
+                    {
+                        AllowedDirections.Add(Direction.Y);
+                    }
+                }
+            }
+
+            var hasIndex = xml.Elements("Index").Any();
+            if (hasIndex == true)
+            {
+                int index = 0;
+                if (int.TryParse(xml.Element("Index").Value, out index) == true)
+                {
+                    Index = index;
+                }
+            }
         }
 
         public void WriteToXML(XElement root)
@@ -129,6 +192,9 @@ namespace AutosarGuiEditor.Source.Render
             XElement xmlElement = new XElement("AnchorPoint");
             xmlElement.Add(new XElement("X", Position.X.ToString()));
             xmlElement.Add(new XElement("Y", Position.Y.ToString()));
+            xmlElement.Add(new XElement("AllowX", AllowedDirections.Contains(Direction.X)));
+            xmlElement.Add(new XElement("AllowY", AllowedDirections.Contains(Direction.Y)));
+            xmlElement.Add(new XElement("Index", Index.ToString()));
             root.Add(xmlElement);
         }
     }
