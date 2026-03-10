@@ -137,21 +137,66 @@ namespace System {
             return yPoint;
         }
 
-        public void DrawArc(double x1, double y1, double cx1, double cy1, double cx2, double cy2, double x2, double y2, Color color)
+        private void DrawArcSegment(int cx, int cy, double r, int count, ref double currentRad, double stepSize, ref int prevX, ref int prevY, Color color)
         {
-            int x1_ = ShiftAndScaleX(x1);
-            int y1_ = ShiftAndScaleY(y1);
+            for (int i = 0; i < count; i++)
+            {
+                // Move to the next angle
+                currentRad += stepSize;
 
-            int x2_ = ShiftAndScaleX(x2);
-            int y2_ = ShiftAndScaleY(y2);
+                // Calculate new coordinates
+                // Math.Cos returns X, Math.Sin returns Y
+                // Note: We subtract Sin(Y) because standard math Y is up, screen Y is down.
+                int currX = (int)(cx + r * Math.Cos(currentRad));
+                int currY = (int)(cy - r * Math.Sin(currentRad));
 
-            int cx1_ = ShiftAndScaleX(cx1);
-            int cy1_ = ShiftAndScaleY(cy1);
+                // Draw the line segment from previous point to current point
+                DrawLine(prevX, prevY, currX, currY, color);
 
-            int cx2_ = ShiftAndScaleX(cx2);
-            int cy2_ = ShiftAndScaleY(cy2);
+                // Update previous for next iteration
+                prevX = currX;
+                prevY = currY;
+            }
+        }
 
-           // bmp.DrawBezier(x1_, y1_, cx1_, cy1_, cx2_, cy2_, x2_, y2_, color);
+        public void DrawArc(Point center, double radius, double startAngleDeg, double endAngleDeg, Color color)
+        {
+            const int segments = 30;
+
+            // Convert angles to radians (Math functions use Radians)
+            double startRad = startAngleDeg * Math.PI / 180.0;
+            double endRad = endAngleDeg * Math.PI / 180.0;
+
+            // Calculate total span. 
+            // Note: This implementation assumes end > start. 
+            // If you need to handle wrapping (e.g., 350 to 20), logic is needed here.
+            double angleSpan = endRad - startRad;
+
+            if (Math.Abs(angleSpan) < 1e-9) return; // Nothing to draw
+
+            // Create the array: 2 coordinates per point * (segments + 1 points)
+            int[] points = new int[(segments + 1) * 2];
+
+            double stepSize = angleSpan / segments;
+
+            for (int i = 0; i <= segments; i++)
+            {
+                // Calculate current angle for this point
+                double currentRad = startRad + (i * stepSize);
+
+                // Calculate coordinates
+                // X = center + r * cos(theta)
+                // Y = center - r * sin(theta)  <-- Minus because screen Y goes down
+                double x = center.X + radius * Math.Cos(currentRad);
+                double y = center.Y - radius * Math.Sin(currentRad);
+
+                // Store in array: [x0, y0, x1, y1, ...]
+                points[i * 2] = (int)GetImageCoordinateX(x);
+                points[i * 2 + 1] = (int)GetImageCoordinateY(y);
+            }
+
+            // Call the drawing function
+            bmp.DrawPolyline(points, color);
         }
 
         public void DrawRectangle(double startX, double startY, double endX, double endY, Color color)
@@ -237,6 +282,18 @@ namespace System {
             y3 = Offset.Y + y3 * Scale;
 
             bmp.FillTriangle((int)x1, (int)y1, (int)x2, (int)y2, (int)x3, (int)y3, color);
+        }
+
+        public double GetImageCoordinateX(double x)
+        {
+            double xWorld = Offset.X + x * Scale;
+            return xWorld;
+        }
+
+        public double GetImageCoordinateY(double y)
+        {
+            double yWorld = Offset.Y + y * Scale;
+            return yWorld;
         }
 
         public Point GetImageCoordinate(Point worldCoordinate)

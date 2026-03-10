@@ -392,7 +392,7 @@ namespace System
                 point2.OnMove += Anchor_OnMove;
                 point2.OnMoveFinished += TryMergeAnchors;
                 point2.Index = 1;
-                point2.AllowedDirections = p1Directions;
+                point2.AllowedDirections = p2Directions;
                 anchors.Add(point2);
 
                 RecreateLines();
