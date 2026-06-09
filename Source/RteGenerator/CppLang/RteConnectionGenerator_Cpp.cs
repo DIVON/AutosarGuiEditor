@@ -253,9 +253,9 @@ namespace AutosarGuiEditor.Source.RteGenerator.CppLang
                                 writer.WriteLine("");
                                 writer.WriteLine("    if (head != tail)");
                                 writer.WriteLine("    {");
-                                writer.WriteLine("        (*data) = " + copyFromField + ".elements[head % " + queueSize.ToString() + "U];");
+                                writer.WriteLine("        data = " + copyFromField + ".elements[head % " + queueSize.ToString() + "U];");
                                 writer.WriteLine("        " + copyFromField + ".head = (head + 1U) % " + (queueSize * 2).ToString() + "U;");
-                                writer.WriteLine("        _returnValue = Std_ReturnType::RTE_E_OK | " + copyFromField + ".overlayError;");
+                                writer.WriteLine("        _returnValue = " + copyFromField + ".overlayError;");
                                 writer.WriteLine("        " + copyFromField + ".overlayError = Std_ReturnType::RTE_E_OK;");
                                 writer.WriteLine("    }");
                                 writer.WriteLine("");
@@ -309,13 +309,13 @@ namespace AutosarGuiEditor.Source.RteGenerator.CppLang
                                     writer.WriteLine("");
                                     writer.WriteLine("    if ((head == tail) || ((head % " +queueSize.ToString() + "U) != (tail % "+queueSize.ToString()+"U)))");
                                     writer.WriteLine("    {");  
-                                    writer.WriteLine("        " + copyFromField + ".elements[tail % " + queueSize.ToString() + "U] = (*data);");  
+                                    writer.WriteLine("        " + copyFromField + ".elements[tail % " + queueSize.ToString() + "U] = data;");  
                                     writer.WriteLine("        " + copyFromField + ".tail = (tail + 1U) % " + (queueSize * 2).ToString() + "U;");  
                                     writer.WriteLine("    }");  
                                     writer.WriteLine("    else"); 
                                     writer.WriteLine("    {");  
-                                    writer.WriteLine("        " + copyFromField + ".overlayError = RTE_E_LOST_DATA;");  
-                                    writer.WriteLine("        _returnValue = RTE_E_LIMIT;");
+                                    writer.WriteLine("        " + copyFromField + ".overlayError = Std_ReturnType::RTE_E_LOST_DATA;");  
+                                    writer.WriteLine("        _returnValue = Std_ReturnType::RTE_E_LIMIT;");
                                     writer.WriteLine("    }");  
                                     writer.WriteLine("");
                                     writer.WriteLine("    return _returnValue;");  

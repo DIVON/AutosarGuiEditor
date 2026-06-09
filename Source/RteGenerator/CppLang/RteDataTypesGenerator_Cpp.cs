@@ -25,6 +25,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CppLang
             writer.WriteLine();
 
             writer.WriteLine("#include <array>");
+            writer.WriteLine("#include <string>");
             writer.WriteLine("#include <stdint.h>");
             writer.WriteLine();
 

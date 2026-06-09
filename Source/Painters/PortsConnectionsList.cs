@@ -187,6 +187,9 @@ namespace System
                 if (portDef2.PortType == PortType.Receiver)
                 {
                     SenderReceiverInterface srInterface = portDef2.InterfaceDatatype as SenderReceiverInterface;
+                    if (srInterface == null)
+                    { return; }
+
                     if (srInterface.IsQueued == false)
                     {
                         if (IsThisPointConnectionExists(newConnection.Component2, newConnection.Port2) == true)
@@ -194,6 +197,7 @@ namespace System
                             return;
                         }
                     }
+                    
                 }
 
                 /* Sender shall have only one connection */

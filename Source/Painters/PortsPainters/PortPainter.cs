@@ -99,7 +99,6 @@ namespace AutosarGuiEditor.Source.Painters.PortsPainters
             cummulatedShift.X += x;
             cummulatedShift.Y += y;
 
-
             if (Math.Abs(cummulatedShift.X) > AnchorsStep.Step)
             {
                 double ceilPart = Math.Round(cummulatedShift.X / 5) * 5;

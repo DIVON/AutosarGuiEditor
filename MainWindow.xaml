@@ -165,10 +165,9 @@
                         <Image.ContextMenu>
                             <ContextMenu Name="ImageContextMenu">
                                 <MenuItem Click="AddPointToConnectionLineMenu_Click" Header="Make orthogonal" />
-                                <MenuItem Click="ConnectionPointMenu_DeleteClick" Header="Delete" />
+                                <MenuItem Click="ConnectionLine_RemoveAnchors_Click" Header="Remove anchors" />
                                 <MenuItem Click="HideConnectionLine_Click" Header="Hide" />
                                 <MenuItem Click="ShowConnectionLinePermanent_Click" Header="Show permanent" />
-                                <MenuItem Click="ConnectionLine_RemoveAnchors_Click" Header="Remove anchors" />
                             </ContextMenu>
 
                         </Image.ContextMenu>

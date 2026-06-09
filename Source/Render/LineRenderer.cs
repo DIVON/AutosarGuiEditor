@@ -302,7 +302,7 @@ namespace AutosarGuiEditor.Source.Render
                     // Рисуем соединительную дугу между текущей и следующей линией
                     if (i < this.Count - 1)
                     {
-                        DrawConnectingArc(context, currentLine, this[i + 1], gapSize, arcRadius, currentLine.LineColor);
+                        DrawConnectingArc(context, currentLine, this[i + 1], arcRadius, arcRadius, currentLine.LineColor);
                     }
                 }
 

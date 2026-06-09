@@ -754,6 +754,8 @@ namespace AutosarGuiEditor
                 Point sceneCoordinates = scene.MouseToXY(SceneImageCursorPosition);
 
                 (moveObjectsController.SelectedObject as PortConnection).DeleteAnchor(sceneCoordinates);
+                Render(null, null);
+                Render(null, null);
             }
         }
 

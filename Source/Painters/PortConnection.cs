@@ -481,7 +481,7 @@ namespace System
 
 
                 Point startPoint = Port1.GetConnectionPoint();
-                
+
                 AnchorPoint point1 = new AnchorPoint(this);
                 if (anchor.AllowedDirections.Contains(Direction.X))
                 {
@@ -550,8 +550,8 @@ namespace System
             }
 
             for (int i = 0; i < indexesToMove.Count; i++)
-            { 
-                int indexToMove = indexesToMove[i]; 
+            {
+                int indexToMove = indexesToMove[i];
                 var shiftedAnchor = connection.anchors[indexToMove];
                 //≈сли этой разрешено движение по X, то двигаем две предыдущие по Y
                 if (anchor.AllowedDirections.Contains(Direction.X))
@@ -591,14 +591,18 @@ namespace System
 
         private void TryMergeAnchors(object sender)
         {
-            if (anchors.Count <= 2)
-            {
-                return;
-            }
-
             var startPoint = Port1.GetConnectionPoint();
 
-            for (var i = 0; i < anchors.Count - 3; i++)
+            var anchorStartPoint = Port1.GetConnectionPoint();
+            var anchorEndPoint   = Port2.GetConnectionPoint();
+
+            var startAnchor = new AnchorPoint(this);
+            startAnchor.Position = anchorStartPoint;
+
+            var endAnchor = new AnchorPoint(this);
+            endAnchor.Position = anchorEndPoint;
+
+            for (var i = 0; i <= anchors.Count - 3; i++)
             {
                 if (i > 0)
                 {
@@ -611,11 +615,11 @@ namespace System
                         startPoint.Y = anchors[i].Position.Y;
                     }
                 }
-                
+
                 // ¬ыбираем между конечным портом или €корем через два
                 Point endPoint = i < anchors.Count - 3 ? anchors[i + 3].Position : Port2.GetConnectionPoint();
-                
-                var activeAnchor = anchors[i]; 
+
+                var activeAnchor = anchors[i];
                 double xDist = Math.Abs(activeAnchor.Position.X - anchors[i + 2].Position.X);
                 double yDist = Math.Abs(activeAnchor.Position.Y - anchors[i + 2].Position.Y);
 
@@ -649,7 +653,8 @@ namespace System
 
         public void DeleteAnchor(Point closestPoint)
         {
-            if (anchors.Count == 0)
+            anchors.RemoveRange(0, anchors.Count);
+            /*if (anchors.Count == 0)
             {
                 return;
             }
@@ -668,7 +673,7 @@ namespace System
             }
 
             anchors.Remove(closestAnchor);
-
+            */
             UpdateLines();
         }
 

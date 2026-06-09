@@ -69,12 +69,15 @@ namespace AutosarGuiEditor.Source.Autosar.OsTasks
                 {
                     ans = (((arr[i] * ans)) / (gcd(arr[i], ans)));
                 }
-
+                if (ans == 0)
+                {
+                    ans = 1;
+                }
                 return ans;
             }
             else
             {
-                return 0;
+                return 1;
             }
             
         }

@@ -18,6 +18,11 @@ namespace AutosarGuiEditor.Source.RteGenerator.CppLang
                     //TODO: избавиться от этого костыля
                     continue;
                 }
+                if (baseDataType.SystemName == "str" && baseDataType.Name == "str")
+                {
+                    //TODO: избавиться от этого костыля
+                    continue;
+                }
                 writer.WriteLine("typedef  " + baseDataType.SystemName + "  " + baseDataType.Name + ";");
 
                 ArrayDataTypeGenerator_Cpp.GenerateArrayForDataType(writer, baseDataType);

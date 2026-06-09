@@ -61,6 +61,11 @@ namespace AutosarGuiEditor.Source.DataTypes.BaseDataType
             {
                 this.Add(CreateBaseDataType("int64", "signed long long"));
             }
+
+            if (FindObject("str") == null)
+            {
+                this.Add(CreateBaseDataType("str", "const char *"));
+            }
         }
 
         public BaseDataType uint8 { get { return this.FindObject("uint8"); } }
@@ -71,6 +76,7 @@ namespace AutosarGuiEditor.Source.DataTypes.BaseDataType
         public BaseDataType uint32 { get { return this.FindObject("uint32"); } }
         public BaseDataType float32 { get { return this.FindObject("float32"); } }
         public BaseDataType boolean { get { return this.FindObject("boolean"); } }
+        public BaseDataType String { get { return this.FindObject("const char *"); } }
 
         public BaseDataType CreateBaseDataType(String Name, String SystemName)
         {
