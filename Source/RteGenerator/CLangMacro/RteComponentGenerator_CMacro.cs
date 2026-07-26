@@ -9,11 +9,11 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 
-namespace AutosarGuiEditor.Source.RteGenerator.CLangMacro
+namespace AutosarGuiEditor.Source.RteGenerator.CMacro
 {
-    public class RteComponentGenerator_C
+    public class RteComponentGenerator_CMacro
     {
-        public RteComponentGenerator_C()
+        public RteComponentGenerator_CMacro()
         {
         }
 
@@ -28,8 +28,8 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLangMacro
         void GenerateComponent(ApplicationSwComponentType component)
         {
             /* Generate component Folder */
-            String componentFolder = RteFunctionsGenerator_C.GetComponentsFolder() + "\\" + component.Name + "\\contracts\\skeleton";
-            String rteDir = RteFunctionsGenerator_C.GetRteFolder() + "\\";
+            String componentFolder = RteFunctionsGenerator_CMacro.GetComponentsFolder() + "\\" + component.Name + "\\contracts\\skeleton";
+            String rteDir = RteFunctionsGenerator_CMacro.GetRteFolder() + "\\";
             String incDir = componentFolder + "\\include\\";
             String srcDir = componentFolder + "\\src\\";
             Directory.CreateDirectory(incDir);
@@ -44,14 +44,14 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLangMacro
                 string arguments = "";
                 string returnType;
 
-                String runnableDefenitionLine = RteFunctionsGenerator_C.Generate_RunnableDeclaration(component, runnable, out returnType);
-
+                String runnableDefenitionLine = RteFunctionsGenerator_CMacro.Generate_RunnableDeclaration(component, runnable, out returnType);
+                
                 CreateRunnable(srcDir, component, runnable, runnableDefenitionLine, arguments, returnType);
             }
 
 
             /* Generate funcitons for Sender-Receiver ports and call operations from client ports */
-            ComponentRteHeaderGenerator_C.GenerateHeader(rteDir, component);
+            ComponentRteHeaderGenerator_CMacro.GenerateHeader(rteDir, component);
 
             CreateComponentIncludes(incDir, component);
         }
@@ -60,38 +60,38 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLangMacro
         {
             String filename = dir + componentDefenition.Name + ".h";
             StreamWriter writer = new StreamWriter(filename);
-            RteFunctionsGenerator_C.GenerateFileTitle(writer, filename, "Implementation for header of " + componentDefenition.Name);
-            RteFunctionsGenerator_C.OpenCppGuardDefine(writer);
+            RteFunctionsGenerator_CMacro.GenerateFileTitle(writer, filename, "Implementation for header of " + componentDefenition.Name);
+            RteFunctionsGenerator_CMacro.OpenCppGuardDefine(writer);
 
             writer.WriteLine("");
-            writer.WriteLine(RteFunctionsGenerator_C.IncludesLine);
+            writer.WriteLine(RteFunctionsGenerator_CMacro.IncludesLine);
             writer.WriteLine("");
-            RteFunctionsGenerator_C.AddInclude(writer, "Rte_" + componentDefenition.Name + ".h");
+            RteFunctionsGenerator_CMacro.AddInclude(writer, "Rte_" + componentDefenition.Name + ".h");
             writer.WriteLine("");
-            writer.WriteLine(RteFunctionsGenerator_C.EndOfIncludesLine);
-            writer.WriteLine("");
-
-            writer.WriteLine("");
-            writer.WriteLine(RteFunctionsGenerator_C.MacrosLine);
-            writer.WriteLine(RteFunctionsGenerator_C.EndOfMacrosLine);
+            writer.WriteLine(RteFunctionsGenerator_CMacro.EndOfIncludesLine);
             writer.WriteLine("");
 
             writer.WriteLine("");
-            writer.WriteLine(RteFunctionsGenerator_C.TypeDefenitionsLine);
-            writer.WriteLine(RteFunctionsGenerator_C.EndOfTypeDefenitionsLine);
+            writer.WriteLine(RteFunctionsGenerator_CMacro.MacrosLine);
+            writer.WriteLine(RteFunctionsGenerator_CMacro.EndOfMacrosLine);
             writer.WriteLine("");
 
             writer.WriteLine("");
-            writer.WriteLine(RteFunctionsGenerator_C.ExternalVariablesLine);
-            writer.WriteLine(RteFunctionsGenerator_C.EndOfExternalVariableLine);
+            writer.WriteLine(RteFunctionsGenerator_CMacro.TypeDefenitionsLine);
+            writer.WriteLine(RteFunctionsGenerator_CMacro.EndOfTypeDefenitionsLine);
             writer.WriteLine("");
 
             writer.WriteLine("");
-            writer.WriteLine(RteFunctionsGenerator_C.GlobalFunctionsDeclarationLine);
-            writer.WriteLine(RteFunctionsGenerator_C.EndOfGlobalFunctionsDeclarationLine);
+            writer.WriteLine(RteFunctionsGenerator_CMacro.ExternalVariablesLine);
+            writer.WriteLine(RteFunctionsGenerator_CMacro.EndOfExternalVariableLine);
             writer.WriteLine("");
 
-            RteFunctionsGenerator_C.CloseCppGuardDefine(writer);
+            writer.WriteLine("");
+            writer.WriteLine(RteFunctionsGenerator_CMacro.GlobalFunctionsDeclarationLine);
+            writer.WriteLine(RteFunctionsGenerator_CMacro.EndOfGlobalFunctionsDeclarationLine);
+            writer.WriteLine("");
+
+            RteFunctionsGenerator_CMacro.CloseCppGuardDefine(writer);
             writer.Close();
         }
 
@@ -99,48 +99,48 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLangMacro
         {
             String filename = dir + compDefenition.Name + "_ru" + runnable.Name + ".c";
             StreamWriter writer = new StreamWriter(filename);
-            RteFunctionsGenerator_C.GenerateFileTitle(writer, filename, "Implementation for " + compDefenition.Name + "_" + runnable.Name);
+            RteFunctionsGenerator_CMacro.GenerateFileTitle(writer, filename, "Implementation for " + compDefenition.Name + "_" + runnable.Name);
 
             writer.WriteLine("");
-            writer.WriteLine(RteFunctionsGenerator_C.IncludesLine);
+            writer.WriteLine(RteFunctionsGenerator_CMacro.IncludesLine);
             writer.WriteLine("");
-            RteFunctionsGenerator_C.AddInclude(writer, compDefenition.Name + ".h");
+            RteFunctionsGenerator_CMacro.AddInclude(writer, compDefenition.Name + ".h");
             writer.WriteLine("");
-            writer.WriteLine(RteFunctionsGenerator_C.EndOfIncludesLine);
-            writer.WriteLine("");
-
-            writer.WriteLine("");
-            writer.WriteLine(RteFunctionsGenerator_C.MacrosLine);
-            writer.WriteLine(RteFunctionsGenerator_C.EndOfMacrosLine);
+            writer.WriteLine(RteFunctionsGenerator_CMacro.EndOfIncludesLine);
             writer.WriteLine("");
 
             writer.WriteLine("");
-            writer.WriteLine(RteFunctionsGenerator_C.TypeDefenitionsLine);
-            writer.WriteLine(RteFunctionsGenerator_C.EndOfTypeDefenitionsLine);
+            writer.WriteLine(RteFunctionsGenerator_CMacro.MacrosLine);
+            writer.WriteLine(RteFunctionsGenerator_CMacro.EndOfMacrosLine);
             writer.WriteLine("");
 
             writer.WriteLine("");
-            writer.WriteLine(RteFunctionsGenerator_C.VariablesLine);
-            writer.WriteLine(RteFunctionsGenerator_C.EndOfVariableLine);
+            writer.WriteLine(RteFunctionsGenerator_CMacro.TypeDefenitionsLine);
+            writer.WriteLine(RteFunctionsGenerator_CMacro.EndOfTypeDefenitionsLine);
             writer.WriteLine("");
 
             writer.WriteLine("");
-            writer.WriteLine(RteFunctionsGenerator_C.LocalFunctionsDeclarationLine);
-            writer.WriteLine(RteFunctionsGenerator_C.EndOfLocalFunctionsDeclarationLine);
+            writer.WriteLine(RteFunctionsGenerator_CMacro.VariablesLine);
+            writer.WriteLine(RteFunctionsGenerator_CMacro.EndOfVariableLine);
             writer.WriteLine("");
 
             writer.WriteLine("");
-            writer.WriteLine(RteFunctionsGenerator_C.LocalFunctionsDefenitionsLine);
-            writer.WriteLine(RteFunctionsGenerator_C.EndOfLocalFunctionsDefenitionsLine);
+            writer.WriteLine(RteFunctionsGenerator_CMacro.LocalFunctionsDeclarationLine);
+            writer.WriteLine(RteFunctionsGenerator_CMacro.EndOfLocalFunctionsDeclarationLine);
             writer.WriteLine("");
 
             writer.WriteLine("");
-            writer.WriteLine(RteFunctionsGenerator_C.GlobalFunctionsDefenitionsLine);
+            writer.WriteLine(RteFunctionsGenerator_CMacro.LocalFunctionsDefenitionsLine);
+            writer.WriteLine(RteFunctionsGenerator_CMacro.EndOfLocalFunctionsDefenitionsLine);
+            writer.WriteLine("");
+
+            writer.WriteLine("");
+            writer.WriteLine(RteFunctionsGenerator_CMacro.GlobalFunctionsDefenitionsLine);
             writer.WriteLine("");
 
 
-
-
+            
+            
             /* Fill all function names which component could use*/
             WriteAllFunctionWhichComponentCouldUse(compDefenition, writer);
 
@@ -154,14 +154,14 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLangMacro
             {
                 writer.WriteLine("    ");
             }
-
+            
             writer.WriteLine("}");
             writer.WriteLine("");
 
-            writer.WriteLine(RteFunctionsGenerator_C.EndOfGlobalFunctionsDefenitionsLine);
+            writer.WriteLine(RteFunctionsGenerator_CMacro.EndOfGlobalFunctionsDefenitionsLine);
             writer.WriteLine("");
 
-            RteFunctionsGenerator_C.WriteEndOfFile(writer);
+            RteFunctionsGenerator_CMacro.WriteEndOfFile(writer);
             writer.Close();
         }
 
@@ -170,14 +170,14 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLangMacro
             List<String> lines = new List<string>();
 
             /* Write function name and its body */
-
+            
             foreach (PimDefenition pimDefenition in compDefenition.PerInstanceMemoryList)
             {
-                lines.Add(" *  " + RteFunctionsGenerator_C.GenerateShortPimFunctionName(pimDefenition));
+                lines.Add(" *  " + RteFunctionsGenerator_CMacro.GenerateShortPimFunctionName(pimDefenition));
             }
             foreach (CDataDefenition cdataDefenition in compDefenition.CDataDefenitions)
             {
-                lines.Add(" *  " + RteFunctionsGenerator_C.GenerateShortCDataFunctionName(cdataDefenition));
+                lines.Add(" *  " + RteFunctionsGenerator_CMacro.GenerateShortCDataFunctionName(cdataDefenition));
             }
 
             foreach (PortDefenition port in compDefenition.Ports)
@@ -187,7 +187,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLangMacro
                     SenderReceiverInterface srInterface = AutosarApplication.GetInstance().SenderReceiverInterfaces.FindObject(port.InterfaceGUID);
                     foreach (SenderReceiverInterfaceField field in srInterface.Fields)
                     {
-                        lines.Add(" *  " + RteFunctionsGenerator_C.GenerateReadWriteFunctionName(port, field));
+                        lines.Add(" *  " + RteFunctionsGenerator_CMacro.GenerateReadWriteFunctionName(port, field));
                     }
                 }
             }
@@ -199,7 +199,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLangMacro
                     SenderReceiverInterface srInterface = AutosarApplication.GetInstance().SenderReceiverInterfaces.FindObject(port.InterfaceGUID);
                     foreach (SenderReceiverInterfaceField field in srInterface.Fields)
                     {
-                        lines.Add(" *  " + RteFunctionsGenerator_C.GenerateReadWriteFunctionName(port, field));
+                        lines.Add(" *  " + RteFunctionsGenerator_CMacro.GenerateReadWriteFunctionName(port, field));
                     }
                 }
             }
@@ -211,7 +211,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLangMacro
                     ClientServerInterface csInterface = AutosarApplication.GetInstance().ClientServerInterfaces.FindObject(port.InterfaceGUID);
                     foreach (ClientServerOperation operation in csInterface.Operations)
                     {
-                        lines.Add(" *  " + RteFunctionsGenerator_C.Generate_InternalRteCall_FunctionName(port, operation));
+                        lines.Add(" *  " + RteFunctionsGenerator_CMacro.Generate_InternalRteCall_FunctionName(port, operation));
                     }
                 }
             }

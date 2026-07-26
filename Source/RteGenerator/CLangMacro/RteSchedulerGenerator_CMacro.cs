@@ -7,9 +7,9 @@ using System;
 using System.IO;
 using System.Windows;
 
-namespace AutosarGuiEditor.Source.RteGenerator.CLangMacro
+namespace AutosarGuiEditor.Source.RteGenerator.CMacro
 {
-    public class RteSchedulerGenerator_C
+    public class RteSchedulerGenerator_CMacro
     {
         public void GenerateShedulerFiles(String dir)
         {
@@ -26,8 +26,8 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLangMacro
             String FileName = dir + "\\" + Properties.Resources.RTE_PERIODS_H_FILENAME;
             StreamWriter writer = new StreamWriter(FileName);
 
-            RteFunctionsGenerator_C.GenerateFileTitle(writer, FileName, Properties.Resources.RTE_PERIODS_H_FILENAME);
-            RteFunctionsGenerator_C.OpenCppGuardDefine(writer);
+            RteFunctionsGenerator_CMacro.GenerateFileTitle(writer, FileName, Properties.Resources.RTE_PERIODS_H_FILENAME);
+            RteFunctionsGenerator_CMacro.OpenCppGuardDefine(writer);
 
             writer.WriteLine();
 
@@ -44,8 +44,8 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLangMacro
                 {
                     String periodName = "Rte_Period_" + compDef.Name + "_ru" + tEvent.RunnableName;
                     String period = (tEvent.PeriodMs * 1000).ToString() + "UL";
-                    String define = RteFunctionsGenerator_C.CreateDefine(periodName, period, false);
-
+                    String define = RteFunctionsGenerator_CMacro.CreateDefine(periodName, period, false);
+                        
                     writer.WriteLine(define);
                 }
             }
@@ -57,7 +57,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLangMacro
             writer.WriteLine();
 
             writer.WriteLine();
-            RteFunctionsGenerator_C.CloseCppGuardDefine(writer);
+            RteFunctionsGenerator_CMacro.CloseCppGuardDefine(writer);
 
             writer.Close();
         }
@@ -67,12 +67,12 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLangMacro
             String FileName = dir + "\\" + Properties.Resources.RTE_RUNTIME_ENVIRONMENT_C_FILENAME;
             StreamWriter writer = new StreamWriter(FileName);
 
-            RteFunctionsGenerator_C.GenerateFileTitle(writer, FileName, Properties.Resources.RTE_RUNTIME_ENVIRONMENT_FILE_DESCRIPTION);
-            RteFunctionsGenerator_C.OpenCppGuardDefine(writer);
+            RteFunctionsGenerator_CMacro.GenerateFileTitle(writer, FileName, Properties.Resources.RTE_RUNTIME_ENVIRONMENT_FILE_DESCRIPTION);
+            RteFunctionsGenerator_CMacro.OpenCppGuardDefine(writer);
 
             writer.WriteLine();
-            RteFunctionsGenerator_C.AddInclude(writer, Properties.Resources.RTE_RUNTIME_ENVIRONMENT_H_FILENAME);
-            RteFunctionsGenerator_C.AddInclude(writer, Properties.Resources.RTE_EXTERNALS_FILENAME);
+            RteFunctionsGenerator_CMacro.AddInclude(writer, Properties.Resources.RTE_RUNTIME_ENVIRONMENT_H_FILENAME);
+            RteFunctionsGenerator_CMacro.AddInclude(writer, Properties.Resources.RTE_EXTERNALS_FILENAME);
 
             writer.WriteLine();
 
@@ -82,7 +82,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLangMacro
             {
                 if (osTask.PeriodMs > 0)
                 {
-                    String taskCounter = RteFunctionsGenerator_C.CreateTaskCounter(osTask.Name);
+                    String taskCounter = RteFunctionsGenerator_CMacro.CreateTaskCounter(osTask.Name);
                     String defString = "STATIC uint32 " + taskCounter + ";";
                     writer.WriteLine(defString);
                 }
@@ -95,8 +95,8 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLangMacro
             WriteAllOsTasks(writer);
 
             writer.WriteLine();
-            RteFunctionsGenerator_C.CloseCppGuardDefine(writer);
-            RteFunctionsGenerator_C.WriteEndOfFile(writer);
+            RteFunctionsGenerator_CMacro.CloseCppGuardDefine(writer);
+            RteFunctionsGenerator_CMacro.WriteEndOfFile(writer);
             writer.Close();
         }
 
@@ -134,7 +134,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLangMacro
         }
 
         void writeInitOsTask(StreamWriter writer, OsTask task, RteOsInterfaceGenerator osGenerator)
-        {
+        {            
             String rteTaskName = GenerateRteOsTaskName(task);
             String funcName = RteFunctionsGenerator.GenerateRteOsTaskFunctionName(task);
             String stackSize = (task.StackSizeInBytes / 2).ToString();
@@ -192,7 +192,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLangMacro
 
         void GenerateOsTaskFunctionCallOfRunnables(StreamWriter writer, OsTask osTask)
         {
-            String osTaskName = RteFunctionsGenerator_C.GenerateRteOsTaskFunctionName(osTask);
+            String osTaskName = RteFunctionsGenerator_CMacro.GenerateRteOsTaskFunctionName(osTask);
             writer.WriteLine("void " + osTaskName + "(void)");
             writer.WriteLine("{");
             WriteCallOfOsRunnables(writer, osTask);
@@ -201,7 +201,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLangMacro
                 int maxPeriod = LowestCommonPeriodOfTaskssRunnables(osTask);
                 if (maxPeriod != 0)
                 {
-                    String taskCounter = RteFunctionsGenerator_C.CreateTaskCounter(osTask.Name);
+                    String taskCounter = RteFunctionsGenerator_CMacro.CreateTaskCounter(osTask.Name);
                     writer.WriteLine("    " + taskCounter + " = (" + taskCounter + " + 1U) % (" + maxPeriod.ToString() + " / " + Convert.ToInt32(osTask.PeriodMs * 1000) + ");");
                 }
             }
@@ -255,7 +255,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLangMacro
                 double lastPeriod = -1;
                 bool wasBracersOpen = false;
                 for (int eventIndex = 0; eventIndex < osTask.Events.Count; eventIndex++)
-                {
+                {            
 
                     AutosarEvent autosarEventDefenition = osTask.Events[eventIndex].Defenition;
                     if (autosarEventDefenition is TimingEvent)
@@ -274,7 +274,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLangMacro
                             wasBracersOpen = false;
                         }
 
-                        WriteAsyncClientServerEvent(writer, osTask.Events[eventIndex], autosarEventDefenition as ClientServerEvent);
+                        WriteAsyncClientServerEvent(writer, osTask.Events[eventIndex], autosarEventDefenition as ClientServerEvent);                        
 
                         lastPeriod = -1;
                     }
@@ -291,7 +291,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLangMacro
 
         void WritePeriodicalEvent(StreamWriter writer, ref OsTask osTask, AutosarEventInstance eventInstance, ref bool wasBracersOpen, ref double lastPeriod)
         {
-            String taskCounter = RteFunctionsGenerator_C.CreateTaskCounter(osTask.Name);
+            String taskCounter = RteFunctionsGenerator_CMacro.CreateTaskCounter(osTask.Name);
 
             TimingEvent timingEvent = eventInstance.Defenition as TimingEvent;
 
@@ -319,7 +319,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLangMacro
                     }
 
                     wasBracersOpen = true;
-                    writer.WriteLine("        " + RteFunctionsGenerator_C.Generate_CallOfEvent(eventInstance));
+                    writer.WriteLine("        " + RteFunctionsGenerator_CMacro.Generate_CallOfEvent(eventInstance));
                 }
                 else
                 {
@@ -329,26 +329,26 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLangMacro
                         writer.WriteLine("    }");
                     }
                     lastPeriod = osTask.PeriodMs;
-                    writer.WriteLine("    " + RteFunctionsGenerator_C.Generate_CallOfEvent(eventInstance));
+                    writer.WriteLine("    " + RteFunctionsGenerator_CMacro.Generate_CallOfEvent(eventInstance));
                 }
             }
             else
             {
-                writer.WriteLine("    " + RteFunctionsGenerator_C.Generate_CallOfEvent(eventInstance));
+                writer.WriteLine("    " + RteFunctionsGenerator_CMacro.Generate_CallOfEvent(eventInstance));
             }
         }
 
         void WriteAsyncClientServerEvent(StreamWriter writer, AutosarEventInstance eventInstance, ClientServerEvent eventDefenition)
         {
             ComponentInstance compInstance = AutosarApplication.GetInstance().FindComponentInstanceByEventId(eventInstance.GUID);
-
+            
 
             if (compInstance != null)
             {
                 String asyncField = "Rte_AsyncCall_" + compInstance.Name + "_" + eventDefenition.SourcePort.Name + "_" + eventDefenition.SourceOperation.Name;
                 writer.WriteLine("    if (TRUE == " + asyncField + ")");
                 writer.WriteLine("    {");
-                writer.WriteLine("        " + RteFunctionsGenerator_C.Generate_CallOfEvent(eventInstance));
+                writer.WriteLine("        " + RteFunctionsGenerator_CMacro.Generate_CallOfEvent(eventInstance));
                 writer.WriteLine("        " + asyncField + " = FALSE;");
                 writer.WriteLine("    }");
             }
@@ -360,7 +360,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLangMacro
 
         void WriteOneTimeEvent(StreamWriter writer, AutosarEventInstance eventInstance)
         {
-            writer.WriteLine("    " + RteFunctionsGenerator_C.Generate_CallOfEvent(eventInstance));
+            writer.WriteLine("    " + RteFunctionsGenerator_CMacro.Generate_CallOfEvent(eventInstance));
         }
 
         void Generate_RunTimeEnvironment_Header_File(String dir)
@@ -368,8 +368,8 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLangMacro
             String FileName = dir + "\\" + Properties.Resources.RTE_RUNTIME_ENVIRONMENT_H_FILENAME;
             StreamWriter writer = new StreamWriter(FileName);
 
-            RteFunctionsGenerator_C.GenerateFileTitle(writer, FileName, Properties.Resources.RTE_RUNTIME_ENVIRONMENT_FILE_DESCRIPTION);
-            RteFunctionsGenerator_C.OpenCppGuardDefine(writer);
+            RteFunctionsGenerator_CMacro.GenerateFileTitle(writer, FileName, Properties.Resources.RTE_RUNTIME_ENVIRONMENT_FILE_DESCRIPTION);
+            RteFunctionsGenerator_CMacro.OpenCppGuardDefine(writer);
 
             writer.WriteLine();
             //writer.WriteLine("#define RTE_C");
@@ -378,14 +378,14 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLangMacro
                 //RteFunctionsGenerator_C.AddInclude(writer, "Rte_" + compDef.Name + ".h");
             }
             //writer.WriteLine("#undef RTE_C");
-
+           
             writer.WriteLine("#ifdef __cplusplus");
-            writer.WriteLine("extern \"C\" {");
+            writer.WriteLine("extern \"C\" {");            
             writer.WriteLine("#endif");
             writer.WriteLine();
 
             writer.WriteLine("/* Time periods */");
-            writer.WriteLine(RteFunctionsGenerator_C.CreateDefine("RTE_SYSTICK_FREQUENCY", AutosarApplication.GetInstance().SystickFrequencyHz.ToString()));
+            writer.WriteLine(RteFunctionsGenerator_CMacro.CreateDefine("RTE_SYSTICK_FREQUENCY", AutosarApplication.GetInstance().SystickFrequencyHz.ToString()));
             writer.WriteLine();
 
 
@@ -413,7 +413,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLangMacro
 
             foreach (OsTask osTask in AutosarApplication.GetInstance().OsTasks)
             {
-                String osTaskName = RteFunctionsGenerator_C.GenerateRteOsTaskFunctionName(osTask);
+                String osTaskName = RteFunctionsGenerator_CMacro.GenerateRteOsTaskFunctionName(osTask);
                 writer.WriteLine("void " + osTaskName + "(void);");
             }
 
@@ -424,8 +424,8 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLangMacro
             writer.WriteLine();
 
             writer.WriteLine();
-            RteFunctionsGenerator_C.CloseCppGuardDefine(writer);
-
+            RteFunctionsGenerator_CMacro.CloseCppGuardDefine(writer);
+            
             writer.Close();
         }
 
@@ -434,13 +434,13 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLangMacro
             String FileName = folder + "\\" + Properties.Resources.RTE_EXTERNAL_RUNNABLES_H_FILENAME;
             StreamWriter writer = new StreamWriter(FileName);
 
-            RteFunctionsGenerator_C.GenerateFileTitle(writer, FileName, Properties.Resources.RTE_EXTERNAL_RUNNABLES_FILE_DESCRIPTION);
-            RteFunctionsGenerator_C.OpenCppGuardDefine(writer);
-            RteFunctionsGenerator_C.OpenCGuardDefine(writer);
+            RteFunctionsGenerator_CMacro.GenerateFileTitle(writer, FileName, Properties.Resources.RTE_EXTERNAL_RUNNABLES_FILE_DESCRIPTION);
+            RteFunctionsGenerator_CMacro.OpenCppGuardDefine(writer);
+            RteFunctionsGenerator_CMacro.OpenCGuardDefine(writer);
 
-            RteFunctionsGenerator_C.AddInclude(writer, Properties.Resources.RTE_DATATYPES_H_FILENAME);
+            RteFunctionsGenerator_CMacro.AddInclude(writer, Properties.Resources.RTE_DATATYPES_H_FILENAME);
 
-            RteConnectionGenerator_C.AddComponentIncludes(writer);
+            RteConnectionGenerator_CMacro.AddComponentIncludes(writer);
 
             writer.WriteLine();
             writer.WriteLine("#include \"Rte_DataTypes.h\"");
@@ -453,15 +453,15 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLangMacro
                 foreach (RunnableDefenition runnable in compDefinition.Runnables)
                 {
                     string returnType;
-                    writer.WriteLine(RteFunctionsGenerator_C.Generate_RunnableDeclaration(compDefinition, runnable, out returnType) + ";");
+                    writer.WriteLine(RteFunctionsGenerator_CMacro.Generate_RunnableDeclaration(compDefinition, runnable, out returnType) + ";");
                 }
             }
 
             writer.WriteLine();
 
-            RteFunctionsGenerator_C.CloseCGuardDefine(writer);
-            RteFunctionsGenerator_C.CloseCppGuardDefine(writer);
-            RteFunctionsGenerator_C.WriteEndOfFile(writer);
+            RteFunctionsGenerator_CMacro.CloseCGuardDefine(writer);
+            RteFunctionsGenerator_CMacro.CloseCppGuardDefine(writer);
+            RteFunctionsGenerator_CMacro.WriteEndOfFile(writer);
             writer.Close();
 
         }
@@ -471,17 +471,17 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLangMacro
             String FileName = folder + "\\" + Properties.Resources.RTE_EXTERNALS_FILENAME;
              StreamWriter writer = new StreamWriter(FileName);
 
-            RteFunctionsGenerator_C.GenerateFileTitle(writer, FileName, "This file contains all externals required for scheduling");
-            RteFunctionsGenerator_C.OpenCppGuardDefine(writer);
-            RteFunctionsGenerator_C.OpenCGuardDefine(writer);
+            RteFunctionsGenerator_CMacro.GenerateFileTitle(writer, FileName, "This file contains all externals required for scheduling");
+            RteFunctionsGenerator_CMacro.OpenCppGuardDefine(writer);
+            RteFunctionsGenerator_CMacro.OpenCGuardDefine(writer);
 
-            RteFunctionsGenerator_C.AddInclude(writer, Properties.Resources.RTE_DATATYPES_H_FILENAME);
+            RteFunctionsGenerator_CMacro.AddInclude(writer, Properties.Resources.RTE_DATATYPES_H_FILENAME);
 
             writer.WriteLine();
             writer.WriteLine("#define RTE_C");
             foreach (ApplicationSwComponentType compDef in AutosarApplication.GetInstance().ComponentDefenitionsList)
             {
-                RteFunctionsGenerator_C.AddInclude(writer, "Rte_" + compDef.Name + ".h");
+                RteFunctionsGenerator_CMacro.AddInclude(writer, "Rte_" + compDef.Name + ".h");
             }
             writer.WriteLine("#undef RTE_C");
 
@@ -489,18 +489,18 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLangMacro
             writer.WriteLine("/* Declaration of all async events  */");
             writer.WriteLine();
 
-            RteConnectionGenerator_C.GenerateAllAsyncServerNotificators(writer, true);
+            RteConnectionGenerator_CMacro.GenerateAllAsyncServerNotificators(writer, true);
 
             writer.WriteLine("/* Declaration of all async events  */");
             writer.WriteLine();
 
-            RteConnectionGenerator_C.GenerateExternComponentInstances(writer);
+            RteConnectionGenerator_CMacro.GenerateExternComponentInstances(writer);
 
             writer.WriteLine();
 
-            RteFunctionsGenerator_C.CloseCGuardDefine(writer);
-            RteFunctionsGenerator_C.CloseCppGuardDefine(writer);
-            RteFunctionsGenerator_C.WriteEndOfFile(writer);
+            RteFunctionsGenerator_CMacro.CloseCGuardDefine(writer);
+            RteFunctionsGenerator_CMacro.CloseCppGuardDefine(writer);
+            RteFunctionsGenerator_CMacro.WriteEndOfFile(writer);
             writer.Close();
 
         }
@@ -510,20 +510,20 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLangMacro
             String FileName = dir + "\\" + Properties.Resources.RTE_TASK_SCHEDULER_H_FILENAME;
             StreamWriter writer = new StreamWriter(FileName);
 
-            RteFunctionsGenerator_C.GenerateFileTitle(writer, FileName, Properties.Resources.RTE_TASK_SCHEDULER_FILE_DESCRIPTION);
-            RteFunctionsGenerator_C.OpenCppGuardDefine(writer);
-            RteFunctionsGenerator_C.OpenCGuardDefine(writer);
+            RteFunctionsGenerator_CMacro.GenerateFileTitle(writer, FileName, Properties.Resources.RTE_TASK_SCHEDULER_FILE_DESCRIPTION);
+            RteFunctionsGenerator_CMacro.OpenCppGuardDefine(writer);
+            RteFunctionsGenerator_CMacro.OpenCGuardDefine(writer);
 
-            RteFunctionsGenerator_C.AddInclude(writer, Properties.Resources.RTE_DATATYPES_H_FILENAME);
+            RteFunctionsGenerator_CMacro.AddInclude(writer, Properties.Resources.RTE_DATATYPES_H_FILENAME);
 
             writer.WriteLine();
 
             writer.WriteLine("void DoScheduling(void);");
-
+            
             writer.WriteLine();
-            RteFunctionsGenerator_C.CloseCGuardDefine(writer);
-            RteFunctionsGenerator_C.CloseCppGuardDefine(writer);
-            RteFunctionsGenerator_C.WriteEndOfFile(writer);
+            RteFunctionsGenerator_CMacro.CloseCGuardDefine(writer);
+            RteFunctionsGenerator_CMacro.CloseCppGuardDefine(writer);
+            RteFunctionsGenerator_CMacro.WriteEndOfFile(writer);
             writer.Close();
         }
 
@@ -535,11 +535,11 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLangMacro
             String FileName = dir + "\\" + Properties.Resources.RTE_TASK_SCHEDULER_C_FILENAME;
             StreamWriter writer = new StreamWriter(FileName);
 
-            RteFunctionsGenerator_C.GenerateFileTitle(writer, FileName, Properties.Resources.RTE_RUNTIME_ENVIRONMENT_FILE_DESCRIPTION);
+            RteFunctionsGenerator_CMacro.GenerateFileTitle(writer, FileName, Properties.Resources.RTE_RUNTIME_ENVIRONMENT_FILE_DESCRIPTION);
 
             writer.WriteLine();
-            RteFunctionsGenerator_C.AddInclude(writer, Properties.Resources.RTE_RUNTIME_ENVIRONMENT_H_FILENAME);
-            RteFunctionsGenerator_C.AddInclude(writer, Properties.Resources.RTE_DATATYPES_H_FILENAME);
+            RteFunctionsGenerator_CMacro.AddInclude(writer, Properties.Resources.RTE_RUNTIME_ENVIRONMENT_H_FILENAME);
+            RteFunctionsGenerator_CMacro.AddInclude(writer, Properties.Resources.RTE_DATATYPES_H_FILENAME);
             writer.WriteLine();
 
             OsTasksList nonZeroFrequencyTasks = AutosarApplication.GetInstance().OsTasks.GetTasksWithNonZeroFrequency();
@@ -554,13 +554,13 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLangMacro
             //int tasksCount = AutosarApplication.GetInstance().OsTasks.Count;
             int tasksCount = nonZeroFrequencyTasks.Count;
 
-            writer.WriteLine(RteFunctionsGenerator_C.CreateDefine("RTE_TASKS_COUNT", tasksCount.ToString(), false));
+            writer.WriteLine(RteFunctionsGenerator_CMacro.CreateDefine("RTE_TASKS_COUNT", tasksCount.ToString(), false));
 
             //int stepsCount = AutosarApplication.GetInstance().OsTasks.GetSchedulerNecessaryStepsCount(schedulerStepMicrosec);
             int stepsCount = nonZeroFrequencyTasks.GetSchedulerNecessaryStepsCount(schedulerStepMicrosec);
 
             writer.WriteLine();
-            writer.WriteLine(RteFunctionsGenerator_C.CreateDefine("RTE_SCHEDULER_STEPS", stepsCount.ToString(), false));
+            writer.WriteLine(RteFunctionsGenerator_CMacro.CreateDefine("RTE_SCHEDULER_STEPS", stepsCount.ToString(), false));
 
             writer.WriteLine();
             writer.WriteLine("/* One Rte Task pointer */");
@@ -604,7 +604,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLangMacro
                         includeCondition = (ost == 0);
                         if (includeCondition)
                         {
-                            String osTaskName = RteFunctionsGenerator_C.GenerateRteOsTaskFunctionName(task);
+                            String osTaskName = RteFunctionsGenerator_CMacro.GenerateRteOsTaskFunctionName(task);
                             writer.Write("        " + osTaskName);
                             if (writtenFunctions < tasksCount - 1)
                             {
@@ -664,7 +664,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLangMacro
             writer.WriteLine("}");
 
 
-            RteFunctionsGenerator_C.WriteEndOfFile(writer);
+            RteFunctionsGenerator_CMacro.WriteEndOfFile(writer);
             writer.Close();
 
             //if (initTask != null)

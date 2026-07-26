@@ -3,9 +3,9 @@ using AutosarGuiEditor.Source.SystemInterfaces;
 using System;
 using System.IO;
 
-namespace AutosarGuiEditor.Source.RteGenerator.CLangMacro
+namespace AutosarGuiEditor.Source.RteGenerator.CMacro
 {
-    public static class ArrayDataTypeGenerator_C
+    public static class ArrayDataTypeGenerator_CMacro
     {
         static ArrayDataType GetArrayDatatypeForDatatype(IGUID datatype)
         {
@@ -18,7 +18,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLangMacro
             }
             return null;
         }
-
+        
         public static void GenerateArrayForDataType(StreamWriter writer, IGUID datatype)
         {
             foreach (ArrayDataType arrayDT in AutosarApplication.GetInstance().ArrayDataTypes)
@@ -27,7 +27,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLangMacro
                 {
                     /* Write array size */
                     String arraySizeNameMacro = arrayDT.Name + "_ELEMENTS_COUNT";
-                    writer.WriteLine(RteFunctionsGenerator_C.CreateDefine(arraySizeNameMacro, arrayDT.Size.ToString() + "U", false));
+                    writer.WriteLine(RteFunctionsGenerator_CMacro.CreateDefine(arraySizeNameMacro, arrayDT.Size.ToString() + "U", false));
 
                     writer.WriteLine();
                     writer.WriteLine("typedef " + datatype.Name + " " + arrayDT.Name + "[" + arrayDT.Size + "];");

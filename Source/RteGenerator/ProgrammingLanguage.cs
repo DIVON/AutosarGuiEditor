@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,7 +10,8 @@ namespace AutosarGuiEditor.Source.RteGenerator
     public enum ProgrammingLanguageTypeDef
     {
         C,
-        Cpp
+        Cpp,
+        CMacro
     }
 
     public class ProgrammingLanguage

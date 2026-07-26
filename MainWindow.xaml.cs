@@ -1,4 +1,4 @@
-﻿using AutosarGuiEditor.Source.Render;
+using AutosarGuiEditor.Source.Render;
 using System;
 using System.IO;
 using System.Collections.Generic;
@@ -39,6 +39,7 @@ using AutosarGuiEditor.Source.Painters.Boundaries;
 using AutosarGuiEditor.Source.App.Settings;
 using AutosarGuiEditor.Source;
 using AutosarGuiEditor.Source.RteGenerator.CLang;
+using AutosarGuiEditor.Source.RteGenerator.CMacro;
 using AutosarGuiEditor.Source.RteGenerator.CppLang;
 using AutosarGuiEditor.Source.RteGenerator.TestGeneratorCpp;
 
@@ -887,6 +888,11 @@ namespace AutosarGuiEditor
                     RteGenerator_Cpp rteGenerator = new RteGenerator_Cpp();
                     result = rteGenerator.Generate();
                 }
+                else if (autosarApp.ProgramLanguage.Type == ProgrammingLanguageTypeDef.CMacro)
+                {
+                    RteGenerator_CMacro rteGenerator = new RteGenerator_CMacro();
+                    result = rteGenerator.Generate();
+                }
                 else { }
 
                 if (result == true)
@@ -1329,6 +1335,11 @@ namespace AutosarGuiEditor
                 else if (autosarApp.ProgramLanguage.Type == ProgrammingLanguageTypeDef.Cpp)
                 {
                     RteGenerator_Cpp rteGenerator = new RteGenerator_Cpp();
+                    rteGenerator.GenerateComponentsFiles();
+                }
+                else if (autosarApp.ProgramLanguage.Type == ProgrammingLanguageTypeDef.CMacro)
+                {
+                    RteGenerator_CMacro rteGenerator = new RteGenerator_CMacro();
                     rteGenerator.GenerateComponentsFiles();
                 }
 

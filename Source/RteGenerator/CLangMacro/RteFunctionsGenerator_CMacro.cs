@@ -12,9 +12,9 @@ using AutosarGuiEditor.Source.PortDefenitions;
 using System;
 using System.IO;
 
-namespace AutosarGuiEditor.Source.RteGenerator.CLangMacro
+namespace AutosarGuiEditor.Source.RteGenerator.CMacro
 {
-    public static class RteFunctionsGenerator_C
+    public static class RteFunctionsGenerator_CMacro
     {
         public const String IncludesLine                         = "/* INCLUDES */";
         public const String EndOfIncludesLine                    = "/* END OF INCLUDES */";
@@ -27,7 +27,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLangMacro
 
         public const String VariablesLine                        = "/* VARIABLES */";
         public const String EndOfVariableLine                    = "/* END OF VARIABLES */";
-
+ 
         public const String ExternalVariablesLine                = "/* EXTERNAL VARIABLES */";
         public const String EndOfExternalVariableLine            = "/* END OF EXTERNAL VARIABLES */";
 
@@ -117,7 +117,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLangMacro
             String resFolder = "";
 
                 resFolder = AutosarApplication.GetInstance().GenerateComponentsPath + "\\" + Properties.Resources.COMPONENTS_FOLDER;
-
+         
 
             return resFolder;
         }
@@ -141,14 +141,14 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLangMacro
         public static String GenerateSenderReceiverInterfaceArguments(SenderReceiverInterfaceField field, PortType portType, Boolean MultipleInstantiation = false)
         {
             String result = "(";
-
+            
             if (MultipleInstantiation)
             {
-                result += RteFunctionsGenerator_C.ComponentInstancePointerDatatype + " instance, ";
+                result += RteFunctionsGenerator_CMacro.ComponentInstancePointerDatatype + " instance, ";
             }
 
             String dataTypeName = AutosarApplication.GetInstance().GetDataTypeName(field.BaseDataTypeGUID);
-
+                
             if (portType == PortType.Receiver)
             {
                 if (field.IsPointer == false)
@@ -181,7 +181,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLangMacro
 
             if (MultipleInstantiation)
             {
-                result += RteFunctionsGenerator_C.ComponentInstancePointerDatatype + " instance";
+                result += RteFunctionsGenerator_CMacro.ComponentInstancePointerDatatype + " instance";
             }
             else
             {
@@ -197,7 +197,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLangMacro
 
             if (MultipleInstantiation)
             {
-                result += RteFunctionsGenerator_C.ComponentInstancePointerDatatype + " instance";
+                result += RteFunctionsGenerator_CMacro.ComponentInstancePointerDatatype + " instance";
                 if (operation.Fields.Count > 0)
                 {
                     result += ", ";
@@ -218,10 +218,10 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLangMacro
                 result += GetClientServerOperationFieldIdentification(field);
                 if (i != operation.Fields.Count - 1)
                 {
-                    result += ", ";
+                    result += ", ";   
                 }
             }
-
+            
             return result;
         }
 
@@ -368,7 +368,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLangMacro
         {
             String result = "";
             String dataTypeName = AutosarApplication.GetInstance().GetDataTypeName(field.BaseDataTypeGUID);
-
+            
             if (field.Direction == ClientServerOperationDirection.CONST_VAL_CONST_REF)
             {
                 result = "const " + dataTypeName + " * const " + field.Name;
@@ -427,17 +427,17 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLangMacro
         }
 
         public static String Generate_RunnableFunction(ApplicationSwComponentType compDefenition, RunnableDefenition runnable, String arguments, String returnType)
-        {
+        {             
             if (compDefenition.MultipleInstantiation)
             {
-                String CDSName = RteFunctionsGenerator_C.ComponentDataStructureDefenitionName(compDefenition);
+                String CDSName = RteFunctionsGenerator_CMacro.ComponentDataStructureDefenitionName(compDefenition);
                 if (arguments.Length == 0)
                 {
-                    return returnType + " " + Generate_RunnableFunctionName(compDefenition, runnable) + "(" + RteFunctionsGenerator_C.ComponentInstancePointerDatatype + " instance)";
+                    return returnType + " " + Generate_RunnableFunctionName(compDefenition, runnable) + "(" + RteFunctionsGenerator_CMacro.ComponentInstancePointerDatatype + " instance)";
                 }
                 else
                 {
-                    return returnType + " " + Generate_RunnableFunctionName(compDefenition, runnable) + "( " + RteFunctionsGenerator_C.ComponentInstancePointerDatatype + " instance, " + arguments + ")";
+                    return returnType + " " + Generate_RunnableFunctionName(compDefenition, runnable) + "( " + RteFunctionsGenerator_CMacro.ComponentInstancePointerDatatype + " instance, " + arguments + ")";
                 }
 
 
@@ -475,7 +475,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLangMacro
                         {
                             if (csEvent.SourceOperation.Fields.Count != 0)
                             {
-                                arguments = RteFunctionsGenerator_C.GenerateClientServerInterfaceArguments(csEvent.SourceOperation, compDefenition.MultipleInstantiation); ;
+                                arguments = RteFunctionsGenerator_CMacro.GenerateClientServerInterfaceArguments(csEvent.SourceOperation, compDefenition.MultipleInstantiation); ;
                             }
 
                             returnType = Properties.Resources.STD_RETURN_TYPE;
@@ -561,7 +561,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLangMacro
             writer.WriteLine("/* End of file */");
         }
 
-
+        
         public static String GenerateDefineFromString(String data, Boolean toUpper = true)
         {
             for (int i = data.Length - 1; i > 0; i--)
@@ -634,7 +634,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLangMacro
         public static String LinkToTheComponentInstance(ComponentInstance compInstance)
         {
             String compName = "Rte_Instance_" + compInstance.Name;
-            String result = "(" + RteFunctionsGenerator_C.ComponentInstancePointerDatatype + ")&" + compName;
+            String result = "(" + RteFunctionsGenerator_CMacro.ComponentInstancePointerDatatype + ")&" + compName;
             return result;
         }
 
@@ -661,7 +661,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLangMacro
             return serverPortCallFunction;
         }
 
-
+        
 
         public static String GenerateReadWriteConnectionFunctionName(PortDefenition port, SenderReceiverInterfaceField field)
         {
@@ -761,10 +761,10 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLangMacro
             return str;
         }
 
+        
 
 
-
-
+        
 
         public static String GenerateRteOsTaskName(OsTask task)
         {

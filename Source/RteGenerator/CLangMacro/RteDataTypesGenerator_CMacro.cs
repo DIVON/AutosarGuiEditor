@@ -9,20 +9,20 @@ using System;
 using System.IO;
 using System.Windows;
 
-namespace AutosarGuiEditor.Source.RteGenerator.CLangMacro
+namespace AutosarGuiEditor.Source.RteGenerator.CMacro
 {
-    public class RteDataTypesGenerator_C
+    public class RteDataTypesGenerator_CMacro
     {
         public void GenerateDataTypesFile(String folder)
         {
             String FileName = folder + "\\" + Properties.Resources.RTE_DATATYPES_H_FILENAME;
             StreamWriter writer = new StreamWriter(FileName);
-            RteFunctionsGenerator_C.GenerateFileTitle(writer, Properties.Resources.RTE_DATATYPES_H_FILENAME, Properties.Resources.DATATYPES_H_FILE_DESCRIPTION);
-            RteFunctionsGenerator_C.OpenCppGuardDefine(writer);
-            RteFunctionsGenerator_C.OpenCGuardDefine(writer);
+            RteFunctionsGenerator_CMacro.GenerateFileTitle(writer, Properties.Resources.RTE_DATATYPES_H_FILENAME, Properties.Resources.DATATYPES_H_FILE_DESCRIPTION);
+            RteFunctionsGenerator_CMacro.OpenCppGuardDefine(writer);
+            RteFunctionsGenerator_CMacro.OpenCGuardDefine(writer);
 
             writer.WriteLine();
-            RteFunctionsGenerator_C.AddInclude(writer, Properties.Resources.RTE_RETURN_CODES_FILENAME);
+            RteFunctionsGenerator_CMacro.AddInclude(writer, Properties.Resources.RTE_RETURN_CODES_FILENAME);
             writer.WriteLine();
 
             WriteStaticGlobal(writer);
@@ -37,8 +37,8 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLangMacro
 
             GenerateComponentsDataTypes(writer);
 
-            RteFunctionsGenerator_C.CloseCGuardDefine(writer);
-            RteFunctionsGenerator_C.CloseCppGuardDefine(writer);
+            RteFunctionsGenerator_CMacro.CloseCGuardDefine(writer);
+            RteFunctionsGenerator_CMacro.CloseCppGuardDefine(writer);
             writer.Close();
         }
 
@@ -104,7 +104,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLangMacro
                 writer.WriteLine("/* Datatype for " + compDef.Name  + " */");
                 writer.WriteLine("typedef struct");
                 writer.WriteLine("{");
-
+                
                 /* Create index for components with multipleinstantiation */
                 if (compDef.MultipleInstantiation == true)
                 {
@@ -154,30 +154,30 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLangMacro
                     }
                 }
 
-                writer.WriteLine("} " + compDef.Name + ";");
+                writer.WriteLine("} " + compDef.Name + ";"); 
                 writer.WriteLine();
             }
         }
 
-        public void GenerateDataTypeForPim(StreamWriter writer, ApplicationSwComponentType componentDefenition, PimDefenition pimDefenition)
+        public void GenerateDataTypeForPim(StreamWriter writer, ApplicationSwComponentType componentDefenition, PimDefenition pimDefenition)       
         {
-            writer.WriteLine("    " + pimDefenition.DataTypeName + " " + RteFunctionsGenerator_C.GenerateRtePimFieldInComponentDefenitionStruct(componentDefenition, pimDefenition) + ";");
+            writer.WriteLine("    " + pimDefenition.DataTypeName + " " + RteFunctionsGenerator_CMacro.GenerateRtePimFieldInComponentDefenitionStruct(componentDefenition, pimDefenition) + ";");            
         }
 
         public void GenerateDataTypeForCData(StreamWriter writer, ApplicationSwComponentType componentDefenition, CDataDefenition cdata)
         {
-            writer.WriteLine("    " + cdata.DataTypeName + " " + RteFunctionsGenerator_C.GenerateRteCDataFieldInComponentDefenitionStruct(componentDefenition, cdata) + ";");
+            writer.WriteLine("    " + cdata.DataTypeName + " " + RteFunctionsGenerator_CMacro.GenerateRteCDataFieldInComponentDefenitionStruct(componentDefenition, cdata) + ";");     
         }
 
         public void GenerateFieldsForSenderPorts(StreamWriter writer, ApplicationSwComponentType componentDefenition, PortDefenition portDefenition, SenderReceiverInterfaceField srInterfaceField)
         {
-            writer.WriteLine("    " + srInterfaceField.DataTypeName + " " + RteFunctionsGenerator_C.GenerateRteWriteFieldInComponentDefenitionStruct(portDefenition, srInterfaceField) + ";");
+            writer.WriteLine("    " + srInterfaceField.DataTypeName + " " + RteFunctionsGenerator_CMacro.GenerateRteWriteFieldInComponentDefenitionStruct(portDefenition, srInterfaceField) + ";");
         }
 
         public void GenerateFieldsForQueuedReceiverPort(StreamWriter writer, ApplicationSwComponentType componentDefenition, PortDefenition portDefenition, SenderReceiverInterfaceField srInterfaceField)
         {
             SenderReceiverInterface srInterface = portDefenition.InterfaceDatatype as SenderReceiverInterface;
-            writer.WriteLine("    " + srInterfaceField.QueuedInterfaceName(srInterface.Name) + " " + RteFunctionsGenerator_C.GenerateRteWriteFieldInComponentDefenitionStruct(portDefenition, srInterfaceField) + ";");
+            writer.WriteLine("    " + srInterfaceField.QueuedInterfaceName(srInterface.Name) + " " + RteFunctionsGenerator_CMacro.GenerateRteWriteFieldInComponentDefenitionStruct(portDefenition, srInterfaceField) + ";");
         }
 
         static bool isComplexDataTypeWithoutDependenciesToOtherCDT(ComplexDataType cdt)
@@ -209,7 +209,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLangMacro
                 {
                     /* Find max dependency index */
                     int maxDependency = findMaxDependency(datatypes, datatypes[i], i);
-
+                    
                     /* if there is dependency then move the datatype after dependency and start cycle again */
                     if (maxDependency != -1)
                     {
@@ -217,11 +217,11 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLangMacro
                         datatypes.RemoveAt(i);
                         datatypes.Insert(maxDependency, cdt);
                         hasDependencyLower = true;
-                        break;
+                        break;                        
                     }
                 }
             }
-
+       
             return IterationCount < 100;
         }
 
@@ -239,7 +239,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLangMacro
                              maxDependency = i;
                          }
                      }
-                 }
+                 }                 
              }
              return maxDependency;
         }
@@ -326,7 +326,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLangMacro
             writer.WriteLine("");
 
             /* Generate an array if it existis*/
-            ArrayDataTypeGenerator_C.GenerateArrayForDataType(writer, datatype);
+            ArrayDataTypeGenerator_CMacro.GenerateArrayForDataType(writer, datatype);
         }
 
         public void WriteBaseDataTypes(StreamWriter writer)
@@ -340,12 +340,12 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLangMacro
             writer.WriteLine("#endif");
             writer.WriteLine("");
 
-            BaseDataTypesCodeGenerator_C.GenerateCode(writer, AutosarApplication.GetInstance().BaseDataTypes);
+            BaseDataTypesCodeGenerator_CMacro.GenerateCode(writer, AutosarApplication.GetInstance().BaseDataTypes);
 
             writer.WriteLine("");
             writer.WriteLine("/* Rte data types */");
             writer.WriteLine("typedef uint16               Std_ReturnType;");
-            writer.WriteLine("typedef void    *" + RteFunctionsGenerator_C.ComponentInstancePointerDatatype + ";");
+            writer.WriteLine("typedef void    *" + RteFunctionsGenerator_CMacro.ComponentInstancePointerDatatype + ";");
             writer.WriteLine("");
         }
 
@@ -404,33 +404,33 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLangMacro
                 minValue = acceptFloatValue(datatype.MinValue);
                 maxValue = acceptFloatValue(datatype.MaxValue);
             }
-            writer.WriteLine(RteFunctionsGenerator_C.CreateDefine(upperLimit, maxValue, false));
+            writer.WriteLine(RteFunctionsGenerator_CMacro.CreateDefine(upperLimit, maxValue, false));
 
             String lowerLimit = datatype.Name + "_LOWER_LIMIT";
-            writer.WriteLine(RteFunctionsGenerator_C.CreateDefine(lowerLimit, minValue, false));
+            writer.WriteLine(RteFunctionsGenerator_CMacro.CreateDefine(lowerLimit, minValue, false));
 
             /* Write datatype */
             String dataTypeName = AutosarApplication.GetInstance().GetDataTypeName(datatype.BaseDataTypeGUID);
-            string typedef = RteFunctionsGenerator_C.FillStringForCount("typedef  " + dataTypeName, ' ', 24);
+            string typedef = RteFunctionsGenerator_CMacro.FillStringForCount("typedef  " + dataTypeName, ' ', 24);
             writer.WriteLine(typedef + datatype.Name + ";");
             writer.WriteLine("");
 
             /* Generate an array if it existis*/
-            ArrayDataTypeGenerator_C.GenerateArrayForDataType(writer, datatype);
+            ArrayDataTypeGenerator_CMacro.GenerateArrayForDataType(writer, datatype);
         }
 
         public void WriteEnumDataType(StreamWriter writer, EnumDataType datatype)
         {
             writer.WriteLine("/* Enum Datatype : " + datatype.Name + " */");
 
-            /* Write datatype */
+            /* Write datatype */            
             writer.WriteLine("typedef enum ");
             writer.WriteLine("{");
 
             /* Write values */
-            for (int i = 0; i < datatype.Fields.Count; i++)
-            {
-                writer.Write(RteFunctionsGenerator_C.CreateEnumValue(datatype.Fields[i]));
+            for (int i = 0; i < datatype.Fields.Count; i++)                
+            {                
+                writer.Write(RteFunctionsGenerator_CMacro.CreateEnumValue(datatype.Fields[i]));
                 writer.WriteLine(",");
             }
 
@@ -441,21 +441,21 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLangMacro
             writer.WriteLine("");
 
             int minLimit = datatype.GetLimit(LimitType.ltLowerLimit);
-            String defineMin = RteFunctionsGenerator_C.CreateDefine(datatype.Name + "_LOWER_LIMIT", minLimit.ToString(), false);
+            String defineMin = RteFunctionsGenerator_CMacro.CreateDefine(datatype.Name + "_LOWER_LIMIT", minLimit.ToString(), false);
             writer.WriteLine(defineMin);
 
             int upperLimit = datatype.GetLimit(LimitType.ltUpperLimit);
-            String defineMax = RteFunctionsGenerator_C.CreateDefine(datatype.Name + "_UPPER_LIMIT", upperLimit.ToString(), false);
+            String defineMax = RteFunctionsGenerator_CMacro.CreateDefine(datatype.Name + "_UPPER_LIMIT", upperLimit.ToString(), false);
             writer.WriteLine(defineMax);
 
             int elementsCount = datatype.Fields.Count;
-            String elementsCountStr = RteFunctionsGenerator_C.CreateDefine(datatype.Name + "_ELEMENTS_COUNT", elementsCount.ToString(), false);
+            String elementsCountStr = RteFunctionsGenerator_CMacro.CreateDefine(datatype.Name + "_ELEMENTS_COUNT", elementsCount.ToString(), false);
             writer.WriteLine(elementsCountStr);
 
             writer.WriteLine("");
 
             /* Generate an array if it existis*/
-            ArrayDataTypeGenerator_C.GenerateArrayForDataType(writer, datatype);
+            ArrayDataTypeGenerator_CMacro.GenerateArrayForDataType(writer, datatype);
         }
     }
 }

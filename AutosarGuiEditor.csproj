@@ -9,11 +9,12 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>AutosarGuiEditor</RootNamespace>
     <AssemblyName>AutosarGuiEditor</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <WarningLevel>4</WarningLevel>
     <TargetFrameworkProfile />
+    <IsWebBootstrapper>false</IsWebBootstrapper>
     <PublishUrl>publish\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Disk</InstallFrom>
@@ -26,7 +27,6 @@
     <MapFileExtensions>true</MapFileExtensions>
     <ApplicationRevision>0</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
-    <IsWebBootstrapper>false</IsWebBootstrapper>
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
   </PropertyGroup>
@@ -216,6 +216,18 @@
     <Compile Include="Source\Controllers\SenderReceiverInterfaceController.cs" />
     <Compile Include="Source\DataTypes\BaseDataType\BaseDataType.cs" />
     <Compile Include="Source\Painters\TextPainter.cs" />
+    <Compile Include="Source\RteGenerator\CLangMacro\ArrayDataTypeGenerator_CMacro.cs" />
+    <Compile Include="Source\RteGenerator\CLangMacro\BaseDataTypesCodeGenerator_CMacro.cs" />
+    <Compile Include="Source\RteGenerator\CLangMacro\ComponentRteHeaderGenerator_CMacro.cs" />
+    <Compile Include="Source\RteGenerator\CLangMacro\ReturnCodesGenerator_CMacro.cs" />
+    <Compile Include="Source\RteGenerator\CLangMacro\RteComponentGenerator_CMacro.cs" />
+    <Compile Include="Source\RteGenerator\CLangMacro\RteConnectionGenerator_CMacro.cs" />
+    <Compile Include="Source\RteGenerator\CLangMacro\RteDataTypesGenerator_CMacro.cs" />
+    <Compile Include="Source\RteGenerator\CLangMacro\RteFunctionsGenerator_CMacro.cs" />
+    <Compile Include="Source\RteGenerator\CLangMacro\RteGenerator_CMacro.cs" />
+    <Compile Include="Source\RteGenerator\CLangMacro\RteSchedulerGenerator_CMacro.cs" />
+    <Compile Include="Source\RteGenerator\CLangMacro\Rte_OnBeforeAfterThreadProtectionGenerator_CMacro.cs" />
+    <Compile Include="Source\RteGenerator\CLangMacro\SystemErrorGenerator_CMacro.cs" />
     <Compile Include="Source\RteGenerator\CLang\ArrayDataTypeGenerator_C.cs" />
     <Compile Include="Source\RteGenerator\CLang\BaseDataTypesCodeGenerator_C.cs" />
     <Compile Include="Source\DataTypes\BaseDataType\BaseDataTypesList.cs" />

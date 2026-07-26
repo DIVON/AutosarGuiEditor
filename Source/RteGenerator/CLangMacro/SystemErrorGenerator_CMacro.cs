@@ -2,11 +2,11 @@
 using System;
 using System.IO;
 
-namespace AutosarGuiEditor.Source.RteGenerator.CLangMacro
+namespace AutosarGuiEditor.Source.RteGenerator.CMacro
 {
-    public class SystemErrorGenerator_C
+    public class SystemErrorGenerator_CMacro
     {
-        public SystemErrorGenerator_C()
+        public SystemErrorGenerator_CMacro()
         {
         }
 
@@ -14,31 +14,31 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLangMacro
         {
             String FileName = folder + "\\" + Properties.Resources.SYSTEM_ERRORS_H_FILENAME;
             StreamWriter writer = new StreamWriter(FileName);
-            RteFunctionsGenerator_C.GenerateFileTitle(writer, Properties.Resources.SYSTEM_ERRORS_H_FILENAME, "This file contains all defined system error IDs");
-            RteFunctionsGenerator_C.OpenCppGuardDefine(writer);
+            RteFunctionsGenerator_CMacro.GenerateFileTitle(writer, Properties.Resources.SYSTEM_ERRORS_H_FILENAME, "This file contains all defined system error IDs");
+            RteFunctionsGenerator_CMacro.OpenCppGuardDefine(writer);
 
             writer.WriteLine("/*  System errors */");
             WriteErrorsCount(writer);
             WriteAllErrors(writer);
-            RteFunctionsGenerator_C.CloseCppGuardDefine(writer);
-            RteFunctionsGenerator_C.WriteEndOfFile(writer);
+            RteFunctionsGenerator_CMacro.CloseCppGuardDefine(writer);
+            RteFunctionsGenerator_CMacro.WriteEndOfFile(writer);
             writer.Close();
         }
 
-
+        
         void WriteErrorsCount(StreamWriter writer)
         {
             int immediateSafeStateCount = AutosarApplication.GetInstance().SystemErrors.ErrorCount(SystemErrorStrictness.ImmediateSafeState);
             int totalErrorCount =  AutosarApplication.GetInstance().SystemErrors.Count;
-            writer.WriteLine(RteFunctionsGenerator_C.CreateDefine("SYSTEM_ERRORS_COUNT", (totalErrorCount + 1).ToString()));
-            writer.WriteLine(RteFunctionsGenerator_C.CreateDefine("IMMEDIATE_SAFE_STATE_ERROR_COUNT", immediateSafeStateCount.ToString()));
+            writer.WriteLine(RteFunctionsGenerator_CMacro.CreateDefine("SYSTEM_ERRORS_COUNT", (totalErrorCount + 1).ToString()));
+            writer.WriteLine(RteFunctionsGenerator_CMacro.CreateDefine("IMMEDIATE_SAFE_STATE_ERROR_COUNT", immediateSafeStateCount.ToString()));
             writer.WriteLine();
         }
 
         void WriteAllErrors(StreamWriter writer)
         {
             int maxLen = 0;
-
+            
 
             SystemErrorsList errList = AutosarApplication.GetInstance().SystemErrors;
 
@@ -51,7 +51,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLangMacro
 
             int errCount = 1;
 
-            writer.WriteLine(RteFunctionsGenerator_C.CreateDefine("ERR_ID_INCORRECT_ERROR_ID", "0u", false, maxLen));
+            writer.WriteLine(RteFunctionsGenerator_CMacro.CreateDefine("ERR_ID_INCORRECT_ERROR_ID", "0u", false, maxLen));
             writer.WriteLine();
             writer.WriteLine("/* Immediate Safe State errors */");
             /* Write only immediate safe safe state errors */
@@ -59,9 +59,9 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLangMacro
             {
                 if (errList[i].Strictness == SystemErrorStrictness.ImmediateSafeState)
                 {
-                    writer.WriteLine(RteFunctionsGenerator_C.CreateDefine("ERR_ID_" + errList[i].Name, errCount.ToString() + "u", false, maxLen));
+                    writer.WriteLine(RteFunctionsGenerator_CMacro.CreateDefine("ERR_ID_" + errList[i].Name, errCount.ToString() + "u", false, maxLen));
                     errCount++;
-                }
+                }                
             }
 
             writer.WriteLine();
@@ -71,7 +71,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLangMacro
             {
                 if (errList[i].Strictness == SystemErrorStrictness.NoRestriction)
                 {
-                    writer.WriteLine(RteFunctionsGenerator_C.CreateDefine("ERR_ID_" + errList[i].Name, errCount.ToString() + "u", false, maxLen));
+                    writer.WriteLine(RteFunctionsGenerator_CMacro.CreateDefine("ERR_ID_" + errList[i].Name, errCount.ToString() + "u", false, maxLen));
                     errCount++;
                 }
             }

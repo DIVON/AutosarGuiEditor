@@ -1,4 +1,4 @@
-﻿using AutosarGuiEditor.Source.RteGenerator;
+using AutosarGuiEditor.Source.RteGenerator;
 using System;
 using System.Collections.Generic;
 using System.Linq;

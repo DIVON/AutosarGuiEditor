@@ -11,19 +11,19 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AutosarGuiEditor.Source.RteGenerator.CLangMacro
+namespace AutosarGuiEditor.Source.RteGenerator.CMacro
 {
-    class Rte_OnBeforeAfterThreadProtectionGenerator_C
+    class Rte_OnBeforeAfterThreadProtectionGenerator_CMacro
     {
         public void GenerateThreadProtectionFunctions(String folder)
         {
             String filename = folder + "\\" + Properties.Resources.RTE_THREAD_PROTECTION_H_FILENAME;
             StreamWriter writer = new StreamWriter(filename);
-            RteFunctionsGenerator_C.GenerateFileTitle(writer, filename, "Implementation for interrupt protection of RTE.");
+            RteFunctionsGenerator_CMacro.GenerateFileTitle(writer, filename, "Implementation for interrupt protection of RTE.");
 
-            /*Add #include */
-            RteFunctionsGenerator_C.AddInclude(writer, Properties.Resources.RTE_DATATYPES_H_FILENAME);
-
+            /*Add #include */            
+            RteFunctionsGenerator_CMacro.AddInclude(writer, Properties.Resources.RTE_DATATYPES_H_FILENAME);
+            
             /* Include */
             writer.WriteLine("");
 
@@ -48,10 +48,10 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLangMacro
                         {
                             SenderReceiverInterface srInterface = (portDef.InterfaceDatatype as SenderReceiverInterface);
                             foreach (SenderReceiverInterfaceField field in srInterface.Fields)
-                            {
+                            { 
                                 if (srInterface.IsThreadIrqProtected == true)
                                 {
-                                    String RteFuncName = RteFunctionsGenerator_C.GenerateInternalSendReceiveConnectionFunctionName(component.Name, portDef, field);
+                                    String RteFuncName = RteFunctionsGenerator_CMacro.GenerateInternalSendReceiveConnectionFunctionName(component.Name, portDef, field);
                                     writer.WriteLine("void OnBefore_" + RteFuncName + "();");
                                     writer.WriteLine("void OnAfter_" + RteFuncName + "();");
                                     writer.WriteLine();
@@ -78,7 +78,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLangMacro
                             SenderReceiverInterface srInterface = (portDef.InterfaceDatatype as SenderReceiverInterface);
                             foreach (SenderReceiverInterfaceField field in srInterface.Fields)
                             {
-                                String RteFuncName = RteFunctionsGenerator_C.GenerateInternalSendReceiveConnectionFunctionName(component.Name, portDef, field);
+                                String RteFuncName = RteFunctionsGenerator_CMacro.GenerateInternalSendReceiveConnectionFunctionName(component.Name, portDef, field);
 
                                 if (srInterface.IsThreadIrqProtected == true)
                                 {
@@ -108,7 +108,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLangMacro
                             SenderReceiverInterface srInterface = (portDef.InterfaceDatatype as SenderReceiverInterface);
                             foreach (SenderReceiverInterfaceField field in srInterface.Fields)
                             {
-                                String RteFuncName = RteFunctionsGenerator_C.GenerateInternalReadWriteConnectionFunctionName(component.Name, portDef, field);
+                                String RteFuncName = RteFunctionsGenerator_CMacro.GenerateInternalReadWriteConnectionFunctionName(component.Name, portDef, field);
 
                                 if (srInterface.IsThreadIrqProtected == true)
                                 {
@@ -138,7 +138,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLangMacro
                             SenderReceiverInterface srInterface = (portDef.InterfaceDatatype as SenderReceiverInterface);
                             foreach (SenderReceiverInterfaceField field in srInterface.Fields)
                             {
-                                String RteFuncName = RteFunctionsGenerator_C.GenerateInternalReadWriteConnectionFunctionName(component.Name, portDef, field);
+                                String RteFuncName = RteFunctionsGenerator_CMacro.GenerateInternalReadWriteConnectionFunctionName(component.Name, portDef, field);
 
                                 if (srInterface.IsThreadIrqProtected == true)
                                 {

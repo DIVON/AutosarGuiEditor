@@ -17,21 +17,21 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 
-namespace AutosarGuiEditor.Source.RteGenerator.CLangMacro
+namespace AutosarGuiEditor.Source.RteGenerator.CMacro
 {
-    public class RteConnectionGenerator_C
+    public class RteConnectionGenerator_CMacro
     {
         public void GenerateConnections(String folder)
         {
             String filename = folder + "\\" + Properties.Resources.RTE_CONNECTIONS_C_FILENAME;
             StreamWriter writer = new StreamWriter(filename);
-            RteFunctionsGenerator_C.GenerateFileTitle(writer, filename, "Implementation for RTE connections source file");
+            RteFunctionsGenerator_CMacro.GenerateFileTitle(writer, filename, "Implementation for RTE connections source file");
 
             /*Add #include */
-            RteFunctionsGenerator_C.AddInclude(writer, "<string.h>");
-            RteFunctionsGenerator_C.AddInclude(writer, Properties.Resources.RTE_DATATYPES_H_FILENAME);
-            RteFunctionsGenerator_C.AddInclude(writer, Properties.Resources.SYSTEM_ERRORS_H_FILENAME);
-            RteFunctionsGenerator_C.AddInclude(writer, Properties.Resources.RTE_THREAD_PROTECTION_H_FILENAME);
+            RteFunctionsGenerator_CMacro.AddInclude(writer, "<string.h>");
+            RteFunctionsGenerator_CMacro.AddInclude(writer, Properties.Resources.RTE_DATATYPES_H_FILENAME);
+            RteFunctionsGenerator_CMacro.AddInclude(writer, Properties.Resources.SYSTEM_ERRORS_H_FILENAME);
+            RteFunctionsGenerator_CMacro.AddInclude(writer, Properties.Resources.RTE_THREAD_PROTECTION_H_FILENAME);
 
             RteFunctionsGenerator_Cpp.AddInclude(writer, Properties.Resources.RTE_EXTERNALS_FILENAME);
             //AddComponentIncludes(writer);
@@ -62,7 +62,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLangMacro
             writer.WriteLine("#define RTE_C");
             foreach(ApplicationSwComponentType compDef in AutosarApplication.GetInstance().ComponentDefenitionsList)
             {
-                RteFunctionsGenerator_C.AddInclude(writer, "<Rte_" + compDef.Name + ".h>");
+                RteFunctionsGenerator_CMacro.AddInclude(writer, "<Rte_" + compDef.Name + ".h>");
             }
             writer.WriteLine("#undef RTE_C");
         }
@@ -78,7 +78,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLangMacro
                     foreach (CDataDefenition cdata in compDef.CDataDefenitions)
                     {
                         String returnDatatype = cdata.DataTypeName;
-                        String RteFuncName = RteFunctionsGenerator_C.GenerateInternalCDataFunctionName(component.Name, cdata);
+                        String RteFuncName = RteFunctionsGenerator_CMacro.GenerateInternalCDataFunctionName(component.Name, cdata);
                         String cdataName = "Rte_CDataBuffer_" + component.Name + "_" + cdata.Name;
 
                         writer.WriteLine(returnDatatype + " " + RteFuncName + "(void)");
@@ -101,7 +101,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLangMacro
 
                     foreach (PortDefenition portDef in compDef.Ports)
                     {
-                        if (portDef.PortType == PortType.Client)
+                        if (portDef.PortType == PortType.Client) 
                         {
                             ClientServerInterface csInterface = (portDef.InterfaceDatatype as ClientServerInterface);
 
@@ -112,8 +112,8 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLangMacro
                                 {
                                     String returnValue = Properties.Resources.STD_RETURN_TYPE;
 
-                                    String RteFuncName = RteFunctionsGenerator_C.GenerateInternalCallConnectionFunctionName(component.Name, portDef, operation);
-                                    String fieldVariable = RteFunctionsGenerator_C.GenerateClientServerInterfaceArguments(operation, false);
+                                    String RteFuncName = RteFunctionsGenerator_CMacro.GenerateInternalCallConnectionFunctionName(component.Name, portDef, operation);
+                                    String fieldVariable = RteFunctionsGenerator_CMacro.GenerateClientServerInterfaceArguments(operation, false);
 
                                     writer.WriteLine(returnValue + " " + RteFuncName + "(" + fieldVariable + ")");
                                     writer.WriteLine("{");
@@ -125,9 +125,9 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLangMacro
                                     {
                                         /* Get assigned event */
                                         ClientServerEvent csEvent = oppositCompInstance.ComponentDefenition.GetEventsWithServerOperation(operation);
-
-                                        String functionName = RteFunctionsGenerator_C.Generate_RteCall_FunctionName(oppositCompInstance.ComponentDefenition, csEvent.Runnable);
-                                        String arguments = RteFunctionsGenerator_C.Generate_ClientServerPort_Arguments(oppositCompInstance, operation, oppositCompInstance.ComponentDefenition.MultipleInstantiation);
+                                        
+                                        String functionName = RteFunctionsGenerator_CMacro.Generate_RteCall_FunctionName(oppositCompInstance.ComponentDefenition, csEvent.Runnable);
+                                        String arguments = RteFunctionsGenerator_CMacro.Generate_ClientServerPort_Arguments(oppositCompInstance, operation, oppositCompInstance.ComponentDefenition.MultipleInstantiation);
                                         writer.WriteLine("    return " + functionName + arguments + ";");
                                     }
                                     else
@@ -151,12 +151,12 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLangMacro
                                 {
                                     String returnValue = Properties.Resources.STD_RETURN_TYPE;
 
-                                    String RteFuncName = RteFunctionsGenerator_C.GenerateInternalCallConnectionFunctionName(component.Name, portDef, operation);
+                                    String RteFuncName = RteFunctionsGenerator_CMacro.GenerateInternalCallConnectionFunctionName(component.Name, portDef, operation);
 
                                     writer.WriteLine(returnValue + " " + RteFuncName + "(void)");
                                     writer.WriteLine("{");
                                     PortPainter portPainter = component.Ports.FindPortByItsDefenition(portDef);
-
+                                    
                                     List<PortPainter> oppositePorts = new List<PortPainter>();
 
                                     AutosarApplication.GetInstance().GetOppositeComponentPorts(portPainter, oppositePorts);
@@ -169,7 +169,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLangMacro
                                             String asyncField = "Rte_AsyncCall_" + compInstance.Name + "_" + oppositePort.PortDefenition.Name + "_" + operation.Name;
                                             writer.WriteLine("    " + asyncField + " = TRUE;");
                                         }
-
+                                        
                                         writer.WriteLine("    return RTE_E_OK;");
                                     }
                                     else
@@ -208,8 +208,8 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLangMacro
                             foreach (SenderReceiverInterfaceField field in srInterface.Fields)
                             {
                                 String returnValue = Properties.Resources.STD_RETURN_TYPE;
-                                String RteFuncName = RteFunctionsGenerator_C.GenerateInternalSendReceiveConnectionFunctionName(component.Name, portDef, field);
-                                String fieldVariable = RteFunctionsGenerator_C.GenerateSenderReceiverInterfaceArguments(field, portDef.PortType, false);
+                                String RteFuncName = RteFunctionsGenerator_CMacro.GenerateInternalSendReceiveConnectionFunctionName(component.Name, portDef, field);
+                                String fieldVariable = RteFunctionsGenerator_CMacro.GenerateSenderReceiverInterfaceArguments(field, portDef.PortType, false);
 
                                 writer.WriteLine(returnValue + " " + RteFuncName + fieldVariable);
                                 writer.WriteLine("{");
@@ -242,7 +242,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLangMacro
                                     writer.WriteLine("    OnAfter_" + RteFuncName + "();");
                                 }
 
-                                writer.WriteLine("    return _returnValue;");
+                                writer.WriteLine("    return _returnValue;");  
 
                                 writer.WriteLine("}");
                                 writer.WriteLine("");
@@ -269,8 +269,8 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLangMacro
                             foreach (SenderReceiverInterfaceField field in srInterface.Fields)
                             {
                                 String returnValue = Properties.Resources.STD_RETURN_TYPE;
-                                String RteFuncName = RteFunctionsGenerator_C.GenerateInternalSendReceiveConnectionFunctionName(component.Name, portDef, field);
-                                String fieldVariable = RteFunctionsGenerator_C.GenerateSenderReceiverInterfaceArguments(field, portDef.PortType, false);
+                                String RteFuncName = RteFunctionsGenerator_CMacro.GenerateInternalSendReceiveConnectionFunctionName(component.Name, portDef, field);
+                                String fieldVariable = RteFunctionsGenerator_CMacro.GenerateSenderReceiverInterfaceArguments(field, portDef.PortType, false);
 
                                 writer.WriteLine(returnValue + " " + RteFuncName + fieldVariable);
                                 writer.WriteLine("{");
@@ -299,10 +299,10 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLangMacro
                                                 writer.WriteLine("    uint32 head;");
                                                 writer.WriteLine("    uint32 tail;");
                                                 writer.WriteLine("    Std_ReturnType _returnValue = RTE_E_OK;");
-
+                                                
                                                 connected = true;
                                             }
-
+                                            
                                             int queueSize = srInterface.QueueSize;
 
                                             String copyFromField = "Rte_ReceiveBuffer_" + oppositCompInstance.Name + "_" + oppositePort.PortDefenition.Name + "_" + field.Name;
@@ -332,7 +332,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLangMacro
                                         }
 
                                         writer.WriteLine();
-                                        writer.WriteLine("    return _returnValue;");
+                                        writer.WriteLine("    return _returnValue;"); 
                                     }
                                     else
                                     {
@@ -376,8 +376,8 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLangMacro
                             foreach (SenderReceiverInterfaceField field in srInterface.Fields)
                             {
                                 String returnValue = Properties.Resources.STD_RETURN_TYPE;
-                                String RteFuncName = RteFunctionsGenerator_C.GenerateInternalReadWriteConnectionFunctionName(component.Name, portDef, field);
-                                String fieldVariable = RteFunctionsGenerator_C.GenerateSenderReceiverInterfaceArguments(field, portDef.PortType, false);
+                                String RteFuncName = RteFunctionsGenerator_CMacro.GenerateInternalReadWriteConnectionFunctionName(component.Name, portDef, field);
+                                String fieldVariable = RteFunctionsGenerator_CMacro.GenerateSenderReceiverInterfaceArguments(field, portDef.PortType, false);
 
                                 writer.WriteLine(returnValue + " " + RteFuncName + fieldVariable);
                                 writer.WriteLine("{");
@@ -390,7 +390,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLangMacro
                                 String writeFieldName = "Rte_DataBuffer_" + component.Name + "_" + portDef.Name + "_" + field.Name;
                                 if (field.IsPointer == false)
                                 {
-
+                                    
 
                                     if (!(field.DataType is ArrayDataType))
                                     {
@@ -437,8 +437,8 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLangMacro
                             foreach (SenderReceiverInterfaceField field in srInterface.Fields)
                             {
                                 String returnValue = Properties.Resources.STD_RETURN_TYPE;
-                                String RteFuncName = RteFunctionsGenerator_C.GenerateInternalReadWriteConnectionFunctionName(component.Name, portDef, field);
-                                String fieldVariable = RteFunctionsGenerator_C.GenerateSenderReceiverInterfaceArguments(field, portDef.PortType, false);
+                                String RteFuncName = RteFunctionsGenerator_CMacro.GenerateInternalReadWriteConnectionFunctionName(component.Name, portDef, field);
+                                String fieldVariable = RteFunctionsGenerator_CMacro.GenerateSenderReceiverInterfaceArguments(field, portDef.PortType, false);
 
                                 writer.WriteLine(returnValue + " " + RteFuncName + fieldVariable);
                                 writer.WriteLine("{");
@@ -451,7 +451,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLangMacro
                                 ComponentInstance oppositCompInstance;
                                 PortPainter oppositePort;
                                 AutosarApplication.GetInstance().GetOppositePortAndComponent(portPainter, out oppositCompInstance, out oppositePort);
-
+                                
                                 if (oppositCompInstance != null)
                                 {
                                     String copyFromField = "Rte_DataBuffer_" + oppositCompInstance.Name + "_" + oppositePort.PortDefenition.Name + "_" + field.Name;
@@ -499,7 +499,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLangMacro
                     ApplicationSwComponentType compDef = component.ComponentDefenition;
 
                     foreach (PortDefenition portDef in compDef.Ports)
-                    {
+                    {                        
                         if ((portDef.PortType == PortType.Sender) && ((portDef.InterfaceDatatype as SenderReceiverInterface).IsQueued == false))
                         {
                             SenderReceiverInterface srInterface = (portDef.InterfaceDatatype as SenderReceiverInterface);
@@ -560,9 +560,9 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLangMacro
                 foreach (ComponentInstance component in composition.ComponentInstances)
                 {
                     ApplicationSwComponentType compDef = component.ComponentDefenition;
-                    String CDSname = RteFunctionsGenerator_C.ComponentDataStructureDefenitionName(compDef);
+                    String CDSname = RteFunctionsGenerator_CMacro.ComponentDataStructureDefenitionName(compDef);
                     writer.WriteLine("extern const " + CDSname + " Rte_Instance_" + component.Name + ";");
-                }
+                }  
             }
             writer.WriteLine("");
         }
@@ -576,7 +576,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLangMacro
                     ApplicationSwComponentType compDef = component.ComponentDefenition;
 
                     foreach (PortDefenition portDef in compDef.Ports)
-                    {
+                    {                        
                         if ((portDef.PortType == PortType.Receiver) && ((portDef.InterfaceDatatype as SenderReceiverInterface).IsQueued == true))
                         {
                             SenderReceiverInterface srInterface = (portDef.InterfaceDatatype as SenderReceiverInterface);
@@ -634,7 +634,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLangMacro
                         String cdataName = "Rte_CDataBuffer_" + component.Name + "_" + cdata.Name;
                         String defValue = cdata.GetDefaultValue();
                         String writeString = "const " + cdata.Defenition.DataTypeName + " " + cdataName + " = " + defValue + ";";
-                        writer.WriteLine(writeString);
+                        writer.WriteLine(writeString);                        
                     }
                 }
             }
@@ -648,7 +648,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLangMacro
                 foreach (ComponentInstance component in composition.ComponentInstances)
                 {
                     ApplicationSwComponentType compDef = component.ComponentDefenition;
-                    String CDSname = RteFunctionsGenerator_C.ComponentDataStructureDefenitionName(compDef);
+                    String CDSname = RteFunctionsGenerator_CMacro.ComponentDataStructureDefenitionName(compDef);
                     writer.WriteLine("const " + CDSname + " Rte_Instance_" + component.Name + " = ");
                     writer.WriteLine("{");
 
@@ -662,7 +662,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLangMacro
                     /* write ports */
                     foreach (PortDefenition portDef in compDef.Ports)
                     {
-
+                        
 
                         if (portDef.InterfaceDatatype is SenderReceiverInterface)
                         {
@@ -672,7 +672,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLangMacro
                             {
                                 foreach (SenderReceiverInterfaceField field in srInterface.Fields)
                                 {
-                                    String rteFuncName = RteFunctionsGenerator_C.GenerateInternalReadWriteConnectionFunctionName(component.Name, portDef, field);
+                                    String rteFuncName = RteFunctionsGenerator_CMacro.GenerateInternalReadWriteConnectionFunctionName(component.Name, portDef, field);
                                     writer.WriteLine("        &" + rteFuncName + ",");
                                 }
                             }
@@ -680,7 +680,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLangMacro
                             {
                                 foreach (SenderReceiverInterfaceField field in srInterface.Fields)
                                 {
-                                    String rteFuncName = RteFunctionsGenerator_C.GenerateInternalSendReceiveConnectionFunctionName(component.Name, portDef, field);
+                                    String rteFuncName = RteFunctionsGenerator_CMacro.GenerateInternalSendReceiveConnectionFunctionName(component.Name, portDef, field);
                                     writer.WriteLine("        &" + rteFuncName + ",");
                                 }
                             }
@@ -693,7 +693,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLangMacro
 
                             foreach (ClientServerOperation operation in csInterface.Operations)
                             {
-                                String rteFuncName = RteFunctionsGenerator_C.GenerateInternalCallConnectionFunctionName(component.Name, portDef, operation);
+                                String rteFuncName = RteFunctionsGenerator_CMacro.GenerateInternalCallConnectionFunctionName(component.Name, portDef, operation);
                                 writer.WriteLine("        &" + rteFuncName + ",");
                             }
                             writer.WriteLine("    },");
@@ -703,7 +703,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLangMacro
                     /* write cdata  */
                     foreach (CDataDefenition cdata in compDef.CDataDefenitions)
                     {
-                        String rteFuncName = RteFunctionsGenerator_C.GenerateInternalCDataFunctionName(component.Name, cdata);
+                        String rteFuncName = RteFunctionsGenerator_CMacro.GenerateInternalCDataFunctionName(component.Name, cdata);
                         writer.WriteLine("    &" + rteFuncName + ",");
                     }
 
