@@ -7,3 +7,4 @@ obj
 /WriteableBitmapEx/Build/Debug/WriteableBitmapEx.Wpf.pdb
 /.vs/AutosarGuiEditor/v17/*.suo
 WriteableBitmapEx/bin/*
+/example

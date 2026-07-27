@@ -56,7 +56,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CppLang
             writer.WriteLine("#define STATIC static");
             writer.WriteLine("#define STATIC_CONST static const");
             writer.WriteLine("#define CONST_VOLATILE const volatile");
-            writer.WriteLine("#define ALWAYS_INLINE  inline __attribute__((always_inline))");
+            writer.WriteLine("#define ALWAYS_INLINE  __attribute__((always_inline))");
             writer.WriteLine("#endif");
             writer.WriteLine();
         }
@@ -89,9 +89,9 @@ namespace AutosarGuiEditor.Source.RteGenerator.CppLang
             foreach (ApplicationSwComponentType compDef in AutosarApplication.GetInstance().ComponentDefenitionsList)
             {
                 writer.WriteLine("/* Datatype for " + compDef.Name  + " */");
-                writer.WriteLine("struct " + compDef.Name); 
+                writer.WriteLine("struct " + compDef.Name);
                 writer.WriteLine("{");
-                
+
                 /* Create index for components with multipleinstantiation */
                 if (compDef.MultipleInstantiation == true)
                 {
@@ -141,19 +141,19 @@ namespace AutosarGuiEditor.Source.RteGenerator.CppLang
                     }
                 }
 
-                writer.WriteLine("};"); 
+                writer.WriteLine("};");
                 writer.WriteLine();
             }
         }
 
-        public void GenerateDataTypeForPim(StreamWriter writer, ApplicationSwComponentType componentDefenition, PimDefenition pimDefenition)       
+        public void GenerateDataTypeForPim(StreamWriter writer, ApplicationSwComponentType componentDefenition, PimDefenition pimDefenition)
         {
-            writer.WriteLine("    " + pimDefenition.DataTypeName + " " + RteFunctionsGenerator_Cpp.GenerateRtePimFieldInComponentDefenitionStruct(componentDefenition, pimDefenition) + ";");            
+            writer.WriteLine("    " + pimDefenition.DataTypeName + " " + RteFunctionsGenerator_Cpp.GenerateRtePimFieldInComponentDefenitionStruct(componentDefenition, pimDefenition) + ";");
         }
 
         public void GenerateDataTypeForCData(StreamWriter writer, ApplicationSwComponentType componentDefenition, CDataDefenition cdata)
         {
-            writer.WriteLine("    " + cdata.DataTypeName + " " + RteFunctionsGenerator_Cpp.GenerateRteCDataFieldInComponentDefenitionStruct(componentDefenition, cdata) + ";");     
+            writer.WriteLine("    " + cdata.DataTypeName + " " + RteFunctionsGenerator_Cpp.GenerateRteCDataFieldInComponentDefenitionStruct(componentDefenition, cdata) + ";");
         }
 
         public void GenerateFieldsForSenderPorts(StreamWriter writer, ApplicationSwComponentType componentDefenition, PortDefenition portDefenition, SenderReceiverInterfaceField srInterfaceField)
@@ -196,7 +196,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CppLang
                 {
                     /* Find max dependency index */
                     int maxDependency = findMaxDependency(datatypes, datatypes[i], i);
-                    
+
                     /* if there is dependency then move the datatype after dependency and start cycle again */
                     if (maxDependency != -1)
                     {
@@ -204,11 +204,11 @@ namespace AutosarGuiEditor.Source.RteGenerator.CppLang
                         datatypes.RemoveAt(i);
                         datatypes.Insert(maxDependency, cdt);
                         hasDependencyLower = true;
-                        break;                        
+                        break;
                     }
                 }
             }
-       
+
             return IterationCount < 100;
         }
 
@@ -226,7 +226,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CppLang
                              maxDependency = i;
                          }
                      }
-                 }                 
+                 }
              }
              return maxDependency;
         }
@@ -296,7 +296,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CppLang
         public void WriteComplexDataType(StreamWriter writer, ComplexDataType datatype)
         {
             writer.WriteLine("/* Complex datatype : " + datatype.Name + " */");
-            writer.WriteLine("struct " + datatype.Name); 
+            writer.WriteLine("struct " + datatype.Name);
             writer.WriteLine("{");
             foreach (ComplexDataTypeField field in datatype.Fields)
             {
@@ -406,13 +406,13 @@ namespace AutosarGuiEditor.Source.RteGenerator.CppLang
         {
             writer.WriteLine("/* Enum Datatype : " + datatype.Name + " */");
 
-            /* Write datatype */            
-            writer.WriteLine("enum class " + datatype.Name); 
+            /* Write datatype */
+            writer.WriteLine("enum class " + datatype.Name);
             writer.WriteLine("{");
 
             /* Write values */
-            for (int i = 0; i < datatype.Fields.Count; i++)                
-            {                
+            for (int i = 0; i < datatype.Fields.Count; i++)
+            {
                 writer.Write(RteFunctionsGenerator_Cpp.CreateEnumValue(datatype.Fields[i]));
                 writer.WriteLine(",");
             }

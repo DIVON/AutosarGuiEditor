@@ -158,7 +158,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CppLang
                                     if (oppositCompInstance != null)
                                     {
                                         /* Get assigned event */
-                                        ClientServerEvent csEvent = oppositCompInstance.ComponentDefenition.GetEventsWithServerOperation(operation);
+                                        ClientServerEvent csEvent = oppositCompInstance.ComponentDefenition.GetEventsWithServerOperation(oppositePort.PortDefenition, operation);
                                         
                                         String arguments = RteFunctionsGenerator_Cpp.Generate_ClientServerPort_Arguments(oppositCompInstance, operation, oppositCompInstance.ComponentDefenition.MultipleInstantiation);
                                         writer.WriteLine("    return Rte_CI_" + oppositCompInstance.Name +".ru" + csEvent.Runnable.Name + arguments + ";");

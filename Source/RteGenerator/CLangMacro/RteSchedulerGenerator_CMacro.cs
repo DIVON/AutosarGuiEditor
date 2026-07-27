@@ -491,7 +491,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CMacro
 
             RteConnectionGenerator_CMacro.GenerateAllAsyncServerNotificators(writer, true);
 
-            writer.WriteLine("/* Declaration of all async events  */");
+            writer.WriteLine("/* Declaration of all sync events  */");
             writer.WriteLine();
 
             RteConnectionGenerator_CMacro.GenerateExternComponentInstances(writer);

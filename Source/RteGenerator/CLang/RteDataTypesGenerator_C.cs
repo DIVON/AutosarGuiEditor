@@ -64,7 +64,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLang
             writer.WriteLine("    #define STATIC_CONST static const");
             writer.WriteLine("    #define STATIC_GLOBAL static");
             writer.WriteLine("    #define CONST_VOLATILE const volatile");
-            writer.WriteLine("    #define ALWAYS_INLINE  inline __attribute__((always_inline))");
+            writer.WriteLine("    #define ALWAYS_INLINE  __attribute__((always_inline))");
 
             writer.WriteLine("    #define ALIGNED_32 __attribute__ ((aligned (32)))");
             writer.WriteLine("    #define ALIGNED_16 __attribute__ ((aligned (16)))");
@@ -104,7 +104,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLang
                 writer.WriteLine("/* Datatype for " + compDef.Name  + " */");
                 writer.WriteLine("typedef struct");
                 writer.WriteLine("{");
-                
+
                 /* Create index for components with multipleinstantiation */
                 if (compDef.MultipleInstantiation == true)
                 {
@@ -154,19 +154,19 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLang
                     }
                 }
 
-                writer.WriteLine("} " + compDef.Name + ";"); 
+                writer.WriteLine("} " + compDef.Name + ";");
                 writer.WriteLine();
             }
         }
 
-        public void GenerateDataTypeForPim(StreamWriter writer, ApplicationSwComponentType componentDefenition, PimDefenition pimDefenition)       
+        public void GenerateDataTypeForPim(StreamWriter writer, ApplicationSwComponentType componentDefenition, PimDefenition pimDefenition)
         {
-            writer.WriteLine("    " + pimDefenition.DataTypeName + " " + RteFunctionsGenerator_C.GenerateRtePimFieldInComponentDefenitionStruct(componentDefenition, pimDefenition) + ";");            
+            writer.WriteLine("    " + pimDefenition.DataTypeName + " " + RteFunctionsGenerator_C.GenerateRtePimFieldInComponentDefenitionStruct(componentDefenition, pimDefenition) + ";");
         }
 
         public void GenerateDataTypeForCData(StreamWriter writer, ApplicationSwComponentType componentDefenition, CDataDefenition cdata)
         {
-            writer.WriteLine("    " + cdata.DataTypeName + " " + RteFunctionsGenerator_C.GenerateRteCDataFieldInComponentDefenitionStruct(componentDefenition, cdata) + ";");     
+            writer.WriteLine("    " + cdata.DataTypeName + " " + RteFunctionsGenerator_C.GenerateRteCDataFieldInComponentDefenitionStruct(componentDefenition, cdata) + ";");
         }
 
         public void GenerateFieldsForSenderPorts(StreamWriter writer, ApplicationSwComponentType componentDefenition, PortDefenition portDefenition, SenderReceiverInterfaceField srInterfaceField)
@@ -209,7 +209,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLang
                 {
                     /* Find max dependency index */
                     int maxDependency = findMaxDependency(datatypes, datatypes[i], i);
-                    
+
                     /* if there is dependency then move the datatype after dependency and start cycle again */
                     if (maxDependency != -1)
                     {
@@ -217,11 +217,11 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLang
                         datatypes.RemoveAt(i);
                         datatypes.Insert(maxDependency, cdt);
                         hasDependencyLower = true;
-                        break;                        
+                        break;
                     }
                 }
             }
-       
+
             return IterationCount < 100;
         }
 
@@ -239,7 +239,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLang
                              maxDependency = i;
                          }
                      }
-                 }                 
+                 }
              }
              return maxDependency;
         }
@@ -423,13 +423,13 @@ namespace AutosarGuiEditor.Source.RteGenerator.CLang
         {
             writer.WriteLine("/* Enum Datatype : " + datatype.Name + " */");
 
-            /* Write datatype */            
+            /* Write datatype */
             writer.WriteLine("typedef enum ");
             writer.WriteLine("{");
 
             /* Write values */
-            for (int i = 0; i < datatype.Fields.Count; i++)                
-            {                
+            for (int i = 0; i < datatype.Fields.Count; i++)
+            {
                 writer.Write(RteFunctionsGenerator_C.CreateEnumValue(datatype.Fields[i]));
                 writer.WriteLine(",");
             }

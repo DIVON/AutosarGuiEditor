@@ -920,7 +920,7 @@ namespace AutosarGuiEditor.Source.Tester
                             foreach (ClientServerOperation csOperation in csInterface.Operations)
                             {
                                 /* Looking for runnable of operation */
-                                ClientServerEvent csEvent = compDef.GetEventsWithServerOperation(csOperation);
+                                ClientServerEvent csEvent = compDef.GetEventsWithServerOperation(portDef, csOperation);
                                 if (csEvent == null)
                                 {
                                     AppendText("Each operation at server port shall have event: " + compDef.Name + " " + portDef.Name + " " + csOperation.Name, MessageType.ERROR);

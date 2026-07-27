@@ -1,4 +1,4 @@
-п»їusing AutosarGuiEditor.Source.Autosar.Events;
+using AutosarGuiEditor.Source.Autosar.Events;
 using AutosarGuiEditor.Source.AutosarInterfaces;
 using AutosarGuiEditor.Source.AutosarInterfaces.ClientServer;
 using AutosarGuiEditor.Source.AutosarInterfaces.SenderReceiver;
@@ -34,7 +34,6 @@ namespace AutosarGuiEditor.Source.RteGenerator.CMacro
             RteFunctionsGenerator_CMacro.AddInclude(writer, Properties.Resources.RTE_THREAD_PROTECTION_H_FILENAME);
 
             RteFunctionsGenerator_Cpp.AddInclude(writer, Properties.Resources.RTE_EXTERNALS_FILENAME);
-            //AddComponentIncludes(writer);
 
             /* Include */
             writer.WriteLine("");
@@ -45,6 +44,8 @@ namespace AutosarGuiEditor.Source.RteGenerator.CMacro
             GenerateAllAsyncServerNotificators(writer);
 
             GenerateQueuedDataBuffers(writer);
+
+            /* Generate functions for multipleInstance components */
             GenerateWriteFunctions(writer);
             GenerateReadFunctions(writer);
             GenerateSendFunctions(writer);
@@ -53,6 +54,9 @@ namespace AutosarGuiEditor.Source.RteGenerator.CMacro
             GenerateCDataFunctions(writer);
 
             GenerateAllComponentInstances(writer);
+
+            /* Generate functions for non-multipleInstance components */
+            GenerateNonMultipleInstanceFunctions(writer);
 
             writer.Close();
         }
@@ -101,11 +105,11 @@ namespace AutosarGuiEditor.Source.RteGenerator.CMacro
 
                     foreach (PortDefenition portDef in compDef.Ports)
                     {
-                        if (portDef.PortType == PortType.Client) 
+                        if (portDef.PortType == PortType.Client)
                         {
                             ClientServerInterface csInterface = (portDef.InterfaceDatatype as ClientServerInterface);
 
-                            /* Syncronous operation */
+                            /* Synchronous operation */
                             if (csInterface.IsAsync == false)
                             {
                                 foreach (ClientServerOperation operation in csInterface.Operations)
@@ -118,16 +122,20 @@ namespace AutosarGuiEditor.Source.RteGenerator.CMacro
                                     writer.WriteLine(returnValue + " " + RteFuncName + "(" + fieldVariable + ")");
                                     writer.WriteLine("{");
                                     PortPainter portPainter = component.Ports.FindPortByItsDefenition(portDef);
-                                    ComponentInstance oppositCompInstance;
-                                    PortPainter oppositePort;
+                                    ComponentInstance oppositCompInstance;//корректно найден
+                                    PortPainter oppositePort; //корректно найден
                                     AutosarApplication.GetInstance().GetOppositePortAndComponent(portPainter, out oppositCompInstance, out oppositePort);
                                     if (oppositCompInstance != null)
                                     {
-                                        /* Get assigned event */
-                                        ClientServerEvent csEvent = oppositCompInstance.ComponentDefenition.GetEventsWithServerOperation(operation);
+                                        /* Get assigned event from the CLIENT component (not server) */
+                                        /* ClientServerEvent is stored in the client component */
+                                        ApplicationSwComponentType oppositeCompDef = oppositCompInstance.ComponentDefenition;
+                                        PortDefenition oppositePortDefinition = oppositePort.PortDefenition;
                                         
+                                        ClientServerEvent csEvent = oppositeCompDef.GetEventsWithServerOperation(oppositePortDefinition, operation);
+
                                         String functionName = RteFunctionsGenerator_CMacro.Generate_RteCall_FunctionName(oppositCompInstance.ComponentDefenition, csEvent.Runnable);
-                                        String arguments = RteFunctionsGenerator_CMacro.Generate_ClientServerPort_Arguments(oppositCompInstance, operation, oppositCompInstance.ComponentDefenition.MultipleInstantiation);
+                                        String arguments = RteFunctionsGenerator_CMacro.Generate_ClientServerPort_Arguments(oppositCompInstance, csEvent.SourceOperation, oppositCompInstance.ComponentDefenition.MultipleInstantiation);
                                         writer.WriteLine("    return " + functionName + arguments + ";");
                                     }
                                     else
@@ -156,7 +164,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CMacro
                                     writer.WriteLine(returnValue + " " + RteFuncName + "(void)");
                                     writer.WriteLine("{");
                                     PortPainter portPainter = component.Ports.FindPortByItsDefenition(portDef);
-                                    
+
                                     List<PortPainter> oppositePorts = new List<PortPainter>();
 
                                     AutosarApplication.GetInstance().GetOppositeComponentPorts(portPainter, oppositePorts);
@@ -169,7 +177,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CMacro
                                             String asyncField = "Rte_AsyncCall_" + compInstance.Name + "_" + oppositePort.PortDefenition.Name + "_" + operation.Name;
                                             writer.WriteLine("    " + asyncField + " = TRUE;");
                                         }
-                                        
+
                                         writer.WriteLine("    return RTE_E_OK;");
                                     }
                                     else
@@ -242,7 +250,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CMacro
                                     writer.WriteLine("    OnAfter_" + RteFuncName + "();");
                                 }
 
-                                writer.WriteLine("    return _returnValue;");  
+                                writer.WriteLine("    return _returnValue;");
 
                                 writer.WriteLine("}");
                                 writer.WriteLine("");
@@ -299,10 +307,10 @@ namespace AutosarGuiEditor.Source.RteGenerator.CMacro
                                                 writer.WriteLine("    uint32 head;");
                                                 writer.WriteLine("    uint32 tail;");
                                                 writer.WriteLine("    Std_ReturnType _returnValue = RTE_E_OK;");
-                                                
+
                                                 connected = true;
                                             }
-                                            
+
                                             int queueSize = srInterface.QueueSize;
 
                                             String copyFromField = "Rte_ReceiveBuffer_" + oppositCompInstance.Name + "_" + oppositePort.PortDefenition.Name + "_" + field.Name;
@@ -332,7 +340,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CMacro
                                         }
 
                                         writer.WriteLine();
-                                        writer.WriteLine("    return _returnValue;"); 
+                                        writer.WriteLine("    return _returnValue;");
                                     }
                                     else
                                     {
@@ -390,7 +398,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CMacro
                                 String writeFieldName = "Rte_DataBuffer_" + component.Name + "_" + portDef.Name + "_" + field.Name;
                                 if (field.IsPointer == false)
                                 {
-                                    
+
 
                                     if (!(field.DataType is ArrayDataType))
                                     {
@@ -451,7 +459,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CMacro
                                 ComponentInstance oppositCompInstance;
                                 PortPainter oppositePort;
                                 AutosarApplication.GetInstance().GetOppositePortAndComponent(portPainter, out oppositCompInstance, out oppositePort);
-                                
+
                                 if (oppositCompInstance != null)
                                 {
                                     String copyFromField = "Rte_DataBuffer_" + oppositCompInstance.Name + "_" + oppositePort.PortDefenition.Name + "_" + field.Name;
@@ -499,7 +507,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CMacro
                     ApplicationSwComponentType compDef = component.ComponentDefenition;
 
                     foreach (PortDefenition portDef in compDef.Ports)
-                    {                        
+                    {
                         if ((portDef.PortType == PortType.Sender) && ((portDef.InterfaceDatatype as SenderReceiverInterface).IsQueued == false))
                         {
                             SenderReceiverInterface srInterface = (portDef.InterfaceDatatype as SenderReceiverInterface);
@@ -559,10 +567,15 @@ namespace AutosarGuiEditor.Source.RteGenerator.CMacro
             {
                 foreach (ComponentInstance component in composition.ComponentInstances)
                 {
+                    if (!component.ComponentDefenition.MultipleInstantiation)
+                    {
+                        // Структуры генерируются только для MultipleInstance компонентов
+                        continue;
+                    }
                     ApplicationSwComponentType compDef = component.ComponentDefenition;
                     String CDSname = RteFunctionsGenerator_CMacro.ComponentDataStructureDefenitionName(compDef);
                     writer.WriteLine("extern const " + CDSname + " Rte_Instance_" + component.Name + ";");
-                }  
+                }
             }
             writer.WriteLine("");
         }
@@ -576,7 +589,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CMacro
                     ApplicationSwComponentType compDef = component.ComponentDefenition;
 
                     foreach (PortDefenition portDef in compDef.Ports)
-                    {                        
+                    {
                         if ((portDef.PortType == PortType.Receiver) && ((portDef.InterfaceDatatype as SenderReceiverInterface).IsQueued == true))
                         {
                             SenderReceiverInterface srInterface = (portDef.InterfaceDatatype as SenderReceiverInterface);
@@ -634,7 +647,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CMacro
                         String cdataName = "Rte_CDataBuffer_" + component.Name + "_" + cdata.Name;
                         String defValue = cdata.GetDefaultValue();
                         String writeString = "const " + cdata.Defenition.DataTypeName + " " + cdataName + " = " + defValue + ";";
-                        writer.WriteLine(writeString);                        
+                        writer.WriteLine(writeString);
                     }
                 }
             }
@@ -648,6 +661,13 @@ namespace AutosarGuiEditor.Source.RteGenerator.CMacro
                 foreach (ComponentInstance component in composition.ComponentInstances)
                 {
                     ApplicationSwComponentType compDef = component.ComponentDefenition;
+
+                    /* For non-multipleInstance components, do not generate structures */
+                    if (compDef.MultipleInstantiation == false)
+                    {
+                        continue;
+                    }
+
                     String CDSname = RteFunctionsGenerator_CMacro.ComponentDataStructureDefenitionName(compDef);
                     writer.WriteLine("const " + CDSname + " Rte_Instance_" + component.Name + " = ");
                     writer.WriteLine("{");
@@ -662,7 +682,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CMacro
                     /* write ports */
                     foreach (PortDefenition portDef in compDef.Ports)
                     {
-                        
+
 
                         if (portDef.InterfaceDatatype is SenderReceiverInterface)
                         {
@@ -708,6 +728,270 @@ namespace AutosarGuiEditor.Source.RteGenerator.CMacro
                     }
 
                     writer.WriteLine("};");
+                    writer.WriteLine("");
+                }
+            }
+        }
+
+        void GenerateNonMultipleInstanceFunctions(StreamWriter writer)
+        {
+            /* Generate functions for non-multipleInstance components */
+            /* We iterate over component definitions, not instances, and use definition names */
+            foreach (ApplicationSwComponentType compDef in AutosarApplication.GetInstance().ComponentDefenitionsList)
+            {
+                /* Only process non-multipleInstance components */
+                if (compDef.MultipleInstantiation == true)
+                {
+                    continue;
+                }
+
+                /* Find the component instance for buffer naming (there should be only one for non-multipleInstance) */
+                ComponentInstance componentInstance = null;
+                foreach (CompositionInstance composition in AutosarApplication.GetInstance().Compositions)
+                {
+                    foreach (ComponentInstance component in composition.ComponentInstances)
+                    {
+                        if (component.ComponentDefenition == compDef)
+                        {
+                            componentInstance = component;
+                            break;
+                        }
+                    }
+                    if (componentInstance != null)
+                        break;
+                }
+
+                if (componentInstance == null)
+                    continue;
+
+                /* Generate write functions - inline without static for non-multipleInstance */
+                /* Use compDef.Name (definition name) for function naming */
+                foreach (PortDefenition portDef in compDef.Ports)
+                {
+                    if ((portDef.PortType == PortType.Sender) && (portDef.InterfaceDatatype is SenderReceiverInterface))
+                    {
+                        SenderReceiverInterface srInterface = portDef.InterfaceDatatype as SenderReceiverInterface;
+                        if (srInterface.IsQueued == false)
+                        {
+                            foreach (SenderReceiverInterfaceField field in srInterface.Fields)
+                            {
+                                String RteFuncName = RteFunctionsGenerator_CMacro.GenerateInternalReadWriteConnectionFunctionName(compDef.Name, portDef, field);
+                                String fieldVariable = RteFunctionsGenerator_CMacro.GenerateSenderReceiverInterfaceArguments(field, portDef.PortType, false);
+
+                                writer.WriteLine("__attribute__((always_inline)) " + Properties.Resources.STD_RETURN_TYPE + " " + RteFuncName + fieldVariable);
+                                writer.WriteLine("{");
+
+                                if (srInterface.IsThreadIrqProtected == true)
+                                {
+                                    writer.WriteLine("    OnBefore_" + RteFuncName + "();");
+                                }
+
+                                String writeFieldName = "Rte_DataBuffer_" + componentInstance.Name + "_" + portDef.Name + "_" + field.Name;
+                                if (field.IsPointer == false)
+                                {
+                                    if (!(field.DataType is AutosarGuiEditor.Source.DataTypes.ArrayDataType.ArrayDataType))
+                                    {
+                                        writer.WriteLine("    " + writeFieldName + " = (*data);");
+                                    }
+                                    else
+                                    {
+                                        writer.WriteLine("    memcpy(" + writeFieldName + ", (*data), sizeof(" + field.DataTypeName + "));");
+                                    }
+                                }
+                                else
+                                {
+                                    writer.WriteLine("    " + writeFieldName + " = data;");
+                                }
+
+                                if (srInterface.IsThreadIrqProtected == true)
+                                {
+                                    writer.WriteLine("    OnAfter_" + RteFuncName + "();");
+                                }
+
+                                writer.WriteLine("    return " + Properties.Resources.RTE_E_OK + ";");
+                                writer.WriteLine("}");
+                                writer.WriteLine("");
+                            }
+                        }
+                    }
+                }
+
+                /* Generate read functions - inline without static for non-multipleInstance */
+                foreach (PortDefenition portDef in compDef.Ports)
+                {
+                    if ((portDef.PortType == PortType.Receiver) && (portDef.InterfaceDatatype is SenderReceiverInterface))
+                    {
+                        SenderReceiverInterface srInterface = portDef.InterfaceDatatype as SenderReceiverInterface;
+                        if (srInterface.IsQueued == false)
+                        {
+                            foreach (SenderReceiverInterfaceField field in srInterface.Fields)
+                            {
+                                String RteFuncName = RteFunctionsGenerator_CMacro.GenerateInternalReadWriteConnectionFunctionName(compDef.Name, portDef, field);
+                                String fieldVariable = RteFunctionsGenerator_CMacro.GenerateSenderReceiverInterfaceArguments(field, portDef.PortType, false);
+
+                                writer.WriteLine("__attribute__((always_inline)) " + Properties.Resources.STD_RETURN_TYPE + " " + RteFuncName + fieldVariable);
+                                writer.WriteLine("{");
+
+                                if (srInterface.IsThreadIrqProtected == true)
+                                {
+                                    writer.WriteLine("    OnBefore_" + RteFuncName + "();");
+                                }
+
+                                PortPainter portPainter = null;
+                                foreach (CompositionInstance composition in AutosarApplication.GetInstance().Compositions)
+                                {
+                                    foreach (ComponentInstance component in composition.ComponentInstances)
+                                    {
+                                        if (component.ComponentDefenition == compDef)
+                                        {
+                                            portPainter = component.Ports.FindPortByItsDefenition(portDef);
+                                            break;
+                                        }
+                                    }
+                                    if (portPainter != null)
+                                        break;
+                                }
+
+                                ComponentInstance oppositCompInstance;
+                                PortPainter oppositePort;
+                                AutosarApplication.GetInstance().GetOppositePortAndComponent(portPainter, out oppositCompInstance, out oppositePort);
+
+                                if (oppositCompInstance != null)
+                                {
+                                    String copyFromField = "Rte_DataBuffer_" + oppositCompInstance.Name + "_" + oppositePort.PortDefenition.Name + "_" + field.Name;
+
+                                    if (!(field.DataType is AutosarGuiEditor.Source.DataTypes.ArrayDataType.ArrayDataType))
+                                    {
+                                        writer.WriteLine("    *data = " + copyFromField + ";");
+                                    }
+                                    else
+                                    {
+                                        writer.WriteLine("    memcpy(*data, " + copyFromField + ", sizeof(" + field.DataTypeName + "));");
+                                    }
+
+                                    if (srInterface.IsThreadIrqProtected == true)
+                                    {
+                                        writer.WriteLine("    OnAfter_" + RteFuncName + "();");
+                                    }
+                                    writer.WriteLine("    return " + Properties.Resources.RTE_E_OK + ";");
+                                }
+                                else
+                                {
+                                    writer.WriteLine("    memset(data, 0, sizeof(" + field.DataTypeName + "));");
+                                    if (srInterface.IsThreadIrqProtected == true)
+                                    {
+                                        writer.WriteLine("    OnAfter_" + RteFuncName + "();");
+                                    }
+                                    writer.WriteLine("    return " + Properties.Resources.RTE_E_UNCONNECTED + ";");
+                                }
+
+                                writer.WriteLine("}");
+                                writer.WriteLine("");
+                            }
+                        }
+                    }
+                }
+
+                /* Generate call functions - inline without static for non-multipleInstance */
+                foreach (PortDefenition portDef in compDef.Ports)
+                {
+                    if (portDef.PortType == PortType.Client && (portDef.InterfaceDatatype is ClientServerInterface))
+                    {
+                        ClientServerInterface csInterface = portDef.InterfaceDatatype as ClientServerInterface;
+
+                        foreach (ClientServerOperation operation in csInterface.Operations)
+                        {
+                            String returnValue = Properties.Resources.STD_RETURN_TYPE;
+                            String RteFuncName = RteFunctionsGenerator_CMacro.GenerateInternalCallConnectionFunctionName(compDef.Name, portDef, operation);
+                            String fieldVariable = RteFunctionsGenerator_CMacro.GenerateClientServerInterfaceArguments(operation, false);
+
+                            writer.WriteLine("__attribute__((always_inline)) " + returnValue + " " + RteFuncName + "(" + fieldVariable + ")");
+                            writer.WriteLine("{");
+
+                            PortPainter portPainter = null;
+                            foreach (CompositionInstance composition in AutosarApplication.GetInstance().Compositions)
+                            {
+                                foreach (ComponentInstance component in composition.ComponentInstances)
+                                {
+                                    if (component.ComponentDefenition == compDef)
+                                    {
+                                        portPainter = component.Ports.FindPortByItsDefenition(portDef);
+                                        break;
+                                    }
+                                }
+                                if (portPainter != null)
+                                    break;
+                            }
+
+                            ComponentInstance oppositCompInstance;
+                            PortPainter oppositePort;
+                            AutosarApplication.GetInstance().GetOppositePortAndComponent(portPainter, out oppositCompInstance, out oppositePort);
+
+                            if (oppositCompInstance != null)
+                            {
+                                /* Get assigned event from the CLIENT component definition (not server) */
+                                /* ClientServerEvent is stored in the client component */
+                                ClientServerEvent csEvent = compDef.GetEventsWithServerOperation(oppositePort.PortDefenition, operation);
+                                
+                                if (csEvent == null)
+                                {
+                                    /* Mark all parameters unused */
+                                    foreach (ClientServerOperationField field in operation.Fields)
+                                    {
+                                        writer.WriteLine("    (void)" + field.Name + ";");
+                                    }
+                                    writer.WriteLine("    return " + Properties.Resources.RTE_E_UNCONNECTED + ";");
+                                    writer.WriteLine("}");
+                                    writer.WriteLine("");
+                                    continue;
+                                }
+                                
+                                /* Get the server runnable from the event */
+                                RunnableDefenition serverRunnable = csEvent.Runnable;
+                                ApplicationSwComponentType serverCompDef = oppositCompInstance.ComponentDefenition;
+
+                                String functionName = RteFunctionsGenerator_CMacro.Generate_RteCall_FunctionName(serverCompDef, serverRunnable);
+
+                                /* Determine if we need to pass instance parameter */
+                                if (oppositCompInstance.ComponentDefenition.MultipleInstantiation == false)
+                                {
+                                    /* Target is non-multipleInstance: call without instance */
+                                    String arguments = RteFunctionsGenerator_CMacro.Generate_ClientServerPort_ArgumentsWithoutInstance(oppositCompInstance, operation);
+                                    writer.WriteLine("    return " + functionName + arguments + ";");
+                                }
+                                else
+                                {
+                                    /* Target is multipleInstance: pass the server instance pointer */
+                                    String arguments = RteFunctionsGenerator_CMacro.Generate_ClientServerPort_ArgumentsForNonMultipleClientToMultipleServer(componentInstance, oppositCompInstance, operation);
+                                    writer.WriteLine("    return " + functionName + arguments + ";");
+                                }
+                            }
+                            else
+                            {
+                                /* Mark all parameters unused */
+                                foreach (ClientServerOperationField field in operation.Fields)
+                                {
+                                    writer.WriteLine("    (void)" + field.Name + ";");
+                                }
+                                writer.WriteLine("    return " + Properties.Resources.RTE_E_UNCONNECTED + ";");
+                            }
+
+                            writer.WriteLine("}");
+                            writer.WriteLine("");
+                        }
+                    }
+                }
+
+                /* Generate CData functions */
+                foreach (CDataDefenition cdata in compDef.CDataDefenitions)
+                {
+                        String returnDatatype = cdata.DataTypeName;
+                        String RteFuncName = RteFunctionsGenerator_CMacro.GenerateInternalCDataFunctionName(compDef.Name, cdata);
+
+                        writer.WriteLine("__attribute__((always_inline)) " + returnDatatype + " " + RteFuncName + "(void)");
+                    writer.WriteLine("{");
+                    writer.WriteLine("    return Rte_CDataBuffer_" + componentInstance.Name + "_" + cdata.Name + ";");
+                    writer.WriteLine("}");
                     writer.WriteLine("");
                 }
             }

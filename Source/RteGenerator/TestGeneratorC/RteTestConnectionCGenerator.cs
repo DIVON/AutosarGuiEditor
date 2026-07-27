@@ -161,7 +161,7 @@ namespace AutosarGuiEditor.Source.RteGenerator
                                 if (oppositCompInstance != null)
                                 {
                                     /* Get assigned event */
-                                    ClientServerEvent csEvent = oppositCompInstance.ComponentDefenition.GetEventsWithServerOperation(operation);
+                                    ClientServerEvent csEvent = oppositCompInstance.ComponentDefenition.GetEventsWithServerOperation(oppositePort.PortDefenition, operation);
 
                                     String functionName = RteFunctionsGenerator_C.Generate_RteCall_FunctionName(oppositCompInstance.ComponentDefenition, csEvent.Runnable);
 

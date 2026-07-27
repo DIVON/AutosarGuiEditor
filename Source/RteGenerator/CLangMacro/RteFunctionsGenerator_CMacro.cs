@@ -1,4 +1,4 @@
-﻿using AutosarGuiEditor.Source.Autosar.Events;
+using AutosarGuiEditor.Source.Autosar.Events;
 using AutosarGuiEditor.Source.Autosar.OsTasks;
 using AutosarGuiEditor.Source.AutosarInterfaces;
 using AutosarGuiEditor.Source.AutosarInterfaces.ClientServer;
@@ -130,6 +130,11 @@ namespace AutosarGuiEditor.Source.RteGenerator.CMacro
         public static String Generate_InternalRteCall_FunctionName(PortDefenition portDef, ClientServerOperation operation)
         {
             return "Rte_Call_" + portDef.Name + "_" + operation.Name;
+        }
+
+        public static String Generate_InternalRteCall_FunctionName(String componentName, PortDefenition portDef, ClientServerOperation operation)
+        {
+            return "Rte_Call_" + componentName + "_" + portDef.Name + "_" + operation.Name;
         }
 
         public static String Generate_RteCall_ConnectionGroup_FunctionName(ApplicationSwComponentType compDef, PortDefenition port, ClientServerOperation operation)
@@ -648,6 +653,51 @@ namespace AutosarGuiEditor.Source.RteGenerator.CMacro
                 {
                     serverPortCallFunction += ", ";
                 }
+            }
+            for (int i = 0; i < operation.Fields.Count; i++)
+            {
+                serverPortCallFunction += operation.Fields[i].Name;
+                if (i != operation.Fields.Count - 1)
+                {
+                    serverPortCallFunction += ", ";
+                }
+            }
+            serverPortCallFunction += ")";
+            return serverPortCallFunction;
+        }
+
+        /// <summary>
+        /// Generates arguments for calling a server runnable when the client is non-multipleInstance.
+        /// Returns just the operation fields without instance parameter.
+        /// </summary>
+        public static String Generate_ClientServerPort_ArgumentsWithoutInstance(ComponentInstance compInstance, ClientServerOperation operation)
+        {
+            String serverPortCallFunction = "(";
+            // No instance parameter for non-multipleInstance target
+            for (int i = 0; i < operation.Fields.Count; i++)
+            {
+                serverPortCallFunction += operation.Fields[i].Name;
+                if (i != operation.Fields.Count - 1)
+                {
+                    serverPortCallFunction += ", ";
+                }
+            }
+            serverPortCallFunction += ")";
+            return serverPortCallFunction;
+        }
+
+        /// <summary>
+        /// Generates arguments for calling a multipleInstance server runnable from a non-multipleInstance client.
+        /// Finds the connected server instance and passes its instance pointer.
+        /// </summary>
+        public static String Generate_ClientServerPort_ArgumentsForNonMultipleClientToMultipleServer(ComponentInstance clientComponent, ComponentInstance serverComponent, ClientServerOperation operation)
+        {
+            String serverPortCallFunction = "(";
+            // Pass the server instance pointer
+            serverPortCallFunction += LinkToTheComponentInstance(serverComponent);
+            if (operation.Fields.Count > 0)
+            {
+                serverPortCallFunction += ", ";
             }
             for (int i = 0; i < operation.Fields.Count; i++)
             {

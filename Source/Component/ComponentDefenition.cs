@@ -30,7 +30,7 @@ namespace AutosarGuiEditor.Source.Component
         public Boolean MultipleInstantiation = false;
 
         public RunnableDefenitionsList Runnables = new RunnableDefenitionsList();
-        
+
         public PerInstanceMemoryDefenitionList PerInstanceMemoryList = new PerInstanceMemoryDefenitionList();
         public CDataDefenitionList CDataDefenitions = new CDataDefenitionList();
 
@@ -65,10 +65,10 @@ namespace AutosarGuiEditor.Source.Component
             PerInstanceMemoryList.LoadFromXML(xml);
             CDataDefenitions.LoadFromXML(xml);
             String portDefString = XmlUtilits.GetFieldValue(xml, "MultipleInstantiation", "false");
-            
+
             if (!Boolean.TryParse(portDefString, out MultipleInstantiation))
             {
-                MultipleInstantiation = false; 
+                MultipleInstantiation = false;
             }
             syncClientServerEvents.LoadFromXML(xml);
             asyncClientServerEvents.LoadFromXML(xml);
@@ -182,12 +182,12 @@ namespace AutosarGuiEditor.Source.Component
             return list;
         }
 
-        public ClientServerEvent GetEventsWithServerOperation(ClientServerOperation csOperation)
+        public ClientServerEvent GetEventsWithServerOperation(PortDefenition portDef, ClientServerOperation csOperation)
         {
             foreach (AutosarEvent aEvent in this.asyncClientServerEvents)
             {
                 ClientServerEvent csEvent = aEvent as ClientServerEvent;
-                if (csEvent.SourceOperation == csOperation)
+                if ((csEvent.SourceOperation == csOperation) && (csEvent.SourcePort == portDef))
                 {
                     return csEvent;
                 }
@@ -195,7 +195,8 @@ namespace AutosarGuiEditor.Source.Component
             foreach (AutosarEvent aEvent in this.syncClientServerEvents)
             {
                 ClientServerEvent csEvent = aEvent as ClientServerEvent;
-                if (csEvent.SourceOperation == csOperation)
+
+                if ((csEvent.SourceOperation == csOperation) && (csEvent.SourcePort == portDef))
                 {
                     return csEvent;
                 }
