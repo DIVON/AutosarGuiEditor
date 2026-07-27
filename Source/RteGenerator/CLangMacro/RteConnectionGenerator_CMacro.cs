@@ -930,8 +930,8 @@ namespace AutosarGuiEditor.Source.RteGenerator.CMacro
                             if (oppositCompInstance != null)
                             {
                                 /* Get assigned event from the CLIENT component definition (not server) */
-                                /* ClientServerEvent is stored in the client component */
-                                ClientServerEvent csEvent = compDef.GetEventsWithServerOperation(oppositePort.PortDefenition, operation);
+                                /* ClientServerEvent is stored in the server component */
+                                ClientServerEvent csEvent = oppositCompInstance.ComponentDefenition.GetEventsWithServerOperation(oppositePort.PortDefenition, operation);
                                 
                                 if (csEvent == null)
                                 {
