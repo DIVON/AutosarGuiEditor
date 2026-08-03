@@ -1,4 +1,4 @@
-﻿<Window
+<Window
     x:Class="AutosarGuiEditor.MainWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -51,6 +51,8 @@
                 <Separator />
                 <MenuItem Click="SaveProject_Click" Header="Save" />
                 <MenuItem Click="SaveAsProject_Click" Header="Save as" />
+                <Separator />
+                <MenuItem Click="SaveAsArxml_Click" Header="Save as ARXML" />
             </MenuItem>
             <MenuItem Header="Project">
                 <MenuItem Click="ProjectSettings_Click" Header="Settings..." />

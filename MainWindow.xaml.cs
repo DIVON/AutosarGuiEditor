@@ -821,6 +821,37 @@ namespace AutosarGuiEditor
             }
         }
 
+        private void SaveAsArxml_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                AutosarApplication app = AutosarApplication.GetInstance();
+                
+                // Check if project file is saved
+                if (string.IsNullOrEmpty(app.FileName))
+                {
+                    MessageBox.Show("Please save the project first before exporting to ARXML.", 
+                        "Project Not Saved", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
+                
+                // Generate ARXML filename based on project filename
+                string projectPath = app.FileName;
+                string projectDirectory = System.IO.Path.GetDirectoryName(projectPath);
+                string projectFileName = System.IO.Path.GetFileNameWithoutExtension(projectPath);
+                string arxmlPath = System.IO.Path.Combine(projectDirectory, projectFileName + ".arxml");
+                
+                Source.Autosar.ArxmlExporter exporter = new Source.Autosar.ArxmlExporter();
+                exporter.ExportToArxml(app, arxmlPath);
+                MessageBox.Show("ARXML file has been saved successfully to:\n" + arxmlPath, 
+                    "ARXML Export", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error: " + ex.Message, "ARXML Export Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
         private void OpenProject_Click(object sender, RoutedEventArgs e)
         {
             bool openResult = openSaveController.Open();

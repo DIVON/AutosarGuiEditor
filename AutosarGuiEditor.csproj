@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
@@ -132,6 +132,7 @@
     <Compile Include="Source\AutosarInterfaces\SenderReceiver\SenderReceiverInterfaceFieldsList.cs" />
     <Compile Include="Source\AutosarInterfaces\SenderReceiver\SenderReceiverInterfacesList.cs" />
     <Compile Include="Source\Autosar\ArxmlPackage.cs" />
+    <Compile Include="Source\Autosar\ArxmlExporter.cs" />
     <Compile Include="Source\Autosar\AutosarApplication.cs" />
     <Compile Include="Source\Autosar\CDataPool\CDataPool.cs" />
     <Compile Include="Source\Autosar\Events\AutosarEventInstances.cs" />
