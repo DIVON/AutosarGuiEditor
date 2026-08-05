@@ -232,6 +232,13 @@ namespace AutosarGuiEditor.Source.RteGenerator.CMacro
                         }
                     }
                 }
+
+                /* Generate CData function declarations */
+                foreach (CDataDefenition cdata in compDef.CDataDefenitions)
+                {
+                    String internalFuncName = "Rte_InternalCData_" + compDef.Name + "_" + cdata.Name;
+                    writer.WriteLine("extern " + cdata.DataTypeName + " " + internalFuncName + "(void);");
+                }
             }
             else
             {
@@ -344,6 +351,26 @@ namespace AutosarGuiEditor.Source.RteGenerator.CMacro
                             writer.WriteLine(define);
                         }
                     }
+                }
+            }
+
+            /* Add defines for CData */
+            foreach (CDataDefenition cdata in compDef.CDataDefenitions)
+            {
+                if (compDef.MultipleInstantiation == false)
+                {
+                    /* For non-multipleInstance: CData is accessed via internal function call (no extra parentheses) */
+                    String macroName = RteFunctionsGenerator_CMacro.GenerateShortCDataFunctionName(cdata);
+                    String internalFuncName = "Rte_InternalCData_" + compDef.Name + "_" + cdata.Name;
+                    writer.WriteLine(RteFunctionsGenerator_CMacro.CreateDefine(macroName + "()", internalFuncName + "()", false));
+                }
+                else
+                {
+                    /* For multipleInstance: CData is accessed through component instance */
+                    String macroName = RteFunctionsGenerator_CMacro.GenerateShortCDataFunctionName(cdata);
+                    String instance = "(Rte_CDS_" + compDef.Name + "*)instance";
+                    String rteFuncName = "(" + instance + ")->CData_" + cdata.Name + "()";
+                    writer.WriteLine(RteFunctionsGenerator_CMacro.CreateDefine(macroName + "(instance)", rteFuncName, true));
                 }
             }
 
