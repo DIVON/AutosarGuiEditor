@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Xml;
 using System.Xml.Linq;
-using AutosarGuiEditor.Source.Painters.PortsPainters;
 using AutosarGuiEditor.Source.Autosar.OsTasks;
 using AutosarGuiEditor.Source.Autosar.Events;
 using AutosarGuiEditor.Source.Component;
@@ -20,153 +20,204 @@ using AutosarGuiEditor.Source.AutosarInterfaces.ClientServer;
 using AutosarGuiEditor.Source.AutosarInterfaces.SenderReceiver;
 using AutosarGuiEditor.Source.SystemInterfaces;
 using AutosarGuiEditor.Source.PortDefenitions;
-using AutosarGuiEditor.Source.Component.CData;
-using AutosarGuiEditor.Source.Component.PerInstanceMemory;
 using AutosarGuiEditor.Source.Painters;
+using AutosarGuiEditor.Source.Painters.PortsPainters;
 
 namespace AutosarGuiEditor.Source.Autosar
 {
-    /// <summary>
-    /// Экспортер проекта в формат ARXML (AUTOSAR RTE Package format)
-    /// </summary>
     public class ArxmlExporter
     {
         private AutosarApplication _app;
-        private int _compositionIndex;
-        private int _taskIndex;
         private int _eventIndex;
-        private int _portDefIndex;
-        private int _connectionIndex;
 
-        // ARXML namespace
         private static readonly string ArNamespace = "http://autosar.org/schema/r4.0";
-        private static readonly XmlNamespaceManager ArNs = new XmlNamespaceManager(new NameTable());
 
-        static ArxmlExporter()
-        {
-            ArNs.AddNamespace("aar", ArNamespace);
-        }
-
-        /// <summary>
-        /// Экспорт проекта в ARXML файл
-        /// </summary>
         public bool ExportToArxml(AutosarApplication app, string filePath)
         {
             _app = app;
-            ResetIndexes();
+            _eventIndex = 0;
 
             XDocument document = CreateArxmlDocument();
-            document.Save(filePath);
-
+            
+            // Save with pretty printing (indented XML)
+            using (var writer = XmlWriter.Create(filePath, new XmlWriterSettings
+            {
+                Encoding = new UTF8Encoding(false), // false = no BOM
+                Indent = true,
+                OmitXmlDeclaration = false,
+                NewLineHandling = NewLineHandling.Replace,
+                NewLineOnAttributes = false
+            }))
+            {
+                document.Save(writer);
+            }
+            
             return true;
-        }
-
-        private void ResetIndexes()
-        {
-            _compositionIndex = 0;
-            _taskIndex = 0;
-            _eventIndex = 0;
-            _portDefIndex = 0;
-            _connectionIndex = 0;
         }
 
         private XDocument CreateArxmlDocument()
         {
-            XDocument doc = new XDocument(
-                new XDeclaration("1.0", "UTF-8", null),
-                new XElement(ns + "AR-PACKAGES",
-                    new XElement(ns + "AR-PACKAGE",
-                        new XElement(ns + "SHORT-NAME", "AUTOSAR_Project"),
-                        new XElement(ns + "ELEMENTS",
-                            ExportDataDefinitions(),
-                            ExportInterfaces(),
-                            ExportSwCompositionDefinitions(),
-                            ExportCompositionInstances(),
-                            ExportOsElements()
-                        ),
-                        ExportPackageHierarchy()
-                    )
-                )
-            );
+            XNamespace ns = XNamespace.Get(ArNamespace);
 
-            return doc;
+            // Package hierarchy children
+            XElement baseDataTypesHierarchy = new XElement(ns + "CHILD-PACKAGES",
+                new XElement(ns + "SHORT-NAME", "BaseDataTypes"));
+
+            XElement userDefinedTypesHierarchy = new XElement(ns + "CHILD-PACKAGES",
+                new XElement(ns + "SHORT-NAME", "UserDefinedTypes"));
+
+            XElement dataDefinitionsHierarchy = new XElement(ns + "CHILD-PACKAGES",
+                new XElement(ns + "SHORT-NAME", "DataDefinitions"),
+                baseDataTypesHierarchy,
+                userDefinedTypesHierarchy);
+
+            XElement interfacesHierarchy = new XElement(ns + "CHILD-PACKAGES",
+                new XElement(ns + "SHORT-NAME", "Interfaces"));
+
+            XElement swComponentDefinitionsHierarchy = new XElement(ns + "CHILD-PACKAGES",
+                new XElement(ns + "SHORT-NAME", "SwComponentDefinitions"));
+
+            XElement compositionInstancesHierarchy = new XElement(ns + "CHILD-PACKAGES",
+                new XElement(ns + "SHORT-NAME", "CompositionInstances"));
+
+            XElement osHierarchy = new XElement(ns + "CHILD-PACKAGES",
+                new XElement(ns + "SHORT-NAME", "Os"));
+
+            XElement packageHierarchy = new XElement(ns + "PACKAGE-HIERARCHY",
+                dataDefinitionsHierarchy,
+                interfacesHierarchy,
+                swComponentDefinitionsHierarchy,
+                compositionInstancesHierarchy,
+                osHierarchy);
+
+            XElement root = new XElement(ns + "AR-PACKAGES",
+                new XElement(ns + "AR-PACKAGE",
+                    new XElement(ns + "SHORT-NAME", "AUTOSAR_Project"),
+                    new XElement(ns + "ELEMENTS",
+                        ExportDataDefinitions(ns),
+                        ExportInterfaces(ns),
+                        ExportSwComponentDefinitions(ns),
+                        ExportCompositions(ns),
+                        ExportOsElements(ns)
+                    ),
+                    packageHierarchy));
+
+            // Create XDocument with explicit declaration for proper formatting
+            XDocument document = new XDocument();
+            document.Add(new XDeclaration("1.0", "utf-8", null));
+            document.Add(root);
+            return document;
         }
 
-        private string ns => "{" + ArNamespace + "}";
+        // ==================== DATA DEFINITIONS ====================
 
-        private XElement ExportDataDefinitions()
+        private XElement ExportDataDefinitions(XNamespace ns)
         {
             XElement dataDefs = new XElement(ns + "DATA-DEFINITIONS");
 
-            // Base data types
             foreach (BaseDataType baseDt in _app.BaseDataTypes)
             {
-                dataDefs.Add(ExportBaseDataType(baseDt));
+                dataDefs.Add(ExportPrimitiveType(ns, baseDt));
             }
 
-            // Simple data types
             foreach (SimpleDataType simpleDt in _app.SimpleDataTypes)
             {
-                dataDefs.Add(ExportSimpleDataType(simpleDt));
+                dataDefs.Add(ExportSimpleDataType(ns, simpleDt));
             }
 
-            // Array data types
             foreach (ArrayDataType arrayDt in _app.ArrayDataTypes)
             {
-                dataDefs.Add(ExportArrayDataType(arrayDt));
+                dataDefs.Add(ExportArrayDataType(ns, arrayDt));
             }
 
-            // Complex data types
             foreach (ComplexDataType complexDt in _app.ComplexDataTypes)
             {
-                dataDefs.Add(ExportComplexDataType(complexDt));
+                dataDefs.Add(ExportComplexDataType(ns, complexDt));
             }
 
-            // Enum data types
             foreach (EnumDataType enumDt in _app.Enums)
             {
-                dataDefs.Add(ExportEnumDataType(enumDt));
+                dataDefs.Add(ExportEnumDataType(ns, enumDt));
             }
 
             return dataDefs;
         }
 
-        private XElement ExportBaseDataType(BaseDataType baseDt)
+        private XElement ExportPrimitiveType(XNamespace ns, BaseDataType baseDt)
         {
-            // BaseDataType inherits from PlainDataType which doesn't have SizeInBits/IsSigned
-            // Use default values for ARXML export
+            (int size, string encoding) = GetBaseTypeInfo(baseDt);
+
             XElement primitiveType = new XElement(ns + "PRIMITIVE-TYPE",
                 new XElement(ns + "SHORT-NAME", baseDt.Name),
-                new XElement(ns + "BASE-TYPE-SIZE", "4"),
-                new XElement(ns + "BASE-TYPE-ENCODING", "SIGNED")
+                new XElement(ns + "BASE-TYPE-SIZE", size.ToString()),
+                new XElement(ns + "BASE-TYPE-ENCODING", encoding)
             );
 
             return primitiveType;
         }
 
-        private XElement ExportSimpleDataType(SimpleDataType simpleDt)
+        private (int size, string encoding) GetBaseTypeInfo(BaseDataType baseDt)
         {
-            // Find base type (SimpleDataType.BaseDataTypeGUID)
-            BaseDataType baseType = _app.BaseDataTypes.FindObject(simpleDt.BaseDataTypeGUID);
-            string baseTypeName = baseType != null ? baseType.Name : "UNKNOWN";
-            
-            // Get size and signed info from base type if available
-            string isSigned = "FALSE";
-            int size = 32;
-            if (baseType != null)
+            string sysName = baseDt.SystemName ?? baseDt.Name;
+
+            switch (sysName.ToLower())
             {
-                // BaseDataType doesn't have SizeInBits/IsSigned, use defaults
-                isSigned = "SIGNED";
-                size = 32;
+                case "unsigned char":
+                case "boolean":
+                    return (1, "UNSIGNED");
+                case "signed char":
+                    return (1, "SIGNED");
+                case "unsigned short":
+                    return (2, "UNSIGNED");
+                case "signed short":
+                    return (2, "SIGNED");
+                case "unsigned int":
+                case "uint8":
+                case "uint16":
+                case "uint32":
+                    return (4, "UNSIGNED");
+                case "signed int":
+                case "int8":
+                case "int16":
+                case "int32":
+                    return (4, "SIGNED");
+                case "unsigned long long":
+                case "uint64":
+                    return (8, "UNSIGNED");
+                case "signed long long":
+                case "int64":
+                    return (8, "SIGNED");
+                case "float":
+                    return (4, "FLOAT");
+                case "double":
+                    return (8, "FLOAT");
+                case "const char*":
+                case "str":
+                    return (1, "UNSIGNED");
+                default:
+                    // Fallback: try to infer from name
+                    if (sysName.StartsWith("uint") || sysName.StartsWith("unsigned"))
+                        return (4, "UNSIGNED");
+                    else if (sysName.StartsWith("int") || sysName.StartsWith("signed"))
+                        return (4, "SIGNED");
+                    else
+                        return (1, "UNSIGNED");
             }
+        }
+
+        private XElement ExportSimpleDataType(XNamespace ns, SimpleDataType simpleDt)
+        {
+            BaseDataType baseType = _app.BaseDataTypes.FindObject(simpleDt.BaseDataTypeGUID);
+            string baseTypeName = baseType != null ? baseType.Name : "int8";
+            (int size, string encoding) = baseType != null ? GetBaseTypeInfo(baseType) : (4, "SIGNED");
 
             XElement dataType = new XElement(ns + "DATA-TYPE",
                 new XElement(ns + "SHORT-NAME", simpleDt.Name),
                 new XElement(ns + "TYPE-IDENTIFIER",
                     new XElement(ns + "T-PRIMITIVE-TYPE",
                         new XElement(ns + "BASE-TYPE", baseTypeName),
-                        new XElement(ns + "IS-SIGNED", isSigned),
-                        new XElement(ns + "SIZE", size)
+                        new XElement(ns + "IS-SIGNED", encoding),
+                        new XElement(ns + "SIZE", size.ToString())
                     )
                 )
             );
@@ -174,51 +225,29 @@ namespace AutosarGuiEditor.Source.Autosar
             return dataType;
         }
 
-        private XElement ExportArrayDataType(ArrayDataType arrayDt)
+        private XElement ExportArrayDataType(XNamespace ns, ArrayDataType arrayDt)
         {
-            XElement dataType = new XElement(ns + "DATA-TYPE",
+            string elementRef = GetDataTypeRef(ns, arrayDt.DataTypeGUID);
+
+            XElement arrayType = new XElement(ns + "DATA-TYPE",
                 new XElement(ns + "SHORT-NAME", arrayDt.Name),
                 new XElement(ns + "TYPE-IDENTIFIER",
                     new XElement(ns + "T-ARRAY-DATA-TYPE",
-                        ExportArrayElementType(arrayDt),
+                        new XElement(ns + "ELEMENT-TYPE-REF",
+                            new XAttribute(ns + "DEST", "AR-PKG"),
+                            elementRef),
                         new XElement(ns + "LOWER-LIMIT", "0"),
                         new XElement(ns + "UPPER-LIMIT", arrayDt.Size.ToString())
                     )
                 )
             );
 
-            return dataType;
+            return arrayType;
         }
 
-        private XElement ExportArrayElementType(ArrayDataType arrayDt)
+        private XElement ExportComplexDataType(XNamespace ns, ComplexDataType complexDt)
         {
-            string elementRef = GetDataTypeRef(arrayDt.DataTypeGUID);
-            if (elementRef != null)
-            {
-                return new XElement(ns + "ELEMENT-TYPE-REF",
-                    new XAttribute(ns + "DEST", "AR-PKG"),
-                    elementRef);
-            }
-            return new XElement(ns + "ELEMENT-TYPE",
-                new XElement(ns + "SHORT-NAME", "UnknownElementType"));
-        }
-
-        private XElement ExportComplexDataType(ComplexDataType complexDt)
-        {
-            XElement structType = new XElement(ns + "DATA-TYPE",
-                new XElement(ns + "SHORT-NAME", complexDt.Name),
-                new XElement(ns + "TYPE-IDENTIFIER",
-                    new XElement(ns + "T-STRUCT-DATA-TYPE")
-                ),
-                ExportComplexDataTypeFields(complexDt)
-            );
-
-            return structType;
-        }
-
-        private XElement ExportComplexDataTypeFields(ComplexDataType complexDt)
-        {
-            XElement fields = new XElement(ns + "STRUCTURE-ELEMENTS");
+            XElement structElements = new XElement(ns + "STRUCTURE-ELEMENTS");
 
             foreach (ComplexDataTypeField field in complexDt.Fields)
             {
@@ -226,35 +255,27 @@ namespace AutosarGuiEditor.Source.Autosar
                     new XElement(ns + "SHORT-NAME", field.Name),
                     new XElement(ns + "ACCESS-HINT", "OPTIONAL"),
                     new XElement(ns + "IS-QN-REQUIRED", "FALSE"),
-                new XElement(ns + "TYPE-REF",
-                    new XAttribute(ns + "DEST", "AR-PKG"),
-                    GetDataTypeRef(field.DataTypeGUID) ?? "")
+                    new XElement(ns + "TYPE-REF",
+                        new XAttribute(ns + "DEST", "AR-PKG"),
+                        GetDataTypeRef(ns, field.DataTypeGUID))
                 );
-
-                fields.Add(element);
+                structElements.Add(element);
             }
 
-            return fields;
-        }
-
-        private XElement ExportEnumDataType(EnumDataType enumDt)
-        {
-            XElement enumType = new XElement(ns + "DATA-TYPE",
-                new XElement(ns + "SHORT-NAME", enumDt.Name),
+            XElement structType = new XElement(ns + "DATA-TYPE",
+                new XElement(ns + "SHORT-NAME", complexDt.Name),
                 new XElement(ns + "TYPE-IDENTIFIER",
-                    new XElement(ns + "T-ENUM-DATA-TYPE",
-                        new XElement(ns + "DISPLAY-VALUE", "DEC"),
-                        ExportEnumValues(enumDt)
-                    )
+                    new XElement(ns + "T-STRUCT-DATA-TYPE"),
+                    structElements
                 )
             );
 
-            return enumType;
+            return structType;
         }
 
-        private XElement ExportEnumValues(EnumDataType enumDt)
+        private XElement ExportEnumDataType(XNamespace ns, EnumDataType enumDt)
         {
-            XElement values = new XElement(ns + "ENUMERATION-VALUES");
+            XElement enumValues = new XElement(ns + "ENUMERATION-VALUES");
 
             foreach (EnumField field in enumDt.Fields)
             {
@@ -262,140 +283,125 @@ namespace AutosarGuiEditor.Source.Autosar
                     new XElement(ns + "SHORT-NAME", field.Name),
                     new XElement(ns + "VALUE", field.Value.ToString())
                 );
-                values.Add(value);
+                enumValues.Add(value);
             }
 
-            return values;
+            XElement enumType = new XElement(ns + "DATA-TYPE",
+                new XElement(ns + "SHORT-NAME", enumDt.Name),
+                new XElement(ns + "TYPE-IDENTIFIER",
+                    new XElement(ns + "T-ENUM-DATA-TYPE",
+                        new XElement(ns + "DISPLAY-VALUE", "DEC"),
+                        enumValues)
+                )
+            );
+
+            return enumType;
         }
 
-        private XElement ExportInterfaces()
+        // ==================== INTERFACES ====================
+
+        private XElement ExportInterfaces(XNamespace ns)
         {
             XElement interfaces = new XElement(ns + "INTERFACES");
 
             foreach (SenderReceiverInterface srInterface in _app.SenderReceiverInterfaces)
             {
-                interfaces.Add(ExportSenderReceiverInterface(srInterface));
+                interfaces.Add(ExportSenderReceiverInterface(ns, srInterface));
             }
 
             foreach (ClientServerInterface csInterface in _app.ClientServerInterfaces)
             {
-                interfaces.Add(ExportClientServerInterface(csInterface));
+                interfaces.Add(ExportClientServerInterface(ns, csInterface));
             }
 
             return interfaces;
         }
 
-        private XElement ExportSenderReceiverInterface(SenderReceiverInterface srInterface)
+        private XElement ExportSenderReceiverInterface(XNamespace ns, SenderReceiverInterface srInterface)
         {
+            XElement subElements = new XElement(ns + "SENDER-RECEIVER-INTERFACE-SUB-ELEMENTS");
+
+            foreach (SenderReceiverInterfaceField field in srInterface.Fields)
+            {
+                string typeName = GetDataTypeName(field.BaseDataTypeGUID);
+                XElement dataElement = new XElement(ns + "DATA-ELEMENT-PROTOTYPE",
+                    new XElement(ns + "SHORT-NAME", field.Name),
+                    new XElement(ns + "TYPE-REF",
+                        new XAttribute(ns + "DEST", "AR-PKG"),
+                        $"//DataDefinitions/{typeName}")
+                );
+                subElements.Add(dataElement);
+            }
+
             XElement senderReceiver = new XElement(ns + "SENDER-RECEIVER-INTERFACE",
                 new XElement(ns + "SHORT-NAME", srInterface.Name),
-                ExportSenderReceiverTopologies(srInterface),
-                ExportSenderReceiverFields(srInterface)
+                new XElement(ns + "SENDER-RECEIVER-INTERFACE-SUB-ELEMENTS", subElements)
             );
 
             return senderReceiver;
         }
 
-        private XElement ExportSenderReceiverFields(SenderReceiverInterface srInterface)
-        {
-            XElement fields = new XElement(ns + "SENDER-RECEIVER-INTERFACE-SUB-ELEMENTS");
-
-            foreach (SenderReceiverInterfaceField field in srInterface.Fields)
-            {
-                XElement dataEndpoint = new XElement(ns + "DATA-ENDPOINT-INST-PROXY-SUB-ELEMENT",
-                    new XElement(ns + "SHORT-NAME", field.Name),
-                    new XElement(ns + "TOPIC-REF",
-                        new XAttribute(ns + "DEST", "AR-PKG"),
-                        $"//DataDefinitions/{GetDataTypeName(field.BaseDataTypeGUID)}")
-                );
-                fields.Add(dataEndpoint);
-            }
-
-            return fields;
-        }
-
-        private XElement ExportSenderReceiverTopologies(SenderReceiverInterface srInterface)
-        {
-            // Skip for now - would need topology data from composition
-            return new XElement(ns + "TOPOLOGIES");
-        }
-
-        private XElement ExportClientServerInterface(ClientServerInterface csInterface)
-        {
-            XElement clientServer = new XElement(ns + "CLIENT-SERVER-INTERFACE",
-                new XElement(ns + "SHORT-NAME", csInterface.Name),
-                ExportClientServerOperations(csInterface)
-            );
-
-            return clientServer;
-        }
-
-        private XElement ExportClientServerOperations(ClientServerInterface csInterface)
+        private XElement ExportClientServerInterface(XNamespace ns, ClientServerInterface csInterface)
         {
             XElement operations = new XElement(ns + "CLIENT-SERVER-INTERFACE-OPERATIONS");
 
             foreach (ClientServerOperation operation in csInterface.Operations)
             {
-                // Use the interface's IsAsync property to determine mode
-                string mode = csInterface.IsAsync ? "ASYNC" : "SYNC";
-                XElement op = new XElement(ns + "CLIENT-SERVER-INTERFACE-OPERATION",
+                XElement parameters = new XElement(ns + "PARAMETER-PROTOTYPES");
+
+                foreach (ClientServerOperationField field in operation.Fields)
+                {
+                    string typeName = GetDataTypeName(field.BaseDataTypeGUID);
+                    string direction = GetArxmlDirection(field.Direction);
+
+                    XElement param = new XElement(ns + "PARAMETER-PROTOTYPE",
+                        new XElement(ns + "SHORT-NAME", field.Name),
+                        new XElement(ns + "DIRECTION", direction),
+                        new XElement(ns + "TYPE-REF",
+                            new XAttribute(ns + "DEST", "AR-PKG"),
+                            $"//DataDefinitions/{typeName}")
+                    );
+                    parameters.Add(param);
+                }
+
+                XElement operationElem = new XElement(ns + "OPERATION-PROTOTYPE",
                     new XElement(ns + "SHORT-NAME", operation.Name),
-                    new XElement(ns + "MODE", mode),
-                    ExportClientServerOperationParameters(operation, csInterface)
+                    parameters
                 );
-                operations.Add(op);
+                operations.Add(operationElem);
             }
 
-            return operations;
+            XElement clientServer = new XElement(ns + "CLIENT-SERVER-INTERFACE",
+                new XElement(ns + "SHORT-NAME", csInterface.Name),
+                operations
+            );
+
+            return clientServer;
         }
 
-        private XElement ExportClientServerOperationParameters(ClientServerOperation operation, ClientServerInterface csInterface)
-        {
-            XElement parameters = new XElement(ns + "I-O-CONSTRAINTS");
-
-            foreach (ClientServerOperationField field in operation.Fields)
-            {
-                string paramName = field.Name;
-                if (string.IsNullOrEmpty(paramName))
-                    paramName = field.Direction.ToString().ToLower();
-
-                string direction = GetArxmlParameterDirection(field.Direction);
-                string dataTypeRef = GetDataTypeRef(field.BaseDataTypeGUID) ?? "//DataDefinitions/None";
-
-                XElement param = new XElement(ns + "I-O-PARAMETER-CONSTRAINT",
-                    new XElement(ns + "SHORT-NAME", paramName),
-                    new XElement(ns + "SEQUENCE-POSITION", "0"),
-                    new XElement(ns + "DIRECTION", direction),
-                    new XElement(ns + "TYPE-REF",
-                        new XAttribute(ns + "DEST", "AR-PKG"),
-                        dataTypeRef)
-                );
-
-                parameters.Add(param);
-            }
-
-            return parameters;
-        }
-
-        private string GetArxmlParameterDirection(ClientServerOperationDirection direction)
+        private string GetArxmlDirection(ClientServerOperationDirection direction)
         {
             switch (direction)
             {
                 case ClientServerOperationDirection.VALUE:
                 case ClientServerOperationDirection.CONST_VALUE:
-                    return "IN-OUT";
+                    return "IN";
                 case ClientServerOperationDirection.VAL_REF:
                 case ClientServerOperationDirection.CONST_VAL_REF:
+                    return "IN-OUT";
                 case ClientServerOperationDirection.VAL_CONST_REF:
                 case ClientServerOperationDirection.CONST_VAL_CONST_REF:
+                    return "IN";
                 case ClientServerOperationDirection.CONST_REF:
-                    return "IN-OUT";
+                    return "IN";
                 default:
-                    return "IN-OUT";
+                    return "IN";
             }
         }
 
-        private XElement ExportSwCompositionDefinitions()
+        // ==================== SW COMPONENT DEFINITIONS ====================
+
+        private XElement ExportSwComponentDefinitions(XNamespace ns)
         {
             XElement components = new XElement(ns + "SW-COMPONENT-DEFINITIONS");
 
@@ -404,27 +410,30 @@ namespace AutosarGuiEditor.Source.Autosar
                 if (compDef.IsComponentEmpty())
                     continue;
 
-                components.Add(ExportSwComponentDefinition(compDef));
+                components.Add(ExportSwComponentDefinition(ns, compDef));
             }
 
             return components;
         }
 
-        private XElement ExportSwComponentDefinition(ApplicationSwComponentType compDef)
+        private XElement ExportSwComponentDefinition(XNamespace ns, ApplicationSwComponentType compDef)
         {
+            XElement portDefinitions = ExportPortDefinitions(ns, compDef);
+            XElement runnableDefinitions = ExportRunnableDefinitions(ns, compDef);
+            XElement eventsElement = ExportComponentEvents(ns, compDef);
+
             XElement swComp = new XElement(ns + "SW-COMPONENT-DEFINITION",
                 new XElement(ns + "SHORT-NAME", compDef.Name),
                 new XElement(ns + "INCLUDES-DATA-DEFINITIONS", "FALSE"),
-                ExportSwComponentPortDefinitions(compDef),
-                ExportSwComponentRunnables(compDef),
-                ExportSwComponentTimingEvents(compDef),
-                ExportSwComponentClientServerEvents(compDef)
+                portDefinitions,
+                runnableDefinitions,
+                eventsElement
             );
 
             return swComp;
         }
 
-        private XElement ExportSwComponentPortDefinitions(ApplicationSwComponentType compDef)
+        private XElement ExportPortDefinitions(XNamespace ns, ApplicationSwComponentType compDef)
         {
             XElement portDefs = new XElement(ns + "PORT-DEFINITIONS");
 
@@ -432,76 +441,51 @@ namespace AutosarGuiEditor.Source.Autosar
             {
                 if (portDef.PortType == PortType.Sender || portDef.PortType == PortType.Receiver)
                 {
-                    portDefs.Add(ExportSenderReceiverPortDefinition(compDef.Name, portDef));
+                    XElement srPort = new XElement(ns + "SENDER-RECEIVER-PORT-DEFINITION",
+                        new XElement(ns + "SHORT-NAME", portDef.Name),
+                        new XElement(ns + "MODE", (portDef.PortType == PortType.Sender) ? "SENDER" : "RECEIVER"),
+                        new XElement(ns + "MODIFYABLE-ACCESS-REF", "TRUE")
+                    );
+
+                    if (portDef.InterfaceGUID != Guid.Empty)
+                    {
+                        SenderReceiverInterface srInterface = _app.SenderReceiverInterfaces.FindObject(portDef.InterfaceGUID);
+                        if (srInterface != null)
+                        {
+                            srPort.Add(new XElement(ns + "INTERFACE-REF",
+                                new XAttribute(ns + "DEST", "AR-PKG"),
+                                $"//Interfaces/{srInterface.Name}"));
+                        }
+                    }
+
+                    portDefs.Add(srPort);
                 }
-                else if (portDef.PortType == PortType.Client || portDef.PortType == PortType.Server)
+                else if ((portDef.PortType == PortType.Client) || (portDef.PortType == PortType.Server))
                 {
-                    ExportClientServerPortDefinition(compDef.Name, portDef, portDefs);
+                    XElement csPort = new XElement(ns + "CLIENT-SERVER-PORT-DEFINITION",
+                        new XElement(ns + "SHORT-NAME", portDef.Name),
+                        new XElement(ns + "MODE", (portDef.PortType == PortType.Client) ? "CLIENT" : "SERVER")
+                    );
+
+                    if (portDef.InterfaceGUID != Guid.Empty)
+                    {
+                        ClientServerInterface csInterface = _app.ClientServerInterfaces.FindObject(portDef.InterfaceGUID);
+                        if (csInterface != null)
+                        {
+                            csPort.Add(new XElement(ns + "INTERFACE-REF",
+                                new XAttribute(ns + "DEST", "AR-PKG"),
+                                $"//Interfaces/{csInterface.Name}"));
+                        }
+                    }
+
+                    portDefs.Add(csPort);
                 }
             }
 
             return portDefs;
         }
 
-        private XElement ExportSenderReceiverPortDefinition(string compName, PortDefenition portDef)
-        {
-            _portDefIndex++;
-
-            string direction = portDef.PortType == PortType.Sender ? "SENDER" : "RECEIVER";
-
-            XElement portDefElement = new XElement(ns + "SENDER-RECEIVER-PORT-DEFINITION",
-                new XElement(ns + "SHORT-NAME", portDef.Name),
-                new XElement(ns + "MODE", direction),
-                new XElement(ns + "MODIFYABLE-ACCESS-REF", "TRUE")
-            );
-
-            // Add interface reference for Sender-Receiver ports
-            if (portDef.InterfaceGUID != Guid.Empty)
-            {
-                SenderReceiverInterface srInterface = _app.SenderReceiverInterfaces.FindObject(portDef.InterfaceGUID);
-                if (srInterface != null)
-                {
-                    portDefElement.Add(new XElement(ns + "INTERFACE-REF",
-                        new XAttribute(ns + "DEST", "AR-PKG"),
-                        $"//Interfaces/{srInterface.Name}"));
-                }
-            }
-
-            return portDefElement;
-        }
-
-
-        private void ExportClientServerPortDefinition(string compName, PortDefenition portDef, XElement portDefs)
-        {
-            _portDefIndex++;
-
-            string direction = portDef.PortType == PortType.Client ? "CLIENT" : "SERVER";
-
-            // Get the interface name for this port
-            string interfaceName = "";
-            if (portDef.InterfaceGUID != Guid.Empty)
-            {
-                ClientServerInterface csInterface = _app.ClientServerInterfaces.FindObject(portDef.InterfaceGUID);
-                if (csInterface != null)
-                    interfaceName = csInterface.Name;
-            }
-
-            XElement portDefElement = new XElement(ns + "CLIENT-SERVER-PORT-DEFINITION",
-                new XElement(ns + "SHORT-NAME", portDef.Name),
-                new XElement(ns + "MODE", direction)
-            );
-
-            if (!string.IsNullOrEmpty(interfaceName))
-            {
-                portDefElement.Add(new XElement(ns + "INTERFACE-REF",
-                    new XAttribute(ns + "DEST", "AR-PKG"),
-                    $"//Interfaces/{interfaceName}"));
-            }
-
-            portDefs.Add(portDefElement);
-        }
-
-        private XElement ExportSwComponentRunnables(ApplicationSwComponentType compDef)
+        private XElement ExportRunnableDefinitions(XNamespace ns, ApplicationSwComponentType compDef)
         {
             XElement runnables = new XElement(ns + "RUNNABLE-DEFINITIONS");
 
@@ -516,135 +500,200 @@ namespace AutosarGuiEditor.Source.Autosar
             return runnables;
         }
 
-        private string FindRunnableEventName(string compDefName, string runnableName)
+        private XElement ExportComponentEvents(XNamespace ns, ApplicationSwComponentType compDef)
         {
-            // Try to find matching event from exported events
-            // Events are named as Event_{index} in ExportEvents
-            // We need to match by looking at the task that this runnable belongs to
-            
-            // First check if there's a timing event with this name
-            foreach (var task in _app.OsTasks)
+            XElement result = new XElement(ns + "STARTUP-EVENTS",
+                new XElement(ns + "SHORT-NAME", compDef.Name + "_StartupEvents")
+            );
+
+            XElement timingEvents = new XElement(ns + "TIMING-CONSTRAINED-EVENTS",
+                new XElement(ns + "SHORT-NAME", compDef.Name + "_TimingEvents")
+            );
+
+            XElement clientServerEvents = new XElement(ns + "CLIENT-SERVER-EVENTS",
+                new XElement(ns + "SHORT-NAME", compDef.Name + "_CSEvents")
+            );
+
+            // OneTimeEvents -> STARTUP-EVENT
+            foreach (OneTimeEvent oneTimeEvent in compDef.OneTimeEvents)
             {
-                foreach (var evt in task.Events)
+                string runnableRef = "./" + EscapeRunnableName(oneTimeEvent.Runnable?.Name ?? oneTimeEvent.Name);
+
+                XElement startupEvent = new XElement(ns + "STARTUP-EVENT",
+                    new XElement(ns + "SHORT-NAME", oneTimeEvent.Name),
+                    new XElement(ns + "RUNNABLE-REF",
+                        new XAttribute(ns + "DEST", "SW-COMPONENT"),
+                        runnableRef)
+                );
+                result.Add(startupEvent);
+            }
+
+            // TimingEvents -> PERIODIC-TIMING-CONSTRAINED-EVENT
+            foreach (TimingEvent timingEvent in compDef.TimingEvents)
+            {
+                double periodSeconds = timingEvent.PeriodMs / 1000.0;
+                string runnableName = timingEvent.Runnable?.Name ?? timingEvent.Name;
+
+                XElement timingEventElem = new XElement(ns + "PERIODIC-TIMING-CONSTRAINED-EVENT",
+                    new XElement(ns + "SHORT-NAME", timingEvent.Name),
+                    new XElement(ns + "PERIOD", periodSeconds.ToString("F6").TrimEnd('0').TrimEnd('.')),
+                    new XElement(ns + "RUNNABLE-REF",
+                        new XAttribute(ns + "DEST", "SW-COMPONENT"),
+                        "./" + EscapeRunnableName(runnableName))
+                );
+                timingEvents.Add(timingEventElem);
+            }
+
+            // ServerCallEvent -> SYNC-CLIENT-SERVER-EVENT
+            foreach (ClientServerEvent syncEvent in compDef.SyncClientServerEvents)
+            {
+                // Find the interface and operation from SourcePortGuid and SourceOperationGuid
+                string operationRef = FindOperationRef(ns, syncEvent);
+
+                XElement csEvent = new XElement(ns + "SYNC-CLIENT-SERVER-EVENT",
+                    new XElement(ns + "SHORT-NAME", syncEvent.Name),
+                    new XElement(ns + "OPERATION-REF",
+                        new XAttribute(ns + "DEST", "AR-PKG"),
+                        operationRef)
+                );
+                clientServerEvents.Add(csEvent);
+            }
+
+            // AsyncClientServerEvent -> ASYNC-CLIENT-SERVER-EVENT
+            foreach (ClientServerEvent asyncEvent in compDef.AsyncClientServerEvents)
+            {
+                string operationRef = FindOperationRef(ns, asyncEvent);
+
+                XElement csEvent = new XElement(ns + "ASYNC-CLIENT-SERVER-EVENT",
+                    new XElement(ns + "SHORT-NAME", asyncEvent.Name),
+                    new XElement(ns + "OPERATION-REF",
+                        new XAttribute(ns + "DEST", "AR-PKG"),
+                        operationRef)
+                );
+                clientServerEvents.Add(csEvent);
+            }
+
+            // Merge all into one element
+            XElement allEvents = new XElement(ns + "EVENTS",
+                new XElement(ns + "SHORT-NAME", compDef.Name + "_Events"),
+                result,
+                timingEvents,
+                clientServerEvents
+            );
+
+            return allEvents;
+        }
+
+        private string FindOperationRef(XNamespace ns, ClientServerEvent eventInstance)
+        {
+            // Try to find the interface and operation from the event's source port
+            if (eventInstance.SourcePort != null && eventInstance.SourceOperation != null)
+            {
+                ClientServerInterface csInterface = eventInstance.SourcePort.InterfaceDatatype as ClientServerInterface;
+                if (csInterface != null)
                 {
-                    if (evt.Defenition is TimingEvent timingEvent)
+                    foreach (ClientServerOperation operation in csInterface.Operations)
                     {
-                        string expectedName = $"{compDefName}_{timingEvent.Name}_Event";
-                        if (expectedName == evt.Name || evt.Name == $"{compDefName}_{runnableName}_Event")
+                        if (operation.GUID == eventInstance.SourceOperation.GUID)
                         {
-                            return evt.Name;
+                            return $"//Interfaces/{csInterface.Name}/OPERATION-PROTOTYPES/{operation.Name}";
+                        }
+                    }
+                }
+
+                // Also try by matching the event's SourcePort GUID
+                foreach (ApplicationSwComponentType compDef in _app.ComponentDefenitionsList)
+                {
+                    foreach (PortDefenition portDef in compDef.Ports)
+                    {
+                        if (portDef.GUID == eventInstance.SourcePort.GUID)
+                        {
+                            if ((portDef.PortType == PortType.Client) || (portDef.PortType == PortType.Server))
+                            {
+                                if (portDef.InterfaceGUID != Guid.Empty)
+                                {
+                                    csInterface = _app.ClientServerInterfaces.FindObject(portDef.InterfaceGUID);
+                                    if (csInterface != null)
+                                    {
+                                        foreach (ClientServerOperation operation in csInterface.Operations)
+                                        {
+                                            if (operation.GUID == eventInstance.SourceOperation.GUID)
+                                            {
+                                                return $"//Interfaces/{csInterface.Name}/OPERATION-PROTOTYPES/{operation.Name}";
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            break;
                         }
                     }
                 }
             }
 
-            // Fallback: use the original naming convention
-            return $"{compDefName}_{runnableName}_Event";
+            // Fallback: try to find by matching the event name pattern
+            // e.g., syncEventrs1_DoSomething -> rs1 is port, DoSomething is operation
+            string eventName = eventInstance.Name;
+            foreach (ApplicationSwComponentType compDef in _app.ComponentDefenitionsList)
+            {
+                foreach (PortDefenition portDef in compDef.Ports)
+                {
+                    if ((portDef.PortType == PortType.Client) || (portDef.PortType == PortType.Server))
+                    {
+                        if (portDef.InterfaceGUID != Guid.Empty)
+                        {
+                            ClientServerInterface csInterface = _app.ClientServerInterfaces.FindObject(portDef.InterfaceGUID);
+                            if (csInterface != null)
+                            {
+                                foreach (ClientServerOperation operation in csInterface.Operations)
+                                {
+                                    if (eventName.Contains(operation.Name))
+                                    {
+                                        return $"//Interfaces/{csInterface.Name}/OPERATION-PROTOTYPES/{operation.Name}";
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Last fallback
+            return "//Interfaces/None/OPERATION-PROTOTYPES/None";
         }
 
-        private XElement ExportSwComponentTimingEvents(ApplicationSwComponentType compDef)
+        private string EscapeRunnableName(string name)
         {
-            XElement events = new XElement(ns + "TIMING-CONSTRAINED-EVENTS");
-
-            foreach (TimingEvent timingEvent in compDef.TimingEvents)
-            {
-                string runnableRefName = timingEvent.Runnable?.Name ?? timingEvent.Name;
-                XElement eventDef = new XElement(ns + "PERIODIC-TIMING-CONSTRAINED-EVENT",
-                    new XElement(ns + "SHORT-NAME", timingEvent.Name),
-                    new XElement(ns + "FREQUENCY", $"{(1000.0 / timingEvent.PeriodMs) * 1000000}us"),
-                    new XElement(ns + "DELAY", "0us"),
-                    new XElement(ns + "RUNNABLE-REF",
-                        new XAttribute(ns + "DEST", "AR-PKG"),
-                        runnableRefName)
-                );
-                events.Add(eventDef);
-            }
-
-            return events;
+            if (string.IsNullOrEmpty(name))
+                return "Unnamed";
+            return name.Replace(" ", "_");
         }
 
-        private XElement ExportSwComponentClientServerEvents(ApplicationSwComponentType compDef)
-        {
-            XElement events = new XElement(ns + "CLIENT-SERVER-EVENTS");
+        // ==================== COMPOSITIONS ====================
 
-            foreach (ClientServerEvent asyncEvent in compDef.AsyncClientServerEvents)
-            {
-                string runnableRefName = asyncEvent.Runnable?.Name ?? asyncEvent.Name;
-                XElement eventDef = new XElement(ns + "ASYNC-CLIENT-SERVER-EVENT",
-                    new XElement(ns + "SHORT-NAME", asyncEvent.Name),
-                    new XElement(ns + "OPERATION-REF",
-                        new XAttribute(ns + "DEST", "AR-PKG"),
-                        runnableRefName)
-                );
-                events.Add(eventDef);
-            }
-
-            foreach (ClientServerEvent syncEvent in compDef.SyncClientServerEvents)
-            {
-                string runnableRefName = syncEvent.Runnable?.Name ?? syncEvent.Name;
-                XElement eventDef = new XElement(ns + "SYNC-CLIENT-SERVER-EVENT",
-                    new XElement(ns + "SHORT-NAME", syncEvent.Name),
-                    new XElement(ns + "OPERATION-REF",
-                        new XAttribute(ns + "DEST", "AR-PKG"),
-                        runnableRefName)
-                );
-                events.Add(eventDef);
-            }
-
-            return events;
-        }
-
-        private XElement ExportCompositionInstances()
+        private XElement ExportCompositions(XNamespace ns)
         {
             XElement compositions = new XElement(ns + "COMPOSITIONS");
 
             foreach (CompositionInstance composition in _app.Compositions)
             {
-                // Skip main composition for PCD export
-                if (composition.Name == CompositionInstancesList.MainCompositionName)
-                    continue;
-
-                compositions.Add(ExportComposition(composition));
-            }
-
-            // Also export main composition
-            foreach (CompositionInstance composition in _app.Compositions)
-            {
-                if (composition.Name == CompositionInstancesList.MainCompositionName)
-                {
-                    compositions.Add(ExportComposition(composition));
-                    break;
-                }
+                compositions.Add(ExportComposition(ns, composition));
             }
 
             return compositions;
         }
 
-        private XElement ExportComposition(CompositionInstance composition)
+        private XElement ExportComposition(XNamespace ns, CompositionInstance composition)
         {
-            _compositionIndex++;
-            string compositionId = $"Composition_{_compositionIndex}";
+            XElement componentInstances = new XElement(ns + "COMPONENT-INSTANCES");
+            XElement portPairs = new XElement(ns + "PORT-PAIRS");
 
-            XElement comp = new XElement(ns + "COMPOSITION",
-                new XElement(ns + "SHORT-NAME", compositionId),
-                new XElement(ns + "CLARIFICATION", "SPECIFIED"),
-                new XElement(ns + "VARIABLE-SPACING", "FALSE"),
-                ExportCompositionInstancesList(composition),
-                ExportCompositionConnections(composition)
-            );
-
-            return comp;
-        }
-
-        private XElement ExportCompositionInstancesList(CompositionInstance composition)
-        {
-            XElement instances = new XElement(ns + "COMPONENT-INSTANCES");
-
+            // Export component instances
             foreach (ComponentInstance compInstance in composition.ComponentInstances)
             {
                 ApplicationSwComponentType compDef = compInstance.ComponentDefenition;
 
-                XElement instance = new XElement(ns + "SW-INSTANCE",
+                XElement swInstance = new XElement(ns + "SW-INSTANCE",
                     new XElement(ns + "SHORT-NAME", compInstance.Name),
                     new XElement(ns + "OCCURENCES", "1"),
                     new XElement(ns + "SW-INSTANCE-REF",
@@ -652,97 +701,166 @@ namespace AutosarGuiEditor.Source.Autosar
                         $"//SwComponentDefinitions/{compDef.Name}")
                 );
 
-                instances.Add(instance);
+                // Port instances for this component
+                XElement portInstances = ExportPortInstances(ns, compInstance, compDef);
+                swInstance.Add(portInstances);
+
+                componentInstances.Add(swInstance);
             }
 
-            return instances;
-        }
-
-        private XElement ExportCompositionConnections(CompositionInstance composition)
-        {
-            XElement connections = new XElement(ns + "PORT-PAIRS");
-
+            // Export port pairs (connections)
             foreach (PortConnection connection in composition.Connections)
             {
-                _connectionIndex++;
-                string connectionId = $"Connection_{_connectionIndex}";
+                portPairs.Add(ExportPortPair(ns, connection, composition));
+            }
 
-                // Find component instances for each port directly from the composition
-                string comp1Name = null;
-                string comp2Name = null;
-                string port1Name = null;
-                string port2Name = null;
+            XElement compositionElem = new XElement(ns + "COMPOSITION",
+                new XElement(ns + "SHORT-NAME", composition.Name),
+                new XElement(ns + "CLARIFICATION", "SPECIFIED"),
+                new XElement(ns + "VARIABLE-SPACING", "FALSE"),
+                componentInstances,
+                portPairs
+            );
 
-                foreach (ComponentInstance compInstance in composition.ComponentInstances)
+            return compositionElem;
+        }
+
+        private XElement ExportPortInstances(XNamespace ns, ComponentInstance compInstance, ApplicationSwComponentType compDef)
+        {
+            XElement portInstances = new XElement(ns + "PORT-INSTANCES");
+
+            foreach (PortDefenition portDef in compDef.Ports)
+            {
+                XElement portInstance = new XElement(ns + "PORT-INSTANCE",
+                    new XElement(ns + "SHORT-NAME", portDef.Name)
+                );
+                portInstances.Add(portInstance);
+            }
+
+            return portInstances;
+        }
+
+        private XElement ExportPortPair(XNamespace ns, PortConnection connection, CompositionInstance composition)
+        {
+            // Find source and destination from composition
+            string sourceRef = null;
+            string destRef = null;
+
+            foreach (ComponentInstance compInstance in composition.ComponentInstances)
+            {
+                foreach (PortPainter portPainter in compInstance.Ports)
                 {
-                    foreach (PortPainter portInComp in compInstance.Ports)
+                    if (portPainter.GUID == connection.Port1.GUID)
                     {
-                        if (portInComp.GUID.Equals(connection.Port1.GUID))
+                        sourceRef = $"//CompositionInstances/{composition.Name}/ComponentInstances/{compInstance.Name}/PORT-INSTANCES/{portPainter.PortDefenition?.Name ?? portPainter.Name}";
+                    }
+                    if (portPainter.GUID == connection.Port2.GUID)
+                    {
+                        destRef = $"//CompositionInstances/{composition.Name}/ComponentInstances/{compInstance.Name}/PORT-INSTANCES/{portPainter.PortDefenition?.Name ?? portPainter.Name}";
+                    }
+                }
+            }
+
+            // Also check internal ports
+            foreach (PortPainter internalPort in composition.InternalPortsInstances)
+            {
+                if (internalPort.GUID == connection.Port1.GUID)
+                {
+                    // Find which component this internal port belongs to
+                    foreach (ComponentInstance compInstance in composition.ComponentInstances)
+                    {
+                        foreach (PortPainter portPainter in compInstance.Ports)
                         {
-                            comp1Name = compInstance.Name;
-                            port1Name = portInComp.Name;
-                        }
-                        if (portInComp.GUID.Equals(connection.Port2.GUID))
-                        {
-                            comp2Name = compInstance.Name;
-                            port2Name = portInComp.Name;
+                            if (portPainter.PortDefenitionGuid == internalPort.PortDefenitionGuid)
+                            {
+                                sourceRef = $"//CompositionInstances/{composition.Name}/ComponentInstances/{compInstance.Name}/PORT-INSTANCES/{internalPort.PortDefenition?.Name ?? internalPort.Name}";
+                                break;
+                            }
                         }
                     }
                 }
+                if (internalPort.GUID == connection.Port2.GUID)
+                {
+                    foreach (ComponentInstance compInstance in composition.ComponentInstances)
+                    {
+                        foreach (PortPainter portPainter in compInstance.Ports)
+                        {
+                            if (portPainter.PortDefenitionGuid == internalPort.PortDefenitionGuid)
+                            {
+                                destRef = $"//CompositionInstances/{composition.Name}/ComponentInstances/{compInstance.Name}/PORT-INSTANCES/{internalPort.PortDefenition?.Name ?? internalPort.Name}";
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
 
-                if (comp1Name == null || comp2Name == null)
-                    continue;
-
-                XElement portPair = new XElement(ns + "PORT-PAIR",
-                    new XElement(ns + "SHORT-NAME", connectionId),
+            if (sourceRef == null || destRef == null)
+            {
+                // Fallback: create a minimal port pair
+                _connectionIndex++;
+                string connNameFallback = $"Connection_{_connectionIndex}";
+                return new XElement(ns + "PORT-PAIR",
+                    new XElement(ns + "SHORT-NAME", connNameFallback),
                     new XElement(ns + "MAP-DELAY", "0us"),
                     new XElement(ns + "SOURCE-REF",
                         new XAttribute(ns + "DEST", "AR-PKG"),
-                        $"//CompositionInstances/{comp1Name}/PORT-INSTANCES/{port1Name}"),
+                        sourceRef ?? "//CompositionInstances/None/PORT-INSTANCES/None"),
                     new XElement(ns + "DESTINATION-REF",
                         new XAttribute(ns + "DEST", "AR-PKG"),
-                        $"//CompositionInstances/{comp2Name}/PORT-INSTANCES/{port2Name}")
+                        destRef ?? "//CompositionInstances/None/PORT-INSTANCES/None")
                 );
-
-                connections.Add(portPair);
             }
 
-            return connections;
+            _connectionIndex++;
+            string connName = $"Connection_{_connectionIndex}";
+
+            XElement portPair = new XElement(ns + "PORT-PAIR",
+                new XElement(ns + "SHORT-NAME", connName),
+                new XElement(ns + "MAP-DELAY", "0us"),
+                new XElement(ns + "SOURCE-REF",
+                    new XAttribute(ns + "DEST", "AR-PKG"),
+                    sourceRef),
+                new XElement(ns + "DESTINATION-REF",
+                    new XAttribute(ns + "DEST", "AR-PKG"),
+                    destRef)
+            );
+
+            return portPair;
         }
 
-        private string GetPortInstanceName(PortPainter port)
-        {
-            return port.Name;
-        }
+        private int _connectionIndex = 0;
 
-        private XElement ExportOsElements()
+        private int _portDefIndex = 0;
+
+        // ==================== OS ELEMENTS ====================
+
+        private XElement ExportOsElements(XNamespace ns)
         {
             XElement osElements = new XElement(ns + "OS-ELMENTS");
 
-            osElements.Add(ExportTasks());
-            osElements.Add(ExportEvents());
+            osElements.Add(ExportOsTasks(ns));
+            osElements.Add(ExportOsEvents(ns));
 
             return osElements;
         }
 
-        private XElement ExportTasks()
+        private XElement ExportOsTasks(XNamespace ns)
         {
             XElement tasks = new XElement(ns + "TASKS");
 
             foreach (OsTask task in _app.OsTasks)
             {
-                if (task.Name.Equals("Init") || task.Name.Equals("Idle"))
+                if (task.Name.Equals("Init", StringComparison.OrdinalIgnoreCase) ||
+                    task.Name.Equals("Idle", StringComparison.OrdinalIgnoreCase))
                     continue;
 
-                _taskIndex++;
-                string taskId = $"Task_{_taskIndex}";
-
-                XElement taskElement = new XElement(ns + "TASK",
-                    new XElement(ns + "SHORT-NAME", taskId),
+                XElement taskElem = new XElement(ns + "TASK",
+                    new XElement(ns + "SHORT-NAME", task.Name),
                     new XElement(ns + "SCHEDULE-CORNER", "FIRST_START"),
                     new XElement(ns + "SCHEDULE-CORNER-TIME", "0us"),
                     new XElement(ns + "TASK-ENTRY-POINT",
-                        new XElement(ns + "SHORT-NAME", $"Rte_{taskId}_Entry")),
+                        new XElement(ns + "SHORT-NAME", $"Rte_Task_{task.Name}_Entry")),
                     new XElement(ns + "MAX-AUDIT-LATENCY", "0us"),
                     new XElement(ns + "MAX-BANDWIDTH", "0.00%"),
                     new XElement(ns + "OPTIMIZE-STRING", "DEFAULT"),
@@ -754,182 +872,110 @@ namespace AutosarGuiEditor.Source.Autosar
                 // Add event references
                 foreach (AutosarEventInstance evt in task.Events)
                 {
-                    taskElement.Add(new XElement(ns + "EVENT-REF",
+                    taskElem.Add(new XElement(ns + "EVENT-REF",
                         new XAttribute(ns + "DEST", "AR-PKG"),
                         $"//Os/EVENTS/{evt.Name}"));
                 }
 
-                tasks.Add(taskElement);
+                tasks.Add(taskElem);
             }
 
             return tasks;
         }
 
-        private XElement ExportEvents()
+        private XElement ExportOsEvents(XNamespace ns)
         {
             XElement events = new XElement(ns + "EVENTS");
 
             // Startup event
             events.Add(new XElement(ns + "STARTUP-EVENT",
-                new XElement(ns + "SHORT-NAME", "Startup")));
+                new XElement(ns + "SHORT-NAME", "Startup")
+            ));
 
             // Idle event
             events.Add(new XElement(ns + "IDLE-EVENT",
-                new XElement(ns + "SHORT-NAME", "Idle")));
+                new XElement(ns + "SHORT-NAME", "Idle")
+            ));
 
-            // Task events
+            // Periodic events from OsTasks
             foreach (OsTask task in _app.OsTasks)
             {
+                if (task.Name.Equals("Init", StringComparison.OrdinalIgnoreCase) ||
+                    task.Name.Equals("Idle", StringComparison.OrdinalIgnoreCase))
+                    continue;
+
                 foreach (AutosarEventInstance evt in task.Events)
                 {
                     _eventIndex++;
 
-                    // Generate proper event name matching Runnable references
-                    string eventName = GenerateEventName(evt);
+                    // PeriodMs returns milliseconds, convert to microseconds for AUTOSAR PERIOD
+                    long periodMicroseconds = (long)(evt.PeriodMs * 1000);
 
-                    XElement eventElement = new XElement(ns + "EVENT",
-                        new XElement(ns + "SHORT-NAME", eventName),
+                    XElement eventElem = new XElement(ns + "PERIODIC-EVENT",
+                        new XElement(ns + "SHORT-NAME", evt.Name),
+                        new XElement(ns + "PERIOD", $"{periodMicroseconds}us"),
                         new XElement(ns + "TASK-REF",
                             new XAttribute(ns + "DEST", "AR-PKG"),
-                            $"//Os/TASKS/Task_{task.Priority}")
+                            $"//Os/TASKS/{task.Name}"),
+                        new XElement(ns + "PENDING-BUFFER-SIZE", "1")
                     );
+                    events.Add(eventElem);
+                }
+            }
 
-                    // Timing events get pending buffer size
-                    if (evt.Defenition is TimingEvent)
-                    {
-                        eventElement.Add(new XElement(ns + "PENDING-BUFFER-SIZE", "1"));
-                    }
-
-                    events.Add(eventElement);
+            // Startup events from Init task
+            OsTask initTask = _app.OsTasks.FirstOrDefault(t => t.Name.Equals("Init", StringComparison.OrdinalIgnoreCase));
+            if (initTask != null)
+            {
+                foreach (AutosarEventInstance evt in initTask.Events)
+                {
+                    XElement startupEvent = new XElement(ns + "STARTUP-EVENT",
+                        new XElement(ns + "SHORT-NAME", evt.Name),
+                        new XElement(ns + "TASK-REF",
+                            new XAttribute(ns + "DEST", "AR-PKG"),
+                            $"//Os/TASKS/{initTask.Name}")
+                    );
+                    events.Add(startupEvent);
                 }
             }
 
             return events;
         }
 
-        private string GenerateEventName(AutosarEventInstance evt)
-        {
-            // Get the component instance that owns this event
-            ComponentInstance compInstance = null;
-            try
-            {
-                compInstance = AutosarApplication.GetInstance().FindComponentInstanceByEventId(evt.GUID) as ComponentInstance;
-            }
-            catch
-            {
-                // Component instance not found
-            }
-
-            if (compInstance?.ComponentDefenition != null && evt.Defenition != null)
-            {
-                string compDefName = compInstance.ComponentDefenition.Name;
-                
-                // For TimingEvent, use the Runnable name from the definition
-                if (evt.Defenition is TimingEvent timingEvent && timingEvent.Runnable != null)
-                {
-                    return $"{compDefName}_{timingEvent.Runnable.Name}_Event";
-                }
-                
-                // For other event types, use a fallback name
-                return $"{compDefName}_{evt.Defenition.Name}_Event";
-            }
-
-            // Fallback: use numeric index
-            return $"Event_{_eventIndex}";
-        }
-
-        private XElement ExportPackageHierarchy()
-        {
-            XElement hierarchy = new XElement(ns + "PACKAGE-HIERARCHY");
-
-            hierarchy.Add(new XElement(ns + "CHILD-PACKAGES",
-                new XElement(ns + "SHORT-NAME", "DataDefinitions"),
-                new XElement(ns + "CHILD-PACKAGES",
-                    new XElement(ns + "SHORT-NAME", "BaseDataTypes")
-                ),
-                new XElement(ns + "CHILD-PACKAGES",
-                    new XElement(ns + "SHORT-NAME", "UserDefinedTypes")
-                )
-            ));
-
-            hierarchy.Add(new XElement(ns + "CHILD-PACKAGES",
-                new XElement(ns + "SHORT-NAME", "SwComponentDefinitions")
-            ));
-
-            hierarchy.Add(new XElement(ns + "CHILD-PACKAGES",
-                new XElement(ns + "SHORT-NAME", "Interfaces")
-            ));
-
-            hierarchy.Add(new XElement(ns + "CHILD-PACKAGES",
-                new XElement(ns + "SHORT-NAME", "CompositionInstances")
-            ));
-
-            hierarchy.Add(new XElement(ns + "CHILD-PACKAGES",
-                new XElement(ns + "SHORT-NAME", "Os")
-            ));
-
-            return hierarchy;
-        }
+        // ==================== HELPERS ====================
 
         private string GetDataTypeName(Guid guid)
         {
             if (guid == Guid.Empty)
-                return "None";
+                return "int8";
 
-            // Check base data types
             BaseDataType baseDt = _app.BaseDataTypes.FindObject(guid);
             if (baseDt != null)
                 return baseDt.Name;
 
-            // Check simple data types
             SimpleDataType simpleDt = _app.SimpleDataTypes.FindObject(guid);
             if (simpleDt != null)
                 return simpleDt.Name;
 
-            // Check array data types
             ArrayDataType arrayDt = _app.ArrayDataTypes.FindObject(guid);
             if (arrayDt != null)
                 return arrayDt.Name;
 
-            // Check complex data types
             ComplexDataType complexDt = _app.ComplexDataTypes.FindObject(guid);
             if (complexDt != null)
                 return complexDt.Name;
 
-            // Check enum data types
             EnumDataType enumDt = _app.Enums.FindObject(guid);
             if (enumDt != null)
                 return enumDt.Name;
 
-            return "UnknownType";
+            return "int8";
         }
 
-        private string GetDataTypeRef(Guid guid)
+        private string GetDataTypeRef(XNamespace ns, Guid guid)
         {
             string typeName = GetDataTypeName(guid);
-            if (typeName == "UnknownType" || typeName == "None")
-                return null;
             return $"//DataDefinitions/{typeName}";
-        }
-
-        private string GetCsInterfaceName(PortDefenition portDef)
-        {
-            if (portDef.InterfaceGUID == Guid.Empty)
-                return "UnknownInterface";
-
-            ClientServerInterface csInterface = _app.ClientServerInterfaces.FindObject(portDef.InterfaceGUID);
-            if (csInterface != null)
-                return csInterface.Name;
-
-            return "UnknownInterface";
-        }
-
-        private string GetCsInterfaceNameByPort(PortPainter portPainter)
-        {
-            if (portPainter.PortDefenition == null)
-                return "UnknownInterface";
-            
-            return GetCsInterfaceName(portPainter.PortDefenition);
         }
     }
 }

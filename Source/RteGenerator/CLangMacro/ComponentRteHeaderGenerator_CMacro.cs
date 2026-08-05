@@ -226,9 +226,9 @@ namespace AutosarGuiEditor.Source.RteGenerator.CMacro
                         foreach (ClientServerOperation operation in csInterface.Operations)
                         {
                             String internalFuncName = "Rte_InternalCall_" + compDef.Name + "_" + portDef.Name + "_" + operation.Name;
-                            /* Generate correct argument list with parentheses */
-                            String defineArgs = RteFunctionsGenerator_CMacro.GenerateClientServerInterfaceArgumentsForDefine(operation, false);
-                            writer.WriteLine("extern " + Properties.Resources.STD_RETURN_TYPE + " " + internalFuncName + defineArgs + ";");
+                            /* Generate correct argument list with data types for extern declaration */
+                            String externArgs = RteFunctionsGenerator_CMacro.GenerateClientServerInterfaceArgumentsForExternDeclare(operation, false);
+                            writer.WriteLine("extern " + Properties.Resources.STD_RETURN_TYPE + " " + internalFuncName + externArgs + ";");
                         }
                     }
                 }

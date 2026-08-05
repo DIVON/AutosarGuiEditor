@@ -275,7 +275,39 @@ namespace AutosarGuiEditor.Source.RteGenerator.CMacro
             return result + ")";
         }
 
-#region PIM
+        /// <summary>
+        /// Generates argument list with data types for external function declarations (extern ...).
+        /// This is used for declaring functions in header files where full type information is required.
+        /// </summary>
+        public static String GenerateClientServerInterfaceArgumentsForExternDeclare(ClientServerOperation operation, Boolean MultipleInstantiation = false)
+        {
+            String result = "(";
+
+            if (MultipleInstantiation)
+            {
+                result += RteFunctionsGenerator_CMacro.ComponentInstancePointerDatatype + " instance";
+                if (operation.Fields.Count > 0)
+                {
+                    result += ", ";
+                }
+            }
+
+            for (int i = 0; i < operation.Fields.Count; i++)
+            {
+                ClientServerOperationField field = operation.Fields[i];
+                String fieldDeclaration = GetClientServerOperationFieldIdentification(field);
+                result += fieldDeclaration;
+
+                if (i != operation.Fields.Count - 1)
+                {
+                    result += ", ";
+                }
+            }
+
+            return result + ")";
+        }
+
+        #region PIM
 
         public static String GenerateShortPimFunctionName(PimDefenition pim)
         {
