@@ -307,7 +307,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CMacro
             return result + ")";
         }
 
-        #region PIM
+#region PIM
 
         public static String GenerateShortPimFunctionName(PimDefenition pim)
         {
@@ -322,6 +322,11 @@ namespace AutosarGuiEditor.Source.RteGenerator.CMacro
         public static String GenerateRtePimFieldInComponentDefenitionStruct(ApplicationSwComponentType compDefenition, PimDefenition pim)
         {
             return "Rte_PimField_" + compDefenition.Name + "_" + pim.Name;
+        }
+
+        public static String GenerateInternalPimFunctionName(ApplicationSwComponentType compDef, PimDefenition pim)
+        {
+            return "Rte_InternalPim_" + compDef.Name + "_" + pim.Name;
         }
 
 #endregion

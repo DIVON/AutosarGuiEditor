@@ -64,7 +64,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CMacro
             writer.WriteLine("    #define STATIC_CONST static const");
             writer.WriteLine("    #define STATIC_GLOBAL static");
             writer.WriteLine("    #define CONST_VOLATILE const volatile");
-            writer.WriteLine("    #define ALWAYS_INLINE  __attribute__((always_inline))");
+            writer.WriteLine("    #define ALWAYS_INLINE  __attribute__((always_inline)) inline");
 
             writer.WriteLine("    #define ALIGNED_32 __attribute__ ((aligned (32)))");
             writer.WriteLine("    #define ALIGNED_16 __attribute__ ((aligned (16)))");

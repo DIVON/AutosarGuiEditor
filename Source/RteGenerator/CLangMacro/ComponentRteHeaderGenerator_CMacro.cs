@@ -239,6 +239,26 @@ namespace AutosarGuiEditor.Source.RteGenerator.CMacro
                     String internalFuncName = "Rte_InternalCData_" + compDef.Name + "_" + cdata.Name;
                     writer.WriteLine("extern " + cdata.DataTypeName + " " + internalFuncName + "(void);");
                 }
+
+                /* Generate PIM function declarations - these return pointers */
+                if (compDef.MultipleInstantiation == false)
+                {
+                    /* For non-multipleInstance: function takes no parameters */
+                    foreach (PimDefenition pim in compDef.PerInstanceMemoryList)
+                    {
+                        String internalFuncName = "Rte_InternalPim_" + compDef.Name + "_" + pim.Name;
+                        writer.WriteLine("extern " + pim.DataTypeName + " * " + internalFuncName + "(void);");
+                    }
+                }
+                else
+                {
+                    /* For multipleInstance: function takes Rte_ComponentInstance parameter */
+                    foreach (PimDefenition pim in compDef.PerInstanceMemoryList)
+                    {
+                        String internalFuncName = "Rte_InternalPim_" + compDef.Name + "_" + pim.Name;
+                        writer.WriteLine("extern " + pim.DataTypeName + " * " + internalFuncName + "(Rte_ComponentInstance instance);");
+                    }
+                }
             }
             else
             {
@@ -371,6 +391,26 @@ namespace AutosarGuiEditor.Source.RteGenerator.CMacro
                     String instance = "(Rte_CDS_" + compDef.Name + "*)instance";
                     String rteFuncName = "(" + instance + ")->CData_" + cdata.Name + "()";
                     writer.WriteLine(RteFunctionsGenerator_CMacro.CreateDefine(macroName + "(instance)", rteFuncName, true));
+                }
+            }
+
+            /* Add defines for PIM */
+            foreach (PimDefenition pim in compDef.PerInstanceMemoryList)
+            {
+                if (compDef.MultipleInstantiation == false)
+                {
+                    /* For non-multipleInstance: PIM is accessed via internal function call that returns pointer (no extra parentheses) */
+                    String macroName = RteFunctionsGenerator_CMacro.GenerateShortPimFunctionName(pim);
+                    String internalFuncName = "Rte_InternalPim_" + compDef.Name + "_" + pim.Name;
+                    writer.WriteLine(RteFunctionsGenerator_CMacro.CreateDefine(macroName + "()", internalFuncName + "()", false));
+                }
+                else
+                {
+                    /* For multipleInstance: PIM is accessed through component instance with CDS cast */
+                    String macroName = RteFunctionsGenerator_CMacro.GenerateShortPimFunctionName(pim);
+                    String cdsName = RteFunctionsGenerator_CMacro.ComponentDataStructureDefenitionName(compDef);
+                    String rteFuncName = "((" + cdsName + "*)instance)->Pim_" + pim.Name;
+                    writer.WriteLine(RteFunctionsGenerator_CMacro.CreateDefine(macroName + "(instance)", rteFuncName, false));
                 }
             }
 

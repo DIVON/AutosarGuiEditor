@@ -56,7 +56,7 @@ namespace AutosarGuiEditor.Source.RteGenerator.CppLang
             writer.WriteLine("#define STATIC static");
             writer.WriteLine("#define STATIC_CONST static const");
             writer.WriteLine("#define CONST_VOLATILE const volatile");
-            writer.WriteLine("#define ALWAYS_INLINE  __attribute__((always_inline))");
+            writer.WriteLine("#define ALWAYS_INLINE  __attribute__((always_inline)) inline");
             writer.WriteLine("#endif");
             writer.WriteLine();
         }
