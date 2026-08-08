@@ -1,4 +1,5 @@
-﻿using AutosarGuiEditor.Source.Painters.Boundaries;
+using AutosarGuiEditor.Source.Composition;
+using AutosarGuiEditor.Source.Painters.Boundaries;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,6 +17,7 @@ namespace AutosarGuiEditor.Source.Controllers
         Scene scene;
         Image image;
         Point LastMiddlePoint;
+        bool lastFitWasDone = false;
         public ChangeViewportScaleController(Scene scene, Image image)
         {
             this.scene = scene;
@@ -57,6 +59,9 @@ namespace AutosarGuiEditor.Source.Controllers
 
             scene.Context.Offset.X += currentPoint.X - newImageCoordForLastPoint.X;
             scene.Context.Offset.Y += currentPoint.Y - newImageCoordForLastPoint.Y;
+
+            // Save viewport state for active composition after zoom
+            SaveCurrentViewport();
         }
 
         public Boolean Viewport_MouseMove(MouseEventArgs e)
@@ -69,8 +74,27 @@ namespace AutosarGuiEditor.Source.Controllers
                 scene.Context.Offset.Y += (currentPoint.Y - LastMiddlePoint.Y);
                 LastMiddlePoint = currentPoint;
                 needRedraw = true;
+
+                // Save viewport state for active composition after pan
+                SaveCurrentViewport();
             }
             return needRedraw;
+        }
+
+        /// <summary>
+        /// Saves the current viewport state to the active composition.
+        /// </summary>
+        private void SaveCurrentViewport()
+        {
+            CompositionInstance activeComposition = AutosarApplication.GetInstance().ActiveComposition;
+            if (activeComposition != null)
+            {
+                AutosarApplication.GetInstance().Compositions.SaveViewport(
+                    activeComposition, 
+                    scene.Context.Scale, 
+                    scene.Context.Offset, 
+                    lastFitWasDone);
+            }
         }
 
         public Boolean FitWorldToImage(double viewportWidth, double viewportHeight)
@@ -99,11 +123,53 @@ namespace AutosarGuiEditor.Source.Controllers
                 Point deltaImage = scene.Context.GetImageCoordinate(delta);
                 scene.Context.Offset.X = deltaImage.X;
                 scene.Context.Offset.Y = deltaImage.Y;
+
+                // Mark that we've fit to view for this composition
+                lastFitWasDone = true;
+                AutosarApplication.GetInstance().Compositions.MarkViewportInitialized(
+                    AutosarApplication.GetInstance().ActiveComposition);
+
                 return true;
             }
             else
             {
                 return false;
+            }
+        }
+
+        /// <summary>
+        /// Restores a previously saved viewport for the active composition.
+        /// If no viewport has been saved yet, fits the composition to view.
+        /// Returns true if viewport was restored or fitted, false otherwise.
+        /// </summary>
+        public bool RestoreOrFitViewport(double viewportWidth, double viewportHeight)
+        {
+            CompositionInstance activeComposition = AutosarApplication.GetInstance().ActiveComposition;
+            if (activeComposition == null)
+            {
+                return false;
+            }
+
+            // Try to get saved viewport
+            CompositionViewport savedViewport = AutosarApplication.GetInstance().Compositions.GetViewport(activeComposition);
+
+            if (savedViewport != null && savedViewport.IsViewInitialized)
+            {
+                // Restore the saved viewport
+                scene.Context.Scale = savedViewport.Scale;
+                scene.Context.Offset = savedViewport.Offset;
+                lastFitWasDone = true;
+                return true;
+            }
+            else
+            {
+                // First time viewing this composition - fit to view
+                bool result = FitWorldToImage(viewportWidth, viewportHeight);
+                if (result)
+                {
+                    lastFitWasDone = true;
+                }
+                return result;
             }
         }
     }

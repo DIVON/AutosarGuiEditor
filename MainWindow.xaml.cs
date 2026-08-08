@@ -558,7 +558,9 @@ namespace AutosarGuiEditor
                     SelectElement(item.Tag as CompositionInstance);
                     tabHideHelper.SelectTab(CompositionTab);
                     Render(null, null);
-                    changeViewportScaleController.FitWorldToImage(ViewPortImage.ActualWidth, ViewPortImage.ActualHeight);
+                    // Restore or fit viewport for the composition
+                    changeViewportScaleController.RestoreOrFitViewport(ViewPortImage.ActualWidth, ViewPortImage.ActualHeight);
+                    Render(null, null);
                 }
 
                 tabHideHelper.ProcessTabs();
@@ -1169,7 +1171,9 @@ namespace AutosarGuiEditor
                             }
                             else if (selectedItem.Tag is  CompositionInstance)
                             {
+                                CompositionInstance deletedComposition = selectedItem.Tag as CompositionInstance;
                                 autosarApp.Delete(selectedItem.Tag as  CompositionInstance);
+                                autosarApp.Compositions.RemoveViewport(deletedComposition);
                                 autosarApp.ActiveComposition = autosarApp.Compositions.GetMainComposition();
                             }
                             else if (selectedItem.Tag is  ApplicationSwComponentType)
