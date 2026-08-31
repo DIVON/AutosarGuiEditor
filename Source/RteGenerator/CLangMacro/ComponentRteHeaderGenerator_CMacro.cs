@@ -195,9 +195,20 @@ namespace AutosarGuiEditor.Source.RteGenerator.CMacro
                         SenderReceiverInterface srInterface = portDef.InterfaceDatatype as SenderReceiverInterface;
                         if (srInterface.IsQueued == false)
                         {
+                            /* Non-queued: declare InternalWrite/InternalRead functions */
                             foreach (SenderReceiverInterfaceField field in srInterface.Fields)
                             {
-                                String internalFuncName = "Rte_InternalWrite_" + compDef.Name + "_" + portDef.Name + "_" + field.Name;
+                                String internalFuncName = RteFunctionsGenerator_CMacro.GenerateInternalReadWriteConnectionFunctionName(compDef, portDef, field);
+                                String fieldVar = RteFunctionsGenerator_CMacro.GenerateSenderReceiverInterfaceArguments(field, portDef.PortType, false);
+                                writer.WriteLine("extern " + Properties.Resources.STD_RETURN_TYPE + " " + internalFuncName + fieldVar + ";");
+                            }
+                        }
+                        else
+                        {
+                            /* Queued: declare InternalSend/InternalReceive functions */
+                            foreach (SenderReceiverInterfaceField field in srInterface.Fields)
+                            {
+                                String internalFuncName = RteFunctionsGenerator_CMacro.GenerateInternalSendReceiveConnectionFunctionName(compDef.Name, portDef, field);
                                 String fieldVar = RteFunctionsGenerator_CMacro.GenerateSenderReceiverInterfaceArguments(field, portDef.PortType, false);
                                 writer.WriteLine("extern " + Properties.Resources.STD_RETURN_TYPE + " " + internalFuncName + fieldVar + ";");
                             }
@@ -208,9 +219,20 @@ namespace AutosarGuiEditor.Source.RteGenerator.CMacro
                         SenderReceiverInterface srInterface = portDef.InterfaceDatatype as SenderReceiverInterface;
                         if (srInterface.IsQueued == false)
                         {
+                            /* Non-queued: declare InternalWrite/InternalRead functions */
                             foreach (SenderReceiverInterfaceField field in srInterface.Fields)
                             {
-                                String internalFuncName = "Rte_InternalRead_" + compDef.Name + "_" + portDef.Name + "_" + field.Name;
+                                String internalFuncName = RteFunctionsGenerator_CMacro.GenerateInternalReadWriteConnectionFunctionName(compDef, portDef, field);
+                                String fieldVar = RteFunctionsGenerator_CMacro.GenerateSenderReceiverInterfaceArguments(field, portDef.PortType, false);
+                                writer.WriteLine("extern " + Properties.Resources.STD_RETURN_TYPE + " " + internalFuncName + fieldVar + ";");
+                            }
+                        }
+                        else
+                        {
+                            /* Queued: declare InternalSend/InternalReceive functions */
+                            foreach (SenderReceiverInterfaceField field in srInterface.Fields)
+                            {
+                                String internalFuncName = RteFunctionsGenerator_CMacro.GenerateInternalSendReceiveConnectionFunctionName(compDef.Name, portDef, field);
                                 String fieldVar = RteFunctionsGenerator_CMacro.GenerateSenderReceiverInterfaceArguments(field, portDef.PortType, false);
                                 writer.WriteLine("extern " + Properties.Resources.STD_RETURN_TYPE + " " + internalFuncName + fieldVar + ";");
                             }
@@ -307,13 +329,24 @@ namespace AutosarGuiEditor.Source.RteGenerator.CMacro
                         if (compDef.MultipleInstantiation == false)
                         {
                             /* For non-multipleInstance: use internal function directly */
-                            /* Left side: Rte_Write_SenderPort1_f1(_data_) or Rte_Read_ReceiverPort_f1(_data_) */
-                            /* Right side: internal function call */
-                            String internalFuncPrefix = (portDefenition.PortType == PortType.Sender) ? "Rte_InternalWrite_" : "Rte_InternalRead_";
-                            String internalFuncName = internalFuncPrefix + compDef.Name + "_" + portDefenition.Name + "_" + field.Name;
-                            String macroName = (portDefenition.PortType == PortType.Sender) ? "Rte_Write_" : "Rte_Read_";
-                            macroName += portDefenition.Name + "_" + field.Name;
-                            writer.WriteLine(RteFunctionsGenerator_CMacro.CreateDefine(macroName + "(_data_)", internalFuncName + "(_data_)", false));
+                            if (srInterface.IsQueued == false)
+                            {
+                                /* For non-queued: use Rte_Write_/Rte_Read_ and Rte_InternalWrite_/Rte_InternalRead_ */
+                                /* Left side: Rte_Write_SenderPort1_f1(_data_) or Rte_Read_ReceiverPort_f1(_data_) */
+                                /* Right side: internal function call */
+                                String internalFuncName = RteFunctionsGenerator_CMacro.GenerateInternalReadWriteConnectionFunctionName(compDef, portDefenition, field);
+                                String macroName = RteFunctionsGenerator_CMacro.GenerateReadWriteFunctionName(portDefenition, field);
+                                writer.WriteLine(RteFunctionsGenerator_CMacro.CreateDefine(macroName + "(_data_)", internalFuncName + "(_data_)", false));
+                            }
+                            else
+                            {
+                                /* For queued: use Rte_Send_/Rte_Recv_ and Rte_InternalSend_/Rte_InternalRecv_ */
+                                /* Left side: Rte_Send_SwitchingData_RawData(_data_) or Rte_Recv_SwitchingData_RawData(_data_) */
+                                /* Right side: internal function call */
+                                String internalFuncName = RteFunctionsGenerator_CMacro.GenerateInternalSendReceiveConnectionFunctionName(compDef.Name, portDefenition, field);
+                                String macroName = RteFunctionsGenerator_CMacro.GenerateReadWriteFunctionName(portDefenition, field);
+                                writer.WriteLine(RteFunctionsGenerator_CMacro.CreateDefine(macroName + "(_data_)", internalFuncName + "(_data_)", false));
+                            }
                         }
                         else
                         {

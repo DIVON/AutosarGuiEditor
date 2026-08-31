@@ -788,6 +788,11 @@ namespace AutosarGuiEditor.Source.RteGenerator.CMacro
             return res;
         }
 
+        public static String GenerateInternalReadWriteConnectionFunctionName(ApplicationSwComponentType compDef, PortDefenition port, SenderReceiverInterfaceField field)
+        {
+            return GenerateInternalReadWriteConnectionFunctionName(compDef.Name, port, field);
+        }
+
         public static String GenerateInternalCallConnectionFunctionName(String componentName, PortDefenition port, ClientServerOperation operation)
         {
             String res = "Rte_InternalCall_";
