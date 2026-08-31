@@ -1,4 +1,4 @@
-﻿using AutosarGuiEditor.Source.Autosar.Events;
+using AutosarGuiEditor.Source.Autosar.Events;
 using AutosarGuiEditor.Source.Autosar.OsTasks;
 using AutosarGuiEditor.Source.Component;
 using AutosarGuiEditor.Source.Painters;
@@ -11,8 +11,24 @@ namespace AutosarGuiEditor.Source.RteGenerator.CMacro
 {
     public class RteSchedulerGenerator_CMacro
     {
+        /* Глобальный счётчик индексов функций для мониторинга времени */
+        private uint _globalFunctionIndex = 0;
+
+        /* Сброс глобального счётчика перед генерацией */
+        private void ResetFunctionIndex()
+        {
+            _globalFunctionIndex = 0;
+        }
+
+        /* Получение и инкремент глобального индекса функции */
+        private uint GetNextFunctionIndex()
+        {
+            return _globalFunctionIndex++;
+        }
+
         public void GenerateShedulerFiles(String dir)
         {
+            ResetFunctionIndex();
             Generate_RteExternalHeader_File(dir);
             Generate_RunTimeEnvironment_Header_File(dir);
             Generate_RunTimeEnvironment_Source_File(dir);
@@ -74,8 +90,15 @@ namespace AutosarGuiEditor.Source.RteGenerator.CMacro
             RteFunctionsGenerator_CMacro.AddInclude(writer, Properties.Resources.RTE_RUNTIME_ENVIRONMENT_H_FILENAME);
             RteFunctionsGenerator_CMacro.AddInclude(writer, Properties.Resources.RTE_EXTERNALS_FILENAME);
 
+            // Добавляем внешнюю функцию для получения тактов MCU
             writer.WriteLine();
+            writer.WriteLine("/* Внешняя функция для получения тактов MCU */");
+            writer.WriteLine("extern uint32 getMcuTime(void);");
 
+            // Генерируем секцию мониторинга времени выполнения
+            GenerateMonitoringSection(writer);
+
+            writer.WriteLine();
             writer.WriteLine("/* Scheduler variables  */");
 
             foreach (OsTask osTask in AutosarApplication.GetInstance().OsTasks)
@@ -98,6 +121,96 @@ namespace AutosarGuiEditor.Source.RteGenerator.CMacro
             RteFunctionsGenerator_CMacro.CloseCppGuardDefine(writer);
             RteFunctionsGenerator_CMacro.WriteEndOfFile(writer);
             writer.Close();
+        }
+
+        void GenerateMonitoringSection(StreamWriter writer)
+        {
+            // Подсчитываем общее количество runnable для определения размера массива
+            int totalRunnableCount = CountTotalRunnables();
+            
+            writer.WriteLine();
+            writer.WriteLine("/* ============================================================================");
+            writer.WriteLine("   Переменные мониторинга времени выполнения функций");
+            writer.WriteLine("   ============================================================================ */");
+            writer.WriteLine();
+            writer.WriteLine("#define MEASURE_RUNNABLE_TIME");
+            writer.WriteLine("#ifdef MEASURE_RUNNABLE_TIME");
+            writer.WriteLine();
+            writer.WriteLine("/* Количество функций в Rte tasks */");
+            writer.WriteLine("#define RUNNABLE_FUNCTION_COUNT    (" + totalRunnableCount + "U)");
+            writer.WriteLine();
+            writer.WriteLine("/* Структура для хранения статистики времени выполнения функции */");
+            writer.WriteLine("typedef struct");
+            writer.WriteLine("{");
+            writer.WriteLine("    uint32 cycleTimes[16U];   /* Время выполнения за каждый из 16 циклов (в тактах) */");
+            writer.WriteLine("    uint32 averageTime;       /* Среднее время выполнения (в тактах) */");
+            writer.WriteLine("} FunctionStats_t;");
+            writer.WriteLine();
+            writer.WriteLine("/* Массив статистики для всех функций */");
+            writer.WriteLine("STATIC volatile FunctionStats_t FunctionStats[RUNNABLE_FUNCTION_COUNT];");
+            writer.WriteLine();
+            writer.WriteLine("/* Временные переменные для замеров */");
+            writer.WriteLine("STATIC uint32 FunctionStartTime[RUNNABLE_FUNCTION_COUNT];");
+            writer.WriteLine("STATIC uint32 CurrentMonitorCycle = 0U;");
+            writer.WriteLine();
+            writer.WriteLine("/* Функции измерения времени */");
+            writer.WriteLine("static inline void MeasureStart(uint32 funcIdx)");
+            writer.WriteLine("{");
+            writer.WriteLine("    FunctionStartTime[funcIdx] = getMcuTime();");
+            writer.WriteLine("}");
+            writer.WriteLine();
+            writer.WriteLine("static inline void MeasureEnd(uint32 funcIdx)");
+            writer.WriteLine("{");
+            writer.WriteLine("    uint32 endTicks = getMcuTime();");
+            writer.WriteLine("    uint32 startTicks = FunctionStartTime[funcIdx];");
+            writer.WriteLine("    FunctionStats[funcIdx].cycleTimes[CurrentMonitorCycle] = endTicks - startTicks;");
+            writer.WriteLine("}");
+            writer.WriteLine();
+            writer.WriteLine("#else");
+            writer.WriteLine();
+            writer.WriteLine("/* Пустые заглушки когда измерение отключено */");
+            writer.WriteLine("static inline void MeasureStart(uint32 funcIdx)");
+            writer.WriteLine("{");
+            writer.WriteLine("    (void)funcIdx;");
+            writer.WriteLine("}");
+            writer.WriteLine();
+            writer.WriteLine("static inline void MeasureEnd(uint32 funcIdx)");
+            writer.WriteLine("{");
+            writer.WriteLine("    (void)funcIdx;");
+            writer.WriteLine("}");
+            writer.WriteLine();
+            writer.WriteLine("#endif /* MEASURE_RUNNABLE_TIME */");
+        }
+
+        int CountTotalRunnables()
+        {
+            int count = 0;
+            foreach (OsTask osTask in AutosarApplication.GetInstance().OsTasks)
+            {
+                count += CountRunnablesInTask(osTask);
+            }
+            return count;
+        }
+
+        int CountRunnablesInTask(OsTask task)
+        {
+            int count = 0;
+            foreach (AutosarEventInstance eventInstance in task.Events)
+            {
+                if (eventInstance.Defenition is TimingEvent)
+                {
+                    count++;
+                }
+                else if (eventInstance.Defenition is OneTimeEvent)
+                {
+                    count++;
+                }
+                else if (eventInstance.Defenition is ClientServerEvent)
+                {
+                    count++;
+                }
+            }
+            return count;
         }
 
         void WriteAllExternComponentInstances(StreamWriter writer)
@@ -319,7 +432,8 @@ namespace AutosarGuiEditor.Source.RteGenerator.CMacro
                     }
 
                     wasBracersOpen = true;
-                    writer.WriteLine("        " + RteFunctionsGenerator_CMacro.Generate_CallOfEvent(eventInstance));
+                    uint funcIndex = GetNextFunctionIndex();
+                    writer.WriteLine("        MeasureStart(" + funcIndex + "); " + RteFunctionsGenerator_CMacro.Generate_CallOfEvent(eventInstance) + "; MeasureEnd(" + funcIndex + ");");
                 }
                 else
                 {
@@ -329,12 +443,14 @@ namespace AutosarGuiEditor.Source.RteGenerator.CMacro
                         writer.WriteLine("    }");
                     }
                     lastPeriod = osTask.PeriodMs;
-                    writer.WriteLine("    " + RteFunctionsGenerator_CMacro.Generate_CallOfEvent(eventInstance));
+                    uint funcIndex2 = GetNextFunctionIndex();
+                    writer.WriteLine("    MeasureStart(" + funcIndex2 + "); " + RteFunctionsGenerator_CMacro.Generate_CallOfEvent(eventInstance) + "; MeasureEnd(" + funcIndex2 + ");");
                 }
             }
             else
             {
-                writer.WriteLine("    " + RteFunctionsGenerator_CMacro.Generate_CallOfEvent(eventInstance));
+                uint funcIndex3 = GetNextFunctionIndex();
+                writer.WriteLine("    MeasureStart(" + funcIndex3 + "); " + RteFunctionsGenerator_CMacro.Generate_CallOfEvent(eventInstance) + "; MeasureEnd(" + funcIndex3 + ");");
             }
         }
 
@@ -346,9 +462,10 @@ namespace AutosarGuiEditor.Source.RteGenerator.CMacro
             if (compInstance != null)
             {
                 String asyncField = "Rte_AsyncCall_" + compInstance.Name + "_" + eventDefenition.SourcePort.Name + "_" + eventDefenition.SourceOperation.Name;
+                uint funcIndex = GetNextFunctionIndex();
                 writer.WriteLine("    if (TRUE == " + asyncField + ")");
                 writer.WriteLine("    {");
-                writer.WriteLine("        " + RteFunctionsGenerator_CMacro.Generate_CallOfEvent(eventInstance));
+                writer.WriteLine("        MeasureStart(" + funcIndex + "); " + RteFunctionsGenerator_CMacro.Generate_CallOfEvent(eventInstance) + "; MeasureEnd(" + funcIndex + ");");
                 writer.WriteLine("        " + asyncField + " = FALSE;");
                 writer.WriteLine("    }");
             }
@@ -360,7 +477,8 @@ namespace AutosarGuiEditor.Source.RteGenerator.CMacro
 
         void WriteOneTimeEvent(StreamWriter writer, AutosarEventInstance eventInstance)
         {
-            writer.WriteLine("    " + RteFunctionsGenerator_CMacro.Generate_CallOfEvent(eventInstance));
+            uint funcIndex = GetNextFunctionIndex();
+            writer.WriteLine("    MeasureStart(" + funcIndex + "); " + RteFunctionsGenerator_CMacro.Generate_CallOfEvent(eventInstance) + "; MeasureEnd(" + funcIndex + ");");
         }
 
         void Generate_RunTimeEnvironment_Header_File(String dir)
