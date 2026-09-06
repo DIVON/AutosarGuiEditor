@@ -16,6 +16,7 @@ namespace AutosarGuiEditor.Source.Render
     public class CommentInstance : ResizableRectangleElement
     {
         public string Text { get; set; } = "123";
+        public System.Windows.TextAlignment TextAlign { get; set; } = System.Windows.TextAlignment.Left;
 
         // Default comment size
         private const double DefaultWidth = 200;

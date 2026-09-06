@@ -1377,6 +1377,30 @@
                 </Grid>
             </TabItem>
             <TabItem
+                x:Name="CommentTab"
+                Header="Comment"
+                IsEnabled="False">
+                <Grid Background="#FFE5E5E5">
+                    <StackPanel Margin="10,10,10,10">
+                        <!-- Three alignment buttons -->
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                            <Button Width="75" Height="25" Margin="5,0,5,0" Click="CommentAlignLeft_Click" Content="Слева" />
+                            <Button Width="75" Height="25" Margin="5,0,5,0" Click="CommentAlignCenter_Click" Content="По центру" />
+                            <Button Width="75" Height="25" Margin="5,0,5,0" Click="CommentAlignRight_Click" Content="Справа" />
+                        </StackPanel>
+                        <!-- Label and multiline TextBox -->
+                        <Label Margin="0,0,0,5" Content="Комментарий:" />
+                        <TextBox
+                            Name="CommentTextEditor"
+                            Height="120"
+                            TextWrapping="Wrap"
+                            AcceptsReturn="True"
+                            VerticalScrollBarVisibility="Auto"
+                            TextChanged="CommentTextEditor_TextChanged" />
+                    </StackPanel>
+                </Grid>
+            </TabItem>
+            <TabItem
                 x:Name="CompositionProperties_TabItem"
                 Header="Composition properties"
                 IsEnabled="False">

@@ -73,6 +73,11 @@ namespace AutosarGuiEditor
 
         // Comment placement mode
         private bool isCommentPlacementMode = false;
+
+        // Currently selected comment for editing
+        private CommentInstance selectedCommentForEditing = null;
+
+
         
         public MainWindow()
         {
@@ -210,7 +215,23 @@ namespace AutosarGuiEditor
                 moveObjectsController.Viewport_MouseLeftButtonDown(sceneCoordinates);
                 if (moveObjectsController.SelectedObject != null)
                 {
-                    if (!(moveObjectsController.SelectedObject is CompositionInstance))
+                    if (moveObjectsController.SelectedObject is CommentInstance)
+                    {
+                        foreach (TabItem tab in MainTabControl.Items)
+                        {
+                            if (tab != CompositionTab)
+                                tab.IsEnabled = false;
+                        }
+                        CompositionTab.IsEnabled = true;
+                        CommentInstance selectedComment = (moveObjectsController.SelectedObject as CommentInstance);
+                        selectedCommentForEditing = selectedComment;
+                        CommentTextEditor.Text = selectedComment.Text;
+                        CommentTab.IsEnabled = true;
+                        tabHideHelper.ProcessTabs();
+                        CommentTextEditor.SelectionStart = CommentTextEditor.Text.Length;
+                        CommentTextEditor.Focus();
+                    }
+                    else if (!(moveObjectsController.SelectedObject is CompositionInstance))
                     {
                         AutosarTree.UpdateAutosarTreeView(moveObjectsController.SelectedObject);
                         AutosarTree.Focus();
@@ -249,6 +270,12 @@ namespace AutosarGuiEditor
                     }
                     else if (moveObjectsController.SelectedObject is ComponentInstance)
                     {
+                        foreach (TabItem tab in MainTabControl.Items)
+                        {
+                            if (tab != CompositionTab)
+                                tab.IsEnabled = false;
+                        }
+                        CompositionTab.IsEnabled = true;
                         ComponentInstance inst = (moveObjectsController.SelectedObject as ComponentInstance);
                         componentDefenitionViewController.ComponentDefenition = inst.ComponentDefenition;
                         ComponentDefenitionTab.IsEnabled = true;
@@ -328,6 +355,41 @@ namespace AutosarGuiEditor
             }
             Render(null, null);
         }
+
+        #region COMMENT TAB
+        private void CommentTextEditor_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            if (selectedCommentForEditing != null)
+            {
+                selectedCommentForEditing.Text = CommentTextEditor.Text;
+                Render(null, null);
+            }
+        }
+
+        private void CommentAlignLeft_Click(object sender, RoutedEventArgs e)
+        {
+            if (selectedCommentForEditing != null)
+            {
+                selectedCommentForEditing.TextAlign = System.Windows.TextAlignment.Left;
+            }
+        }
+
+        private void CommentAlignCenter_Click(object sender, RoutedEventArgs e)
+        {
+            if (selectedCommentForEditing != null)
+            {
+                selectedCommentForEditing.TextAlign = System.Windows.TextAlignment.Center;
+            }
+        }
+
+        private void CommentAlignRight_Click(object sender, RoutedEventArgs e)
+        {
+            if (selectedCommentForEditing != null)
+            {
+                selectedCommentForEditing.TextAlign = System.Windows.TextAlignment.Right;
+            }
+        }
+        #endregion
 
 #endregion
 

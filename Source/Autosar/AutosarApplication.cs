@@ -200,6 +200,7 @@ namespace System
             {
                 composition.ComponentInstances.Unselect();
                 composition.Connections.Unselect();
+                composition.CommentInstances.Unselect();
                 composition.Unselect();
             }            
         }
