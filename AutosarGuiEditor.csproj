@@ -163,6 +163,7 @@
     <Compile Include="Source\Component\Runnables\RunnableDefenition.cs" />
     <Compile Include="Source\Component\Runnables\RunnableDefenitionsList.cs" />
     <Compile Include="Source\Composition\CompositionInstance.cs" />
+    <Compile Include="Source\Composition\CommentInstancesList.cs" />
     <Compile Include="Source\Composition\CompositionInstancesList.cs" />
     <Compile Include="Source\Composition\CompositionViewport.cs" />
     <Compile Include="Source\Controllers\AddObjectController.cs" />
@@ -298,6 +299,7 @@
     <Compile Include="Source\Render\RectanglePainter.cs" />
     <Compile Include="Source\Render\Painter.cs" />
     <Compile Include="Source\Render\ResizableRectangleElement.cs" />
+    <Compile Include="Source\Render\CommentInstance.cs" />
     <Compile Include="Source\Render\Scene.cs" />
     <Compile Include="Source\RteGenerator\CLang\ComponentRteHeaderGenerator_C.cs" />
     <Compile Include="Source\RteGenerator\CLang\ReturnCodesGenerator_C.cs" />

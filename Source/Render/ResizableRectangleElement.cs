@@ -1,4 +1,4 @@
-﻿using AutosarGuiEditor.Source.Interfaces;
+using AutosarGuiEditor.Source.Interfaces;
 using AutosarGuiEditor.Source.Painters.Boundaries;
 using AutosarGuiEditor.Source.SystemInterfaces;
 using System;
@@ -139,7 +139,7 @@ namespace AutosarGuiEditor.Source.Render
                 
                
             }
-            OnMoveBottomRightAnchor(BottomRightAnchor, translate);
+            OnMoveBottomRightAnchor?.Invoke(BottomRightAnchor, translate);
         }
 
         void BottomLeftAnchor_OnMove(object sender, System.Windows.Point translate)
@@ -168,7 +168,7 @@ namespace AutosarGuiEditor.Source.Render
                     BottomLeftAnchor.Position.Y = painter.Top + painter.Height;
                 }
             }
-            OnMoveBottomLeftAnchor(BottomLeftAnchor, translate);
+            OnMoveBottomLeftAnchor?.Invoke(BottomLeftAnchor, translate);
         }
 
         void TopRightAnchor_OnMove(object sender, Point translate)
@@ -193,7 +193,7 @@ namespace AutosarGuiEditor.Source.Render
             {
                 TopRightAnchor.Position.Y = painter.Bottom - painter.Height;
             }
-            OnMoveTopRightAnchor(TopRightAnchor, translate);
+            OnMoveTopRightAnchor?.Invoke(TopRightAnchor, translate);
         }
 
         void TopLeftAnchor_OnMove(object sender, Point translate)
@@ -219,7 +219,7 @@ namespace AutosarGuiEditor.Source.Render
             {
                 TopLeftAnchor.Position.Y = painter.Bottom - painter.Height;
             }
-            OnMoveTopLeftAnchor(TopLeftAnchor, translate);
+            OnMoveTopLeftAnchor?.Invoke(TopLeftAnchor, translate);
         }
 
         public virtual bool IsClicked(Point point, out Object clickedObject)

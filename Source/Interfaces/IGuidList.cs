@@ -1,7 +1,6 @@
-﻿using AutosarGuiEditor.Source.SystemInterfaces;
+using AutosarGuiEditor.Source.SystemInterfaces;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
@@ -20,15 +19,11 @@ namespace AutosarGuiEditor.Source.Interfaces
         {
             foreach (T obj in this)
             {
-                object guidProperty = GetProperty(obj, "GUID");
-                if (guidProperty != null)
+                Guid propGuid = obj.GUID;
+                if (propGuid.CompareTo(guid) == 0) /* 0 - means that they are equal */
                 {
-                    Guid propGuid = (Guid)guidProperty;
-                    if (propGuid.CompareTo(guid) == 0) /* 0 - means that they are equal */
-                    {
-                        return obj;
-                    }
-                }          
+                    return obj;
+                }
             }
             return default(T);
         }
@@ -37,22 +32,18 @@ namespace AutosarGuiEditor.Source.Interfaces
         {
             foreach (T obj in this)
             {
-                object guidProperty = GetProperty(obj, "Name");
-                if (guidProperty != null)
+                String propName = obj.Name;
+                if (propName.CompareTo(Name) == 0) /* 0 - means that they are equal */
                 {
-                    String propName = guidProperty.ToString();
-                    if (propName.CompareTo(Name) == 0) /* 0 - means that they are equal */
-                    {
-                        return obj;
-                    }
-                }          
+                    return obj;
+                }
             }
             return default(T);
         }
 
         protected object GetProperty(Object obj, String propertyName)
         {
-            foreach (var property in obj.GetType().GetProperties())
+            foreach (var property in obj.GetType().GetProperties(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.FlattenHierarchy))
             {
                 if (property.Name == propertyName)
                 {
@@ -107,20 +98,13 @@ namespace AutosarGuiEditor.Source.Interfaces
         {
             Sort(delegate(T x, T y)
             {
-                object namePropertyX = GetProperty(x, "Name");
-                object namePropertyY = GetProperty(y, "Name");
-                if ((namePropertyX != null) && (namePropertyY != null))
-                {
-                    string xName = namePropertyX.ToString();
-                    string yName = namePropertyY.ToString();
+                string xName = x.Name;
+                string yName = y.Name;
 
-                    if (xName == null && yName == null) return 0;
-                    else if (xName == null) return -1;
-                    else if (yName == null) return 1;
-                    else return xName.CompareTo(yName);
-                }
-
-                throw new Exception("Sort exception! Properties not exists!");                
+                if (xName == null && yName == null) return 0;
+                else if (xName == null) return -1;
+                else if (yName == null) return 1;
+                else return xName.CompareTo(yName);
             });
         }
 

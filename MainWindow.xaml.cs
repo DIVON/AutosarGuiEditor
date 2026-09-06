@@ -69,7 +69,10 @@ namespace AutosarGuiEditor
         ArrayDataTypeController arrayDataController;
         TabHiderHelper tabHideHelper;
         MoveObjectsController moveObjectsController = new MoveObjectsController();
-        EnumsMenu enumsMenu;                
+        EnumsMenu enumsMenu;
+
+        // Comment placement mode
+        private bool isCommentPlacementMode = false;
         
         public MainWindow()
         {
@@ -191,6 +194,16 @@ namespace AutosarGuiEditor
 
                 //get pointed scene coordinates
                 Point sceneCoordinates = scene.MouseToXY(currentPoint);
+
+                /* Handle comment placement mode */
+                if (isCommentPlacementMode)
+                {
+                    isCommentPlacementMode = false;
+                    CommentInstance newComment = new CommentInstance(sceneCoordinates.X, sceneCoordinates.Y, "123");
+                    AutosarApplication.GetInstance().ActiveComposition.CommentInstances.Add(newComment);
+                    Render(null, null);
+                    return;
+                }
 
                 autosarApp.UnselectComponents();
 
@@ -336,6 +349,11 @@ namespace AutosarGuiEditor
         private void AddConnectionButton_Click(object sender, RoutedEventArgs e)
         {
             connectionLineController.StartConnection();
+        }
+
+        private void AddCommentButton_Click(object sender, RoutedEventArgs e)
+        {
+            isCommentPlacementMode = true;
         }
 
         private void Window_KeyDown(object sender, KeyEventArgs e)

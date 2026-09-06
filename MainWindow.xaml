@@ -67,6 +67,7 @@
                 <MenuItem Click="AddComponentDefenitionButton_Click" Header="Component defenition" />
                 <MenuItem Click="AddCompositionButton_Click" Header="Composition" />
                 <MenuItem Click="AddConnectionButton_Click" Header="Connection" />
+                <MenuItem Click="AddCommentButton_Click" Header="Comment" />
                 <Separator />
                 <MenuItem Click="AddEnumDataTypeMenu_Click" Header="Enum" />
                 <MenuItem Click="AddSimpleDataTypeMenu_Click" Header="Simple data type" />

@@ -8,3 +8,4 @@ obj
 /.vs/AutosarGuiEditor/v17/*.suo
 WriteableBitmapEx/bin/*
 /example
+.cocoindex_code

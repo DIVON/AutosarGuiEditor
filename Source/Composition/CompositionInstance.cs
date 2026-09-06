@@ -1,4 +1,4 @@
-﻿using AutosarGuiEditor.Source.Interfaces;
+using AutosarGuiEditor.Source.Interfaces;
 using AutosarGuiEditor.Source.Painters;
 using AutosarGuiEditor.Source.Painters.Boundaries;
 using AutosarGuiEditor.Source.Painters.PortsPainters;
@@ -21,16 +21,18 @@ namespace AutosarGuiEditor.Source.Composition
     {
         public ComponentInstancesList ComponentInstances = new ComponentInstancesList();
         public PortsConnectionsList Connections = new PortsConnectionsList();
-        public PortDefenitionsList PortsDefenitions = new PortDefenitionsList(); 
+        public PortDefenitionsList PortsDefenitions = new PortDefenitionsList();
         public PortPaintersList InternalPortsInstances = new PortPaintersList();
+        public CommentInstancesList CommentInstances = new CommentInstancesList();
 
         public override void LoadFromXML(XElement xml)
         {
-            base.LoadFromXML(xml);           
+            base.LoadFromXML(xml);
             ComponentInstances.LoadFromXML(xml);
             Connections.LoadFromXML(xml);
             PortsDefenitions.LoadFromXML(xml);
             InternalPortsInstances.LoadFromXML(xml, "Internal");
+            CommentInstances.LoadFromXML(xml);
             foreach (PortPainter port in Ports)
             {
                 port.IsDelegatePort = false;
@@ -81,6 +83,7 @@ namespace AutosarGuiEditor.Source.Composition
             Connections.WriteToXML(xmlElement);
             PortsDefenitions.WriteToXML(xmlElement);
             InternalPortsInstances.WriteToXML(xmlElement, "Internal");
+            CommentInstances.WriteToXML(xmlElement);
             root.Add(xmlElement);
         }
 
@@ -91,6 +94,7 @@ namespace AutosarGuiEditor.Source.Composition
             ComponentInstances.Clear();
             PortsDefenitions.Clear();
             InternalPortsInstances.Clear();
+            CommentInstances.Clear();
         }
 
         public PortPainter GetExternalPortPainter(PortDefenition portDef)
@@ -165,7 +169,7 @@ namespace AutosarGuiEditor.Source.Composition
 
 
         public void RenderCompositionEntrails(RenderContext renderContext, Boolean renderAllElements)
-        {            
+        {
             foreach(ComponentInstance componentInstance in ComponentInstances)
             {
                 componentInstance.Render(renderContext);
@@ -180,6 +184,12 @@ namespace AutosarGuiEditor.Source.Composition
             }
 
             InternalPortsInstances.RenderPorts(renderContext);
+
+            // Render comments
+            foreach (CommentInstance comment in CommentInstances)
+            {
+                comment.Render(renderContext);
+            }
         }
 
 
@@ -209,12 +219,19 @@ namespace AutosarGuiEditor.Source.Composition
                     return true;
                 }
 
+                // Check comments (after components so components take priority)
+                clicked = CommentInstances.IsClicked(sceneCoordinates, out clickedObject);
+                if (clicked == true)
+                {
+                    return true;
+                }
+
                 clicked = Connections.IsClicked(sceneCoordinates, out clickedObject, false);
                 if (clicked == true)
                 {
                     return true;
                 }
-                                
+
             }
             else
             {
