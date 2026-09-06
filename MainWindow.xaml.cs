@@ -207,6 +207,25 @@ namespace AutosarGuiEditor
                     CommentInstance newComment = new CommentInstance(sceneCoordinates.X, sceneCoordinates.Y, "123");
                     AutosarApplication.GetInstance().ActiveComposition.CommentInstances.Add(newComment);
                     Render(null, null);
+
+                    /* Select the new comment and show Comment tab */
+                    moveObjectsController.SelectedObject = newComment;
+                    foreach (TabItem tab in MainTabControl.Items)
+                    {
+                        if (tab != CompositionTab)
+                            tab.IsEnabled = false;
+                    }
+                    CompositionTab.IsEnabled = true;
+                    CommentTab.IsEnabled = true;
+                    tabHideHelper.ProcessTabs();
+
+                    selectedCommentForEditing = newComment;
+                    CommentTextEditor.Text = newComment.Text;
+                    CommentTextEditor.SelectionStart = CommentTextEditor.Text.Length;
+                    CommentTextEditor.Focus();
+                    AutosarTree.UpdateAutosarTreeView(newComment);
+                    AutosarTree.Focus();
+
                     return;
                 }
 
@@ -283,6 +302,23 @@ namespace AutosarGuiEditor
                         ComponentDefenitionTab.IsEnabled = true;
                         tabHideHelper.ProcessTabs();
                         tabHideHelper.SelectTab(ComponentDefenitionTab);
+                    }
+                    else if (moveObjectsController.SelectedObject is CommentInstance)
+                    {
+                        foreach (TabItem tab in MainTabControl.Items)
+                        {
+                            if (tab != CompositionTab)
+                                tab.IsEnabled = false;
+                        }
+                        CompositionTab.IsEnabled = true;
+                        CommentTab.IsEnabled = true;
+                        CommentInstance selectedComment = (CommentInstance)moveObjectsController.SelectedObject;
+                        selectedCommentForEditing = selectedComment;
+                        CommentTextEditor.Text = selectedComment.Text;
+                        tabHideHelper.ProcessTabs();
+                        tabHideHelper.SelectTab(CommentTab);
+                        CommentTextEditor.SelectionStart = CommentTextEditor.Text.Length;
+                        CommentTextEditor.Focus();
                     }
                 }
             }
