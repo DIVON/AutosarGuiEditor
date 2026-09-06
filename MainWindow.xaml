@@ -1396,7 +1396,8 @@
                             TextWrapping="Wrap"
                             AcceptsReturn="True"
                             VerticalScrollBarVisibility="Auto"
-                            TextChanged="CommentTextEditor_TextChanged" />
+                            TextChanged="CommentTextEditor_TextChanged"
+                            PreviewKeyDown="CommentTextEditor_PreviewKeyDown" />
                     </StackPanel>
                 </Grid>
             </TabItem>

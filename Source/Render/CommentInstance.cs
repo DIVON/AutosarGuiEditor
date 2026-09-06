@@ -15,34 +15,67 @@ namespace AutosarGuiEditor.Source.Render
     /// </summary>
     public class CommentInstance : ResizableRectangleElement
     {
-        public string Text { get; set; } = "123";
+        private string _text = "123";
+        public string Text
+        {
+            get => _text;
+            set
+            {
+                _text = value;
+                if (AutosarApplication.GetInstance() != null)
+                    AdjustSizeToText();
+            }
+        }
         public System.Windows.TextAlignment TextAlign { get; set; } = System.Windows.TextAlignment.Left;
-
-        // Default comment size
-        private const double DefaultWidth = 200;
-        private const double DefaultHeight = 80;
 
         public CommentInstance()
         {
             Painter.BackgroundColor = Colors.Beige;
+            if (AutosarApplication.GetInstance() != null)
+                AdjustSizeToText();
             UpdateAnchorsPositions();
         }
 
         public CommentInstance(double centerX, double centerY, string text)
         {
             Painter.BackgroundColor = Colors.Beige;
-            // Set size
-            Painter.Width = DefaultWidth;
-            Painter.Height = DefaultHeight;
-            // Set position: painter.TopLeft = center - half-size
-            double halfW = DefaultWidth / 2.0;
-            double halfH = DefaultHeight / 2.0;
+            if (AutosarApplication.GetInstance() != null)
+                AdjustSizeToText();
+            double halfW = Painter.Width / 2.0;
+            double halfH = Painter.Height / 2.0;
             Painter.Left = centerX - halfW;
             Painter.Top = centerY - halfH;
-            Painter.Right = Painter.Left + DefaultWidth;
-            Painter.Bottom = Painter.Top + DefaultHeight;
             UpdateAnchorsPositions();
             Text = text ?? "123";
+        }
+
+        private void AdjustSizeToText()
+        {
+            PortableFontDesc font = AutosarApplication.GetInstance().ComponentNameFont;
+            GlyphFont glyphFont = LetterGlyphTool.GetFont(font);
+
+            const int Padding = 16;
+            const int MinLines = 1;
+
+            string[] lines = Text.Split(new[] { '\n' }, StringSplitOptions.None);
+            int lineCount = Math.Max(MinLines, lines.Length);
+            int lineHeight = glyphFont.TextHeight;
+
+            double requiredWidth = 0;
+            foreach (string line in lines)
+            {
+                int lineWidth = glyphFont.GetTextWidth(line);
+                if (lineWidth > requiredWidth)
+                    requiredWidth = lineWidth;
+            }
+
+            double requiredHeight = lineCount * lineHeight;
+            double width = Math.Max(requiredWidth + Padding * 2, GetMinWidth());
+            double height = Math.Max(requiredHeight + lineHeight * 2, GetMinHeight());
+
+            Painter.Width = width;
+            Painter.Height = height;
+            UpdateAnchorsPositions();
         }
 
         public override void Render(RenderContext context)
@@ -57,19 +90,18 @@ namespace AutosarGuiEditor.Source.Render
             PortableFontDesc font = AutosarApplication.GetInstance().ComponentNameFont;
             GlyphFont glyphFont = LetterGlyphTool.GetFont(font);
             int textWidth = glyphFont.GetTextWidth(displayText);
-            int textHeight = glyphFont.GetTextHeight(displayText);
 
             if (textWidth > 0)
             {
-                // Center text in the comment bounds
+                // Center text horizontally, position at top of the comment bounds
                 double textX = Painter.Left + Painter.Width / 2.0;
-                double textY = Painter.Top + Painter.Height / 2.0;
+                double textY = Painter.Top;
 
                 Point imageCoord = context.GetImageCoordinate(new Point(textX, textY));
-                int drawX = (int)imageCoord.X - textWidth / 2;
-                int drawY = (int)imageCoord.Y;
+                imageCoord.Y += glyphFont.TextHeight * 1.5;
+                imageCoord.X -= textWidth / 2.0;
 
-                context.Bitmap.DrawString(drawX, drawY, Colors.Black, font, displayText);
+                context.Bitmap.DrawString((int)imageCoord.X, (int)imageCoord.Y, Colors.Black, font, displayText);
             }
         }
 

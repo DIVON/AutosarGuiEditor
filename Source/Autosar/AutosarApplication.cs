@@ -521,7 +521,18 @@ namespace System
            }
         }
 
-        /* Delete component defenition and its instances */
+
+
+        public void Delete(CommentInstance comment)
+        {
+           foreach (CompositionInstance composition in Compositions)
+           {
+               if (composition.CommentInstances.IndexOf(comment) >= 0)
+               {
+                   composition.CommentInstances.Remove(comment);
+               }
+           }
+        }
         public void Delete(ApplicationSwComponentType componentDefenition)
         {
             /* Find Object instances */

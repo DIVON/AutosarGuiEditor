@@ -250,6 +250,7 @@ namespace AutosarGuiEditor.Source.Composition
             list.Add(ComponentInstances);
             list.Add(Connections);
             list.Add(PortsDefenitions);
+            list.Add(CommentInstances);
             return list;
         }
 

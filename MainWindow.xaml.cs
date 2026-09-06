@@ -230,6 +230,8 @@ namespace AutosarGuiEditor
                         tabHideHelper.ProcessTabs();
                         CommentTextEditor.SelectionStart = CommentTextEditor.Text.Length;
                         CommentTextEditor.Focus();
+                        AutosarTree.UpdateAutosarTreeView(selectedComment);
+                        AutosarTree.Focus();
                     }
                     else if (!(moveObjectsController.SelectedObject is CompositionInstance))
                     {
@@ -389,7 +391,20 @@ namespace AutosarGuiEditor
                 selectedCommentForEditing.TextAlign = System.Windows.TextAlignment.Right;
             }
         }
-        #endregion
+        private void CommentTextEditor_PreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Delete && selectedCommentForEditing != null)
+            {
+                autosarApp.Delete(selectedCommentForEditing);
+                selectedCommentForEditing = null;
+                CommentTab.IsEnabled = false;
+                tabHideHelper.ProcessTabs();
+                moveObjectsController.SelectedObject = null;
+                e.Handled = true;
+                Render(null, null);
+                AutosarTree.UpdateAutosarTreeView(null);
+            }
+        }
 
 #endregion
 
@@ -420,46 +435,25 @@ namespace AutosarGuiEditor
 
         private void Window_KeyDown(object sender, KeyEventArgs e)
         {
-            return;
-            //if (e.Key == Key.Delete)
-            //{
-            //    if (moveObjectsController.SelectedObject != null)
-            //    {
-            //        if (moveObjectsController.SelectedObject is PortConnection)
-            //        {
-            //            autosarApp.DeleteConnection((PortConnection)moveObjectsController.SelectedObject);
-            //        }
-            //        if (moveObjectsController.SelectedObject is PortPainter)
-            //        {
-            //            autosarApp.DeletePort((PortPainter)moveObjectsController.SelectedObject);
-            //        }
-            //        if (moveObjectsController.SelectedObject is ComponentInstance)
-            //        {
-            //            autosarApp.Delete((ComponentInstance)moveObjectsController.SelectedObject);
-            //        }
-            //        if (moveObjectsController.SelectedObject is ComplexDataType)
-            //        {
-            //            autosarApp.Delete((ComplexDataType)moveObjectsController.SelectedObject);
-            //        }
-            //        if (moveObjectsController.SelectedObject is SenderReceiverInterface)
-            //        {
-            //            autosarApp.Delete((SenderReceiverInterface)moveObjectsController.SelectedObject);
-            //        }
-            //        if (moveObjectsController.SelectedObject is ClientServerInterface)
-            //        {
-            //            autosarApp.Delete((ClientServerInterface)moveObjectsController.SelectedObject);
-            //        }
-            //        if (moveObjectsController.SelectedObject is EnumDataType)
-            //        {
-            //            autosarApp.Delete((EnumDataType)moveObjectsController.SelectedObject);
-            //        }
-            //        if (moveObjectsController.SelectedObject is ArrayDataType)
-            //        {
-            //            autosarApp.Delete((ArrayDataType)moveObjectsController.SelectedObject);
-            //        }
-            //        AutosarTree.UpdateAutosarTreeView(null);                    
-            //    }
-            //}
+            if (e.Key == Key.Delete)
+            {
+                if (moveObjectsController.SelectedObject != null)
+                {
+                    if (moveObjectsController.SelectedObject is CommentInstance)
+                    {
+                        if (AskToDelete("Do you want to delete comment?"))
+                        {
+                            autosarApp.Delete((CommentInstance)moveObjectsController.SelectedObject);
+                            selectedCommentForEditing = null;
+                            CommentTab.IsEnabled = false;
+                            tabHideHelper.ProcessTabs();
+                            moveObjectsController.SelectedObject = null;
+                            Render(null, null);
+                            AutosarTree.UpdateAutosarTreeView(null);
+                        }
+                    }
+                }
+            }
         }
 
         private void AddSimpleDataTypeMenu_Click(object sender, RoutedEventArgs e)
@@ -1205,6 +1199,10 @@ namespace AutosarGuiEditor
             {
                 return true;
             }
+            else if (tag is CommentInstance)
+            {
+                return true;
+            }
             
             return false;
         }
@@ -1212,6 +1210,22 @@ namespace AutosarGuiEditor
         {
             if (e.Key == Key.Delete)
             {              
+                if (moveObjectsController.SelectedObject is CommentInstance)
+                {
+                    CommentInstance selectedComment = (CommentInstance)moveObjectsController.SelectedObject;
+                    if (AskToDelete("Do you want to delete comment?"))
+                    {
+                        autosarApp.Delete(selectedComment);
+                        selectedCommentForEditing = null;
+                        CommentTab.IsEnabled = false;
+                        tabHideHelper.ProcessTabs();
+                        moveObjectsController.SelectedObject = null;
+                        Render(null, null);
+                        AutosarTree.UpdateAutosarTreeView(null);
+                    }
+                    return;
+                }
+
                 if (AutosarTree.SelectedItem is TreeViewItem)
                 {
                     TreeViewItem selectedItem = AutosarTree.SelectedItem as TreeViewItem;
@@ -1225,7 +1239,11 @@ namespace AutosarGuiEditor
                         bool delete = AskToDelete("Do you want to delete " + (selectedItem.Tag as IGUID).Name + "?");
                         if (delete == true)
                         {
-                            if (selectedItem.Tag is ComponentInstance)
+                            if (selectedItem.Tag is CommentInstance)
+                            {
+                                autosarApp.Delete(selectedItem.Tag as CommentInstance);
+                            }
+                            else if (selectedItem.Tag is ComponentInstance)
                             {
                                 autosarApp.Delete(selectedItem.Tag as ComponentInstance);
                             }
@@ -1627,3 +1645,4 @@ namespace AutosarGuiEditor
     }
 
 }
+#endregion
