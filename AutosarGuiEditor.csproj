@@ -279,7 +279,6 @@
     <Compile Include="Source\Interfaces\IDraw.cs" />
     <Compile Include="Source\Interfaces\IGuidList.cs" />
     <Compile Include="Source\Interfaces\IXmlWriteable.cs" />
-    <Compile Include="Source\Menu\AddComponentCommand.cs" />
     <Compile Include="Source\Menu\AddPortCommand.cs" />
     <Compile Include="Source\Menu\ComplexDataTypeMenu.cs" />
     <Compile Include="Source\Menu\CreateComplexDataTypeCommand.cs" />
@@ -465,7 +464,7 @@
   <PropertyGroup>
     <PostBuildEvent>XCOPY "$(SolutionDir)Images" "$(TargetDir)\Images\" /S /D</PostBuildEvent>
   </PropertyGroup>
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
   </Target>

@@ -10,7 +10,7 @@
 //   Id:                $Id: WriteableBitmapTransformationExtensions.cs 113191 2015-03-05 17:18:24Z unknown $
 //
 //
-//   Copyright © 2009-2015 Rene Schulte and WriteableBitmapEx Contributors
+//   Copyright Â© 2009-2015 Rene Schulte and WriteableBitmapEx Contributors
 //
 //   This code is open source. Please read the License.txt for details. No worries, we won't sue you! ;)
 //
@@ -309,10 +309,10 @@ namespace System.Windows.Media.Imaging
         #region Rotate
 
         /// <summary>
-        /// Rotates the bitmap in 90° steps clockwise and returns a new rotated WriteableBitmap.
+        /// Rotates the bitmap in 90Â° steps clockwise and returns a new rotated WriteableBitmap.
         /// </summary>
         /// <param name="bmp">The WriteableBitmap.</param>
-        /// <param name="angle">The angle in degrees the bitmap should be rotated in 90° steps clockwise.</param>
+        /// <param name="angle">The angle in degrees the bitmap should be rotated in 90Â° steps clockwise.</param>
         /// <returns>A new WriteableBitmap that is a rotated version of the input.</returns>
         public static WriteableBitmap Rotate(this WriteableBitmap bmp, int angle)
         {
