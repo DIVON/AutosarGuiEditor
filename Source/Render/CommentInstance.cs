@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Xml.Linq;
 using AutosarGuiEditor.Source.SystemInterfaces;
@@ -54,13 +55,13 @@ namespace AutosarGuiEditor.Source.Render
             PortableFontDesc font = AutosarApplication.GetInstance().ComponentNameFont;
             GlyphFont glyphFont = LetterGlyphTool.GetFont(font);
 
-            const int Padding = 16;
-            const int MinLines = 1;
-
-            string[] lines = Text.Split(new[] { '\n' }, StringSplitOptions.None);
-            int lineCount = Math.Max(MinLines, lines.Length);
             int lineHeight = glyphFont.TextHeight;
 
+            // Количество строк = количество \n + 1 (без word-wrap)
+            string[] lines = Text.Split(new[] { '\n' }, StringSplitOptions.None);
+            int lineCount = Math.Max(1, lines.Length);
+
+            // Ширина = ширина самой длинной строки
             double requiredWidth = 0;
             foreach (string line in lines)
             {
@@ -69,9 +70,10 @@ namespace AutosarGuiEditor.Source.Render
                     requiredWidth = lineWidth;
             }
 
+            // Высота = высота всех строк + отступ сверху и снизу по одной высоте строки
             double requiredHeight = lineCount * lineHeight;
-            double width = Math.Max(requiredWidth + Padding * 2, GetMinWidth());
-            double height = Math.Max(requiredHeight + lineHeight * 2, GetMinHeight());
+            double width = requiredWidth + lineHeight * 2;
+            double height = requiredHeight + lineHeight * 2;
 
             Painter.Width = width;
             Painter.Height = height;
@@ -83,25 +85,44 @@ namespace AutosarGuiEditor.Source.Render
             // Draw base shape (filled with beige, borders drawn by painter)
             base.Render(context);
 
-            // Draw text centered in the comment bounds
             string displayText = Text;
+            if (string.IsNullOrEmpty(displayText)) return;
 
             // Use the same scaled font as components
             PortableFontDesc font = AutosarApplication.GetInstance().ComponentNameFont;
             GlyphFont glyphFont = LetterGlyphTool.GetFont(font);
-            int textWidth = glyphFont.GetTextWidth(displayText);
 
-            if (textWidth > 0)
+            int lineHeight = glyphFont.TextHeight;
+
+            // Split by newline only — no word-wrap (one text line per \n)
+            string[] lines = displayText.Split(new[] { '\n' }, StringSplitOptions.None);
+            if (lines.Length == 0) return;
+
+            // Find widest line for centering
+            double maxLineWidth = 0;
+            foreach (string line in lines)
             {
-                // Center text horizontally, position at top of the comment bounds
-                double textX = Painter.Left + Painter.Width / 2.0;
-                double textY = Painter.Top;
+                int lineWidth = glyphFont.GetTextWidth(line);
+                if (lineWidth > maxLineWidth) maxLineWidth = lineWidth;
+            }
 
-                Point imageCoord = context.GetImageCoordinate(new Point(textX, textY));
-                imageCoord.Y += glyphFont.TextHeight * 1.5;
-                imageCoord.X -= textWidth / 2.0;
+            // DrawString expects bitmap/image coordinates. Painter coords are in world coords,
+            // so we convert via GetImageCoordinate (applies scale + offset).
+            // Padding = lineHeight on all sides.
+            Point topLeftImage = context.GetImageCoordinate(
+                new System.Windows.Point(Painter.Left + lineHeight, Painter.Top + lineHeight));
+            double bitmapMaxWidth = maxLineWidth;
 
-                context.Bitmap.DrawString((int)imageCoord.X, (int)imageCoord.Y, Colors.Black, font, displayText);
+            int drawX = (int)topLeftImage.X;
+            int drawY = (int)topLeftImage.Y;
+
+            foreach (string line in lines)
+            {
+                int lineWidth = glyphFont.GetTextWidth(line);
+                // Center line horizontally within the widest line
+                int offsetX = (int)((bitmapMaxWidth - lineWidth) / 2.0);
+                context.Bitmap.DrawString(drawX + offsetX, drawY, Colors.Black, font, line);
+                drawY += lineHeight;
             }
         }
 

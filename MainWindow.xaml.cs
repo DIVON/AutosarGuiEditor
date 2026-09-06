@@ -393,16 +393,21 @@ namespace AutosarGuiEditor
         }
         private void CommentTextEditor_PreviewKeyDown(object sender, KeyEventArgs e)
         {
+            // If Comment tab is enabled, user is editing comment text
+            // Delete should work for TextBox (remove character), not delete the comment
             if (e.Key == Key.Delete && selectedCommentForEditing != null)
             {
-                autosarApp.Delete(selectedCommentForEditing);
-                selectedCommentForEditing = null;
-                CommentTab.IsEnabled = false;
-                tabHideHelper.ProcessTabs();
-                moveObjectsController.SelectedObject = null;
-                e.Handled = true;
-                Render(null, null);
-                AutosarTree.UpdateAutosarTreeView(null);
+                if (!CommentTab.IsEnabled)
+                {
+                    autosarApp.Delete(selectedCommentForEditing);
+                    selectedCommentForEditing = null;
+                    CommentTab.IsEnabled = false;
+                    tabHideHelper.ProcessTabs();
+                    moveObjectsController.SelectedObject = null;
+                    e.Handled = true;
+                    Render(null, null);
+                    AutosarTree.UpdateAutosarTreeView(null);
+                }
             }
         }
 

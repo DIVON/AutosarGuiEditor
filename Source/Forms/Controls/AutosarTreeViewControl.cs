@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -232,17 +232,34 @@ namespace AutosarGuiEditor.Source.Forms.Controls
 
         TreeViewItem findChild(TreeViewItem itemForFind, ItemCollection items)
         {
+            if (itemForFind == null) return null;
             /* Find the same in the new root*/
-            if ((itemForFind.Tag is IGUID) || (itemForFind.Tag is IAutosarTreeList))
+            if (itemForFind.Tag is IGUID)
+            {
+                IGUID guidToFind = (itemForFind.Tag as IGUID);
+                for (int j = items.Count - 1; j >= 0; j--)
+                {
+                    TreeViewItem item = (items[j] as TreeViewItem);
+                    if (item != null && item.Tag is IGUID)
+                    {
+                        IGUID tagGuid = (item.Tag as IGUID);
+                        if (tagGuid.GUID.Equals(guidToFind.GUID))
+                        {
+                            return item;                            
+                        }
+                    }
+                }
+            }
+            else if (itemForFind.Tag is IAutosarTreeList)
             {
                 for (int j = items.Count - 1; j >= 0; j--)
                 {
                     TreeViewItem item = (items[j] as TreeViewItem);
-                    if (item != null)
+                    if (item != null && item.Tag is IAutosarTreeList)
                     {
-                        if (item.Tag.Equals(itemForFind.Tag))
+                        if (item.Header.Equals(itemForFind.Header))
                         {
-                            return item;                            
+                            return item;
                         }
                     }
                 }
@@ -301,8 +318,8 @@ namespace AutosarGuiEditor.Source.Forms.Controls
         }
 
         private void Syncronize(TreeViewItem rootItem, TreeViewItem nextItem)
-        {            
-            if (!rootItem.Header.Equals(nextItem.Header))
+        {
+            if (nextItem.Header == null || (rootItem.Header != null && !rootItem.Header.Equals(nextItem.Header)))
             {
                 nextItem.Header = rootItem.Header;
             }
@@ -319,7 +336,10 @@ namespace AutosarGuiEditor.Source.Forms.Controls
             {
                 /* here searching shall exist */
                 TreeViewItem item = findChild(rootItem.Items[i] as TreeViewItem, nextItem.Items);
-                Syncronize(rootItem.Items[i] as TreeViewItem, item);
+                if (item != null)
+                {
+                    Syncronize(rootItem.Items[i] as TreeViewItem, item);
+                }
             }
         }
 
