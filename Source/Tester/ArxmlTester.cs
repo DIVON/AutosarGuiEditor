@@ -1,4 +1,4 @@
-﻿using AutosarGuiEditor.Source.Autosar.Events;
+using AutosarGuiEditor.Source.Autosar.Events;
 using AutosarGuiEditor.Source.Autosar.OsTasks;
 using AutosarGuiEditor.Source.AutosarInterfaces;
 using AutosarGuiEditor.Source.AutosarInterfaces.ClientServer;
@@ -707,14 +707,14 @@ namespace AutosarGuiEditor.Source.Tester
                 }
             }
 
-            /*  Check that period is more than zero */
+            /*  Check that period is non-negative (0ms = каждый тик задачи) */
             foreach (ApplicationSwComponentType compDef in autosarApp.ComponentDefenitionsList)
             {
                 foreach (TimingEvent timingEvent in compDef.TimingEvents)
                 {
-                    if (timingEvent.PeriodMs <= 0)
+                    if (timingEvent.PeriodMs < 0)
                     {
-                        AppendText("Timing event shall have period more than zero: " + compDef.Name + " " + timingEvent.Name, MessageType.ERROR);
+                        AppendText("Timing event shall have non-negative period: " + compDef.Name + " " + timingEvent.Name, MessageType.ERROR);
                     }
                 }
             }

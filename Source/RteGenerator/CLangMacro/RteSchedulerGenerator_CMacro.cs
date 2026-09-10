@@ -345,6 +345,9 @@ namespace AutosarGuiEditor.Source.RteGenerator.CMacro
                     if (task.Events[i].Defenition is TimingEvent)
                     {
                         TimingEvent timingEvent = task.Events[i].Defenition as TimingEvent;
+                        /* События с PeriodMs == 0 пропускаем — они вызываются каждый тик */
+                        if (timingEvent.PeriodMs == 0)
+                            continue;
                         naimensheeObheeKratnoe = MathUtility.NaimensheeObsheeKratnoe(naimensheeObheeKratnoe, Convert.ToInt32(timingEvent.PeriodMs * 1000));
                         if (naimensheeObheeKratnoe == 0)
                         {
@@ -409,6 +412,14 @@ namespace AutosarGuiEditor.Source.RteGenerator.CMacro
             TimingEvent timingEvent = eventInstance.Defenition as TimingEvent;
 
             RunnableDefenition runnableDefenition = timingEvent.Runnable;
+
+            /* Если частота события = 0ms, вызывать каждый тик задачи */
+            if (timingEvent.PeriodMs == 0)
+            {
+                uint funcIndexZero = GetNextFunctionIndex();
+                writer.WriteLine("    MeasureStart(" + funcIndexZero + "); " + RteFunctionsGenerator_CMacro.Generate_CallOfEvent(eventInstance) + "; MeasureEnd(" + funcIndexZero + ");");
+                return;
+            }
 
             if (osTask.PeriodMs != 0)
             {
