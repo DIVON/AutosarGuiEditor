@@ -548,16 +548,16 @@ namespace AutosarGuiEditor.Source.RteGenerator.CMacro
 
         public static void GenerateFileTitle(StreamWriter writer, String FileName, String FileDescription)
         {
+            var fileLabel = AutosarApplication.GetInstance().FileLabel;
             writer.WriteLine("/*");
             writer.WriteLine(" * file: " + Path.GetFileName(FileName));
             writer.WriteLine(" *");
             writer.WriteLine(" * " + FileDescription);
-            writer.WriteLine(" *");
-            writer.WriteLine(" * $Author: $");
-            writer.WriteLine(" * $Date: $");
-            writer.WriteLine(" * $Revision: $");
-            writer.WriteLine(" *");
-            writer.WriteLine(" * " + AutosarApplication.GetInstance().Signature);
+            if (fileLabel != "")
+            {
+                writer.WriteLine(" *");
+                writer.WriteLine(" * " + fileLabel);
+            }
             writer.WriteLine(" */");
         }
 

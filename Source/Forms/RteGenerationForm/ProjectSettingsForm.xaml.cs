@@ -92,7 +92,21 @@ namespace AutosarGuiEditor.Source.Forms
             }
         }
 
-        
+        public String FileLabel
+        {
+            set
+            {
+                FileLabelEdit.Text = value;
+            }
+            get
+            {
+                return FileLabelEdit.Text;
+            }
+        }
+
+        private void FileLabelEdit_TextChanged(object sender, TextChangedEventArgs e)
+        {
+        }
         private void SysTickFrequencyEdit_TextChanged(object sender, TextChangedEventArgs e)
         {
             uint newFreq = 0;

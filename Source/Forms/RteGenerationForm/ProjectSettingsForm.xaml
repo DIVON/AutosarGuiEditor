@@ -1,4 +1,4 @@
-﻿<Window
+<Window
     x:Class="AutosarGuiEditor.Source.Forms.ProjectSettingsForm"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -116,6 +116,19 @@
                     HorizontalAlignment="Left"
                     VerticalAlignment="Top"
                     Content="Code generator:" />
+                <TextBox
+                    x:Name="FileLabelEdit"
+                    Height="23"
+                    Margin="186,184,68,0"
+                    VerticalAlignment="Top"
+                    VerticalContentAlignment="Center"
+                    TextChanged="FileLabelEdit_TextChanged"
+                    TextWrapping="Wrap" />
+                <Label
+                    Margin="10,180,0,0"
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Top"
+                    Content="File label:" />
 
             </Grid>
 

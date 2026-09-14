@@ -165,7 +165,7 @@ namespace System
         public String GenerateRtePath = "";
         public String GenerateTestRtePath = "";
         public String GenerateComponentsPath = "";
-        public String Signature = "";
+        public String FileLabel = "";
 
         public int DefaultComponentFontSize = 12;
         public int DefaultPortsFontSize = 12;
@@ -215,7 +215,7 @@ namespace System
         const string RteGeneratePathProperty = "RteGeneratedPath";
         const string TestRteGeneratePathProperty = "TestRteGeneratedPath";
         const string RteGenerateComponentPathProperty = "RteComponentPathProperty";
-        const string ProjectSignatureProperty = "ProjectSignature";
+        const string ProjectFileLabelProperty = "ProjectFileLabel";
 
         public bool LoadFromFile(string filename)
         {
@@ -276,9 +276,9 @@ namespace System
                 GenerateTestRtePath = properties.Element(TestRteGeneratePathProperty).Value;
             }
 
-            if (properties.Element(ProjectSignatureProperty) != null)
+            if (properties.Element(ProjectFileLabelProperty) != null)
             {
-                Signature = properties.Element(ProjectSignatureProperty).Value;
+                FileLabel = properties.Element(ProjectFileLabelProperty).Value;
             }
             
             uint freq;
@@ -308,14 +308,14 @@ namespace System
             XElement ComponentPath = new XElement(RteGenerateComponentPathProperty);
             ComponentPath.Value = GenerateComponentsPath;
 
-            XElement SignatureElem = new XElement(ProjectSignatureProperty);
-            SignatureElem.Value = Signature;
+            XElement FileLabelElem = new XElement(ProjectFileLabelProperty);
+            FileLabelElem.Value = FileLabel;
 
             properties.Add(frequencyProp);
             properties.Add(ComponentPath);
             properties.Add(rtePath);
             properties.Add(testRtePath);
-            properties.Add(SignatureElem);
+            properties.Add(FileLabelElem);
 
             root.Add(properties);
         }
@@ -325,7 +325,7 @@ namespace System
             GenerateRtePath = "";
             GenerateComponentsPath = "";
             SystickFrequencyHz = 1000;
-            Signature = "";
+            FileLabel = "";
         }
 
         public bool SaveToFile(string filename)

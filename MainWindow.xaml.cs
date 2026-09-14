@@ -1004,6 +1004,7 @@ namespace AutosarGuiEditor
             projectSettingsForm.Frequency = autosarApp.SystickFrequencyHz;
             projectSettingsForm.McuTypeComboBox.SelectedIndex = autosarApp.MCUType.ToInt();
             projectSettingsForm.ProgramLanguageComboBox.SelectedIndex = autosarApp.ProgramLanguage.ToInt();
+            projectSettingsForm.FileLabel = autosarApp.FileLabel;
             projectSettingsForm.ShowDialog();
             if (projectSettingsForm.DialogResult == true)
             {
@@ -1013,6 +1014,7 @@ namespace AutosarGuiEditor
                 autosarApp.GenerateComponentsPath = projectSettingsForm.ComponentGenerationPath;
                 autosarApp.MCUType.Type = (MCUTypeDef)projectSettingsForm.McuTypeComboBox.SelectedIndex;
                 autosarApp.ProgramLanguage.Type = (ProgrammingLanguageTypeDef)projectSettingsForm.ProgramLanguageComboBox.SelectedIndex;
+                autosarApp.FileLabel = projectSettingsForm.FileLabel;
             }
         }
 

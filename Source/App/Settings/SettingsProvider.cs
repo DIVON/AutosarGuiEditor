@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -16,7 +16,7 @@ namespace AutosarGuiEditor.Source.App.Settings
         IniFile iniFile = new IniFile("config.ini");
 
         const string LastProjectFileNameFN = "LastProjectFileName";
-        const string projectSignature = "Signature";
+        const string projectFileLabel = "FileLabel";
         const string Section = "Default";
 
         public String LastProjectFileName
